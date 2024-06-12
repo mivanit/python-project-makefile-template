@@ -13,15 +13,11 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        versions:
-          - python: "3.12"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          python-version: ${{ matrix.versions.python }}
+          python-version: "3.11"
 
       - name: print python version
         run: python --version
