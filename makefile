@@ -72,7 +72,9 @@ version:
 setup:
 	@echo "install and update via poetry and setup shell"
 	poetry update
-	poetry shell
+	ifndef NO_SHELL # no shell (breaks in CI)
+		poetry shell
+	endif
 
 .PHONY: setup-format
 setup-format:
