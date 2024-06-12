@@ -76,9 +76,9 @@ version:
 setup:
 	@echo "install and update via poetry and setup shell"
 	poetry update
-	ifeq ($(USE_SHELL),1)
-		poetry shell
-	endif
+	@if [ "$(USE_SHELL)" = "1" ]; then \
+		poetry shell; \
+	fi
 
 .PHONY: setup-format
 setup-format:
