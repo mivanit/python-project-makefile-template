@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          python-version: ${{ matrix.versions.python }}
 
       - name: setup-format
         run: make setup-format RUN_GLOBAL=1
