@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         versions:
-          - python: "3.11"
+          - python: "3.12"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
