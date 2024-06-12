@@ -1,15 +1,16 @@
-PACKAGE_NAME := UNDEFINED
+PACKAGE_NAME := myproject
 
 PUBLISH_BRANCH := main
 PYPI_TOKEN_FILE := .pypi-token
 LAST_VERSION_FILE := .lastversion
 COVERAGE_REPORTS_DIR := docs/coverage
 TESTS_DIR := tests/
+TESTS_TEMP_DIR := tests/_temp
 PYPROJECT := pyproject.toml
 
 VERSION := $(shell python -c "import re; print(re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))")
-LAST_VERSION := $(shell cat $(LAST_VERSION_FILE))
-PYPOETRY := poetry run python
+LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NONE)
+PYTHON_BASE := python
 
 # note that the commands at the end:
 # 1) format the git log
@@ -18,15 +19,27 @@ PYPOETRY := poetry run python
 # 4) reverse the order of the lines, so that the oldest commit is first
 # 5) replace newlines with tabs, to prevent the newlines from being lost
 COMMIT_LOG_FILE := .commit_log
-COMMIT_LOG_SINCE_LAST_VERSION := $(shell (git log $(LAST_VERSION)..HEAD --pretty=format:"- %s (%h)" | tr '`' "'" ; echo) | tac | tr '\n' '\t')
+ifeq ($(LAST_VERSION),NONE)
+	COMMIT_LOG_SINCE_LAST_VERSION := "No last version found, cannot generate commit log"
+else
+	COMMIT_LOG_SINCE_LAST_VERSION := $(shell (git log $(LAST_VERSION)..HEAD --pretty=format:"- %s (%h)" | tr '`' "'" ; echo) | tac | tr '\n' '\t')
 #                                                                                    1                2            3       4     5
+endif
 
 
 # command line options
 # --------------------------------------------------
-COV ?= 1
-PYTEST_OPTIONS ?=
+# for formatting, we might want to run python without setting up all of poetry
+RUN_GLOBAL ?= 0
+ifeq ($(RUN_GLOBAL),0)
+	PYTHON = poetry run $(PYTHON_BASE)
+else
+	PYTHON = $(PYTHON_BASE)
+endif
 
+# options we might want to pass to pytest
+PYTEST_OPTIONS ?=
+COV ?= 1
 ifdef VERBOSE
 	PYTEST_OPTIONS += --verbose
 endif
@@ -53,19 +66,48 @@ version:
 		exit 1; \
 	fi
 
+# installation and setup
+# --------------------------------------------------
+.PHONY: setup
+setup:
+	@echo "install and update via poetry and setup shell"
+	poetry update
+	poetry shell
+
+.PHONY: setup-format
+setup-format:
+	@echo "install only packages needed for formatting, direct via pip (useful for CI)"
+	$(PYTHON) -c 'import re,tomllib; cfg = tomllib.load(open("$(PYPROJECT)", "rb")); deps = [(pkg, re.match(r"^\D*(\d.*)", ver).group(1)) for pkg, ver in cfg["tool"]["poetry"]["group"]["dev"]["dependencies"].items() if pkg in ["ruff", "pycln"]]; print(" ".join([f"{pkg}=={ver}" for pkg,ver in deps]))' | xargs $(PYTHON) -m pip install
 
 # formatting
 # --------------------------------------------------
 .PHONY: format
 format:
-	python -m ruff format
-	python -m pycln --config $(PYPROJECT) --all .
+	$(PYTHON) -m ruff format
+	$(PYTHON) -m pycln --config $(PYPROJECT) --all .
 
 .PHONY: check-format
 check-format:
 	@echo "run format check"
-	python -m ruff check
-	python -m pycln --check --config $(PYPROJECT) .
+	$(PYTHON) -m ruff check
+	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
+
+# tests
+# --------------------------------------------------
+
+.PHONY: lint
+lint: clean
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(PACKAGE_NAME)/
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) tests/
+
+.PHONY: test
+test: clean
+	@echo "running tests"
+	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
+
+.PHONY: check
+check: clean check-format clean test lint
+	@echo "run format check, test, and lint"
 
 # coverage reports
 # --------------------------------------------------
@@ -74,32 +116,11 @@ check-format:
 .PHONY: cov
 cov:
 	@echo "generate coverage reports"
-	$(PYPOETRY) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
-	$(PYPOETRY) -m coverage_badge -f -o $(COVERAGE_REPORTS_DIR)/coverage.svg
-	$(PYPOETRY) -m coverage html	
+	@echo "requires tests to have been run"
+	$(PYTHON) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
+	$(PYTHON) -m coverage_badge -f -o $(COVERAGE_REPORTS_DIR)/coverage.svg
+	$(PYTHON) -m coverage html	
 
-# tests
-# --------------------------------------------------
-
-# at some point, need to add back --check-untyped-defs to mypy call
-# but it complains when we specify arguments by keyword where positional is fine
-# not sure how to fix this
-# python -m pylint $(PACKAGE_NAME)/
-# python -m pylint tests/
-.PHONY: lint
-lint: clean
-	$(PYPOETRY) -m mypy --config-file $(PYPROJECT) $(PACKAGE_NAME)/
-	$(PYPOETRY) -m mypy --config-file $(PYPROJECT) tests/
-
-.PHONY: test
-test: clean
-	@echo "running tests"
-	$(PYPOETRY) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
-
-
-.PHONY: check
-check: clean check-format clean test lint
-	@echo "run format check, test, and lint"
 
 # build and publish
 # --------------------------------------------------
@@ -125,18 +146,18 @@ build:
 publish: check build verify-git version
 	@echo "run all checks, build, and then publish"
 
-	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
+	@echo "# Enter the new version number if you want to upload to pypi and create a new tag"
 	@read -p "Confirm: " NEW_VERSION; \
 	if [ "$$NEW_VERSION" != "$(VERSION)" ]; then \
 		echo "Confirmation failed, exiting!"; \
 		exit 1; \
 	fi; \
 
-	@echo "pypi username: __token__"
-	@echo "pypi token from '$(PYPI_TOKEN_FILE)' :"
+	@echo "# pypi username: __token__"
+	@echo "# pypi token from '$(PYPI_TOKEN_FILE)' :"
 	echo $$(cat $(PYPI_TOKEN_FILE))
 
-	echo "Uploading!"; \
+	echo "# Uploading!"; \
 	echo $(VERSION) > $(LAST_VERSION_FILE); \
 	git add $(LAST_VERSION_FILE); \
 	git commit -m "Auto update to $(VERSION)"; \
@@ -157,14 +178,19 @@ clean:
 	rm -rf dist
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
-	rm -rf tests/_temp
-	python -Bc "import pathlib; [p.unlink() for p in pathlib.Path('.').rglob('*.py[co]')]"
-	python -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('.').rglob('__pycache__')]"
+	rm -rf $(TESTS_TEMP_DIR)
+	$(PYTHON) -Bc "import pathlib; [p.unlink() for p in pathlib.Path('.').rglob('*.py[co]')]"
+	$(PYTHON) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('.').rglob('__pycache__')]"
 
 # listing targets, from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
 .PHONY: help
 help:
-	@echo -n "# list make targets"
+	@echo -n "# list make targets and variables"
 	@echo ":"
 	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 25
+	@echo "# makefile variables:"
+	@echo "    PACKAGE_NAME = $(PACKAGE_NAME)"
+	@echo "    VERSION = $(VERSION)"
+	@echo "    LAST_VERSION = $(LAST_VERSION)"
+	@echo "    PYTEST_OPTIONS = $(PYTEST_OPTIONS)"
