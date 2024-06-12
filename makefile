@@ -48,6 +48,10 @@ ifeq ($(COV),1)
     PYTEST_OPTIONS += --cov=.
 endif
 
+USE_SHELL ?= 1
+ifdef NO_SHELL
+	USE_SHELL = 0
+endif
 
 # default target
 # --------------------------------------------------
@@ -72,7 +76,7 @@ version:
 setup:
 	@echo "install and update via poetry and setup shell"
 	poetry update
-	ifndef NO_SHELL # no shell (breaks in CI)
+	ifeq ($(USE_SHELL),1)
 		poetry shell
 	endif
 
