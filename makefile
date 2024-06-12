@@ -77,7 +77,7 @@ setup:
 .PHONY: setup-format
 setup-format:
 	@echo "install only packages needed for formatting, direct via pip (useful for CI)"
-	$(PYTHON) -c 'import re,tomllib; cfg = tomllib.load(open("$(PYPROJECT)", "rb")); deps = [(pkg, re.match(r"^\D*(\d.*)", ver).group(1)) for pkg, ver in cfg["tool"]["poetry"]["group"]["dev"]["dependencies"].items() if pkg in ["ruff", "pycln"]]; print(" ".join([f"{pkg}=={ver}" for pkg,ver in deps]))' | xargs $(PYTHON) -m pip install
+	$(PYTHON_BASE) -c 'import re,tomllib; cfg = tomllib.load(open("$(PYPROJECT)", "rb")); deps = [(pkg, re.match(r"^\D*(\d.*)", ver).group(1)) for pkg, ver in cfg["tool"]["poetry"]["group"]["dev"]["dependencies"].items() if pkg in ["ruff", "pycln"]]; print(" ".join([f"{pkg}=={ver}" for pkg,ver in deps]))' | xargs $(PYTHON) -m pip install
 
 # formatting
 # --------------------------------------------------
@@ -179,8 +179,8 @@ clean:
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON) -Bc "import pathlib; [p.unlink() for p in pathlib.Path('.').rglob('*.py[co]')]"
-	$(PYTHON) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('.').rglob('__pycache__')]"
+	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for p in pathlib.Path('.').rglob('*.py[co]')]"
+	$(PYTHON_BASE) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('.').rglob('__pycache__')]"
 
 # listing targets, from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
