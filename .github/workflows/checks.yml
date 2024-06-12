@@ -13,6 +13,10 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        versions:
+          - python: "3.12"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
