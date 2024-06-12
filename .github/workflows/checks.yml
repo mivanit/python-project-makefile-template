@@ -19,6 +19,9 @@ jobs:
         with:
           python-version: ${{ matrix.versions.python }}
 
+      - name: print python version
+        run: python --version
+
       - name: setup-format
         run: make setup-format RUN_GLOBAL=1
 
