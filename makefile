@@ -37,6 +37,10 @@ else
 	PYTHON = $(PYTHON_BASE)
 endif
 
+PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+
+# COMPATIBILITY_MODE := $(shell $(PYTHON) -c "import sys; print(1 if sys.version_info < (3, 10) else 0)")
+
 # options we might want to pass to pytest
 PYTEST_OPTIONS ?=
 COV ?= 1
@@ -196,6 +200,8 @@ help:
 	@echo ":"
 	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 25
 	@echo "# makefile variables:"
+	@echo "    PYTHON = $(PYTHON)"
+	@echo "    PYTHON_VERSION = $(PYTHON_VERSION)"
 	@echo "    PACKAGE_NAME = $(PACKAGE_NAME)"
 	@echo "    VERSION = $(VERSION)"
 	@echo "    LAST_VERSION = $(LAST_VERSION)"
