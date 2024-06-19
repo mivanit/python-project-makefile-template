@@ -66,7 +66,7 @@ endif
 
 # get the python version now that we have picked the python command
 # --------------------------------------------------
-PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
 
 # if you want different behavior for different python versions
 # --------------------------------------------------
@@ -128,6 +128,7 @@ setup-format:
 # ==================================================
 .PHONY: format
 format:
+	@echo "format the source code"
 	$(PYTHON) -m ruff format
 	$(PYTHON) -m pycln --config $(PYPROJECT) --all .
 
