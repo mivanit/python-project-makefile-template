@@ -14,10 +14,14 @@ pytest = "^7.2.1"
 # coverage
 pytest-cov = "^4.1.0"
 coverage-badge = "^1.1.0"
-# python formatting / linting
+# type checking
+
+[tool.poetry.group.lint.dependencies]
+pytest = "^8.2.2"
 ruff = "^0.4.8"
-mypy = "^1.10.0"
-pycln = "^2.4.0"
+
+[tool.poetry.extras]
+lint = ["ruff", "pycln"]
 
 # ruff config
 [tool.ruff]
