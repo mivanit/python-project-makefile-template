@@ -33,30 +33,6 @@ COMMIT_LOG_FILE := .github/local/.commit_log
 # reading information and command line options
 # ==================================================
 
-# reading version
-# --------------------------------------------------
-# assuming your pyproject.toml has a line that looks like `version = "0.0.1"`, will get the version
-VERSION := $(shell python -c "import re; print(re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))")
-# read last auto-uploaded version from file
-LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NONE)
-
-
-# getting commit log
-# --------------------------------------------------
-# note that the commands at the end:
-# 1) format the git log
-# 2) replace backticks with single quotes, to avoid funny business
-# 3) add a final newline, to make tac happy
-# 4) reverse the order of the lines, so that the oldest commit is first
-# 5) replace newlines with tabs, to prevent the newlines from being lost
-ifeq ($(LAST_VERSION),NONE)
-	COMMIT_LOG_SINCE_LAST_VERSION := "No last version found, cannot generate commit log"
-else
-	COMMIT_LOG_SINCE_LAST_VERSION := $(shell (git log $(LAST_VERSION)..HEAD --pretty=format:"- %s (%h)" | tr '`' "'" ; echo) | tac | tr '\n' '\t')
-#                                                                                    1                2            3       4     5
-endif
-
-
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `poetry run $(PYTHON_BASE)`
 # --------------------------------------------------
 # for formatting, we might want to run python without setting up all of poetry
@@ -67,9 +43,28 @@ else
 	PYTHON = $(PYTHON_BASE)
 endif
 
-# get the python version now that we have picked the python command
+# reading version
 # --------------------------------------------------
-PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+# assuming your pyproject.toml has a line that looks like `version = "0.0.1"`, will get the version
+VERSION := NULL
+# read last auto-uploaded version from file
+LAST_VERSION := NULL
+# get the python version, now that we have picked the python command
+PYTHON_VERSION := NULL
+.PHONY: gen-version-info
+gen-version-info:
+	$(eval VERSION := $(shell python -c "import re; print(re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
+	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
+	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
+
+# getting commit log
+.PHONY: gen-commit-log
+gen-commit-log: gen-version-info
+	if [ "$(LAST_VERSION)" = "NULL" ]; then \
+		echo "LAST_VERSION is NULL, cant get commit log!"; \
+		exit 1; \
+	fi
+	$(shell python -c "import subprocess; open('$(COMMIT_LOG_FILE)', 'w').write('\n'.join(reversed(subprocess.check_output(['git', 'log', '$(LAST_VERSION)'.strip() + '..HEAD', '--pretty=format:- %s (%h)']).decode('utf-8').strip().split('\n'))))")
 
 # if you want different behavior for different python versions
 # --------------------------------------------------
@@ -96,15 +91,15 @@ endif
 default: help
 
 .PHONY: version
-version:
+version: gen-commit-log
 	@echo "Current version is $(VERSION), last auto-uploaded version is $(LAST_VERSION)"
 	@echo "Commit log since last version:"
-	@echo "$(COMMIT_LOG_SINCE_LAST_VERSION)" | tr '\t' '\n' > $(COMMIT_LOG_FILE)
 	@cat $(COMMIT_LOG_FILE)
 	@if [ "$(VERSION)" = "$(LAST_VERSION)" ]; then \
 		echo "Python package $(VERSION) is the same as last published version $(LAST_VERSION), exiting!"; \
 		exit 1; \
 	fi
+
 
 # installation and setup
 # ==================================================
@@ -209,7 +204,7 @@ build:
 	poetry build
 
 .PHONY: publish
-publish: check build verify-git version
+publish: gen-commit-log check build verify-git version
 	@echo "run all checks, build, and then publish"
 
 	@echo "# Enter the new version number if you want to upload to pypi and create a new tag"
