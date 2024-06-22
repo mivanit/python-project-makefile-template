@@ -140,7 +140,7 @@ check-dep-dev:
 	poetry export --only lint --without-hashes --without-urls | diff - $(REQ_LINT)
 
 
-# formatting
+# checks (formatting/linting, typing, tests)
 # ==================================================
 .PHONY: format
 format:
@@ -155,23 +155,6 @@ check-format:
 	$(PYTHON) -m ruff check --config $(PYPROJECT) .
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
-.PHONY: type-check
-type-check: clean
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) tests/
-
-.PHONY: test
-test: clean
-	@echo "running tests"
-	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
-
-.PHONY: check
-check: clean check-format clean test type-check
-	@echo "run format check, test, and type-check"
-
-# tests
-# ==================================================
-
 # at some point, need to add back --check-untyped-defs to mypy call
 # but it complains when we specify arguments by keyword where positional is fine
 # not sure how to fix this
@@ -185,11 +168,9 @@ typing: clean gen-extra-tests
 
 
 .PHONY: test
-test: clean gen-extra-tests
+test: clean
 	@echo "running tests"
-
 	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
-
 
 .PHONY: check
 check: clean check-format test typing
