@@ -53,7 +53,7 @@ LAST_VERSION := NULL
 PYTHON_VERSION := NULL
 .PHONY: gen-version-info
 gen-version-info:
-	$(eval VERSION := $(shell python -c "import re; print(re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
+	$(eval VERSION := $(shell python -c "import re; print('v'+re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
 
@@ -113,6 +113,7 @@ endif
 setup:
 	@echo "install and update via poetry and setup shell"
 	poetry update
+	poetry install --all-extras
 	@if [ "$(USE_SHELL)" = "1" ]; then \
 		poetry shell; \
 	fi
@@ -122,7 +123,7 @@ setup-format:
 	@echo "install only packages needed for formatting, direct via pip (useful for CI)"
 	$(PYTHON) -m pip install -r $(REQ_LINT)
 
-EXPORT_ARGS := --with dev --with lint --without-hashes --without-urls
+EXPORT_ARGS := --all-extras --with dev --with lint --without-hashes --without-urls
 
 .PHONY: dep-dev
 dep-dev:
@@ -144,17 +145,15 @@ check-dep-dev:
 .PHONY: format
 format:
 	@echo "format the source code"
-	$(PYTHON) -m ruff format
+	$(PYTHON) -m ruff format --config $(PYPROJECT) .
+	$(PYTHON) -m ruff check --fix --config $(PYPROJECT) .
 	$(PYTHON) -m pycln --config $(PYPROJECT) --all .
 
 .PHONY: check-format
 check-format:
 	@echo "run format check"
-	$(PYTHON) -m ruff check
+	$(PYTHON) -m ruff check --config $(PYPROJECT) .
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
-
-# tests/linting
-# ==================================================
 
 .PHONY: type-check
 type-check: clean
@@ -169,6 +168,32 @@ test: clean
 .PHONY: check
 check: clean check-format clean test type-check
 	@echo "run format check, test, and type-check"
+
+# tests
+# ==================================================
+
+# at some point, need to add back --check-untyped-defs to mypy call
+# but it complains when we specify arguments by keyword where positional is fine
+# not sure how to fix this
+# python -m pylint $(PACKAGE_NAME)/
+# python -m pylint tests/
+.PHONY: typing
+typing: clean gen-extra-tests
+	@echo "running type checks"
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) tests/
+
+
+.PHONY: test
+test: clean gen-extra-tests
+	@echo "running tests"
+
+	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
+
+
+.PHONY: check
+check: clean check-format test typing
+	@echo "run format and lint checks, tests, and typing checks"
 
 # coverage reports
 # ==================================================
@@ -188,7 +213,7 @@ cov:
 
 .PHONY: verify-git
 verify-git: 
-	@echo "make sure you are on the right branch and git is clean"
+	@echo "checking git status"
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "Git is not on the $(PUBLISH_BRANCH) branch, exiting!"; \
 		exit 1; \
@@ -198,27 +223,31 @@ verify-git:
 		exit 1; \
 	fi; \
 
+
 .PHONY: build
 build: 
 	@echo "build via poetry, assumes checks have been run"
 	poetry build
 
 .PHONY: publish
-publish: gen-commit-log check build verify-git version
+publish: gen-commit-log check build verify-git version gen-version-info
 	@echo "run all checks, build, and then publish"
 
-	@echo "# Enter the new version number if you want to upload to pypi and create a new tag"
+	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
+	@echo "Now would also be the time to edit $(COMMIT_LOG_FILE), as that will be used as the tag description"
 	@read -p "Confirm: " NEW_VERSION; \
-	if [ "$$NEW_VERSION" != "$(VERSION)" ]; then \
-		echo "Confirmation failed, exiting!"; \
+	if [ "$$NEW_VERSION" = $(VERSION) ]; then \
+		echo "Version confirmed. Proceeding with publish."; \
+	else \
+		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(VERSION)"; \
 		exit 1; \
-	fi; \
+	fi;
 
-	@echo "# pypi username: __token__"
-	@echo "# pypi token from '$(PYPI_TOKEN_FILE)' :"
+	@echo "pypi username: __token__"
+	@echo "pypi token from '$(PYPI_TOKEN_FILE)' :"
 	echo $$(cat $(PYPI_TOKEN_FILE))
 
-	echo "# Uploading!"; \
+	echo "Uploading!"; \
 	echo $(VERSION) > $(LAST_VERSION_FILE); \
 	git add $(LAST_VERSION_FILE); \
 	git commit -m "Auto update to $(VERSION)"; \
@@ -249,8 +278,8 @@ clean:
 # listing targets, from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
 .PHONY: help
-help:
-	@echo -n "# list make targets and variables"
+help: gen-version-info
+	@echo -n "list make targets and variables"
 	@echo ":"
 	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 25
 	@echo "# makefile variables:"
