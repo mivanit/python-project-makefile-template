@@ -128,15 +128,15 @@ setup-format:
 
 EXPORT_ARGS := --all-extras --with dev --with lint --without-hashes --without-urls
 
-.PHONY: dep-dev
-dep-dev:
+.PHONY: dep
+dep:
 	@echo "exporting dev and extras deps to $(REQ_DEV), lint/format deps to $(REQ_LINT)"
 	poetry update
 	poetry export $(EXPORT_ARGS) --output $(REQ_DEV)
 	poetry export --only lint --without-hashes --without-urls --output $(REQ_LINT)
 
-.PHONY: check-dep-dev
-check-dep-dev:
+.PHONY: dep-check
+dep-check:
 	@echo "checking poetry lock is good, exported requirements match poetry"
 	poetry check --lock
 	poetry export $(EXPORT_ARGS) | diff - $(REQ_DEV)
@@ -210,7 +210,6 @@ verify-git:
 
 .PHONY: build
 build: 
-	@echo "build via poetry, assumes checks have been run"
 	poetry build
 
 .PHONY: publish
