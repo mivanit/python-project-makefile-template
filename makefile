@@ -111,12 +111,15 @@ endif
 
 .PHONY: setup
 setup:
-	@echo "install and update via poetry and setup shell"
+	@echo "install and update via poetry, setup shell"
 	poetry update
 	poetry install --all-extras
 	@if [ "$(USE_SHELL)" = "1" ]; then \
 		poetry shell; \
 	fi
+
+# exporting requirements -- useful for CI
+# --------------------------------------------------
 
 .PHONY: setup-format
 setup-format:
