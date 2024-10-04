@@ -20,6 +20,8 @@ jobs:
           - python: "3.12"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # whole history for making version
       
       - uses: actions/setup-python@v5
         with:
