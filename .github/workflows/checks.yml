@@ -100,6 +100,15 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           make setup
+      
+      - name: Install pandoc
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pandoc
+          version: '3.3'
+      
+      - name: Check pandoc version
+        run: pandoc --version
 
       - name: docs
         run: make docs
