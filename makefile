@@ -21,8 +21,10 @@ REQ_DEV := .github/requirements-dev.txt
 
 # probably don't change these:
 # --------------------------------------------------
+# local files, don't push
+LOCAL_DIR := .github/local
 # will print this token when publishing
-PYPI_TOKEN_FILE := .github/local/.pypi-token
+PYPI_TOKEN_FILE := $(LOCAL_DIR)/.pypi-token
 # the last version that was auto-uploaded. will use this to create a commit log for version tag
 LAST_VERSION_FILE := .github/.lastversion
 # where the pyproject.toml file is
@@ -30,7 +32,7 @@ PYPROJECT := pyproject.toml
 # base python to use. Will add `uv run` in front of this if `RUN_GLOBAL` is not set to 1
 PYTHON_BASE := python
 # where the commit log will be stored
-COMMIT_LOG_FILE := .github/local/.commit_log
+COMMIT_LOG_FILE := $(LOCAL_DIR)/.commit_log
 # pandoc commands (for docs)
 PANDOC ?= pandoc
 
@@ -69,6 +71,7 @@ gen-commit-log: gen-version-info
 		echo "LAST_VERSION is NULL, cant get commit log!"; \
 		exit 1; \
 	fi
+	mkdir $(LOCAL_DIR) -p
 	$(shell python -c "import subprocess; open('$(COMMIT_LOG_FILE)', 'w').write('\n'.join(reversed(subprocess.check_output(['git', 'log', '$(LAST_VERSION)'.strip() + '..HEAD', '--pretty=format:- %s (%h)']).decode('utf-8').strip().split('\n'))))")
 
 # if you want different behavior for different python versions
