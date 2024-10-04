@@ -24,7 +24,7 @@ PYPI_TOKEN_FILE := .github/local/.pypi-token
 LAST_VERSION_FILE := .github/.lastversion
 # where the pyproject.toml file is
 PYPROJECT := pyproject.toml
-# base python to use. Will add `poetry run` in front of this if `RUN_GLOBAL` is not set to 1
+# base python to use. Will add `uv run` in front of this if `RUN_GLOBAL` is not set to 1
 PYTHON_BASE := python
 # where the commit log will be stored
 COMMIT_LOG_FILE := .github/local/.commit_log
@@ -33,12 +33,12 @@ COMMIT_LOG_FILE := .github/local/.commit_log
 # reading information and command line options
 # ==================================================
 
-# RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `poetry run $(PYTHON_BASE)`
+# RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
 # --------------------------------------------------
-# for formatting, we might want to run python without setting up all of poetry
+# for formatting, we might want to run python without setting uv
 RUN_GLOBAL ?= 0
 ifeq ($(RUN_GLOBAL),0)
-	PYTHON = poetry run $(PYTHON_BASE)
+	PYTHON = uv run $(PYTHON_BASE)
 else
 	PYTHON = $(PYTHON_BASE)
 endif
@@ -60,7 +60,7 @@ gen-version-info:
 # getting commit log
 .PHONY: gen-commit-log
 gen-commit-log: gen-version-info
-	if [ "$(LAST_VERSION)" = "NULL" ]; then \
+	@if [ "$(LAST_VERSION)" = "NULL" ]; then \
 		echo "LAST_VERSION is NULL, cant get commit log!"; \
 		exit 1; \
 	fi
@@ -93,7 +93,7 @@ default: help
 .PHONY: version
 version: gen-commit-log
 	@echo "Current version is $(VERSION), last auto-uploaded version is $(LAST_VERSION)"
-	@echo "Commit log since last version:"
+	@echo "Commit log since last version from '$(COMMIT_LOG_FILE)':"
 	@cat $(COMMIT_LOG_FILE)
 	@if [ "$(VERSION)" = "$(LAST_VERSION)" ]; then \
 		echo "Python package $(VERSION) is the same as last published version $(LAST_VERSION), exiting!"; \
@@ -262,7 +262,7 @@ help-targets:
 	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
 .PHONY: help
-help: help-prereq gen-version-info
+help: help-targets gen-version-info
 	@echo -n ""
 	@echo "# makefile variables"
 	@echo "    PYTHON = $(PYTHON)"
