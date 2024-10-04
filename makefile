@@ -256,16 +256,21 @@ clean:
 	$(PYTHON_BASE) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('.').rglob('__pycache__')]"
 
 
-# setting up smart help command
+# smart help command
 # ==================================================
 # listing targets, from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
-.PHONY: help
-help: gen-version-info
-	@echo -n "list make targets and variables"
+# no .PHONY because this will only be run before `make help`
+# it's a separate command because getting the versions takes a bit of time
+help-targets:
+	@echo -n "# list make targets"
 	@echo ":"
-	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 25
-	@echo "# makefile variables:"
+	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
+
+.PHONY: help
+help: help-prereq gen-version-info
+	@echo -n ""
+	@echo "# makefile variables"
 	@echo "    PYTHON = $(PYTHON)"
 	@echo "    PYTHON_VERSION = $(PYTHON_VERSION)"
 	@echo "    PACKAGE_NAME = $(PACKAGE_NAME)"
