@@ -1,0 +1,389 @@
+<blockquote>
+<p>docs for <a
+href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
+v0.0.2</p>
+</blockquote>
+<h2 id="contents">Contents</h2>
+<h1 id="makefile-template-for-python-projects">Makefile Template for
+Python Projects</h1>
+<p>I’ve ended up using the same makefile template for multiple Python
+projects, so I’ve decided to create a template repository for it.</p>
+<p>Relevant ideological decisions:</p>
+<ul>
+<li><strong>github actions should be minimal, and mostly consist of
+calling makefile recipes</strong></li>
+<li><a href="https://docs.astral.sh/uv/"><code>uv</code></a> for
+dependency management and packaging</li>
+<li><a href="https://docs.pytest.org"><code>pytest</code></a> for
+testing</li>
+<li><a href="https://github.com/python/mypy"><code>mypy</code></a> for
+static type checking</li>
+<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> and <a
+href="https://github.com/hadialqattan/pycln"><code>pycln</code></a> for
+formatting</li>
+<li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation
+generation</li>
+<li><a
+href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a>
+for automation (I know there are better build tools out there and it’s
+overkill, but <code>make</code> is universal)</li>
+<li><a href="https://github.com/git"><code>git</code></a> for version
+control (a spicy take, I know)</li>
+</ul>
+<h2 id="targets">Targets</h2>
+<h3 id="help-info">Help &amp; info</h3>
+<ul>
+<li><code>make help</code> Displays the help message listing all
+available make targets and variables.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># list make targets:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> check                run format and lint checks, tests, and typing checks</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean                cleaning up</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> cov                  generate coverage reports</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep                  sync and export deps to <span class="va">$(</span><span class="ex">REQ_BASE</span><span class="va">)</span>, <span class="va">$(</span><span class="ex">REQ_EXTRAS</span><span class="va">)</span>, and <span class="va">$(</span><span class="ex">REQ_DEV</span><span class="va">)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check            checking uv.lock is good, exported requirements up to date</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs                 generate all documentation</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-clean           clean up docs</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-combined        generate combined docs in markdown and other formats</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-html            generate html docs</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-md              generate combined docs in markdown</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format               format the source code</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format-check         run format check</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> help</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> publish              run all checks, build, and then publish</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> setup                install and update via uv</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> test                 running tests</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> typing               running type checks</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> verify-git           checking git status</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> version              Current version is <span class="va">$(</span><span class="ex">VERSION</span><span class="va">)</span>, last auto-uploaded version is <span class="va">$(</span><span class="ex">LAST_VERSION</span><span class="va">)</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># makefile variables</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON</span> = uv run python</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON_VERSION</span> = 3.12.0 </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PACKAGE_NAME</span> = myproject</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">VERSION</span> = v0.0.2 </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="ex">LAST_VERSION</span> = v0.0.1 </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTEST_OPTIONS</span> =  <span class="at">--cov</span><span class="op">=</span>.</span></code></pre></div>
+<ul>
+<li><p><code>make</code> does the same as
+<code>make help</code></p></li>
+<li><p><code>make version</code> Displays the current version of the
+project and the last auto-uploaded version (via tag). It also generates
+a commit log since the last version (and uses this for tag descriptions
+when publishing)</p></li>
+</ul>
+<h3 id="setupdeps">Setup/deps</h3>
+<ul>
+<li><p><code>make setup</code> install and update via poetry and setup
+shell (from <code>pyproject.toml</code>)</p></li>
+<li><p><code>make dep</code> export dependencies for the base package,
+all extras, and dev requirements into
+<code>.github/requirements.txt</code>,
+<code>.github/requirements-extras.txt</code>, and
+<code>.github/requirements-dev.txt</code> respectively</p></li>
+<li><p><code>make dep-check</code> checks that the <code>uv.lock</code>
+file is up to date and that the exported requirements are up to
+date</p></li>
+</ul>
+<h3 id="formatting">Formatting</h3>
+<ul>
+<li><p><code>make format</code> formats the code using <code>ruff</code>
+and <code>pycln</code></p></li>
+<li><p><code>make format-check</code> checks the code formatting using
+<code>ruff</code> and `pycln</p></li>
+</ul>
+<h3 id="testing-and-linting">Testing and Linting</h3>
+<ul>
+<li><p><code>make test</code> runs tests using <code>pytest</code>, with
+data for coverage reports</p>
+<ul>
+<li>you can pass <code>COV=0</code> to disable coverage reports</li>
+</ul></li>
+<li><p><code>make typing</code> runs type checking using
+<code>mypy</code></p></li>
+<li><p><code>make check</code> runs format check, test, and type
+checks</p></li>
+</ul>
+<h3 id="docs">Docs</h3>
+<p>Provided files for pdoc usage are:</p>
+<ul>
+<li><code>docs/make_docs.py</code> which generates documentation with a
+slightly custom style, automatically adding metadata read from your
+<code>pyproject.toml</code> file</li>
+<li><code>docs/templates/</code> containing template files for both html
+and markdown docs</li>
+<li><code>docs/resources/</code> containing some of the base
+<code>pdoc</code> resources as well as some custom icons for
+admonitions</li>
+</ul>
+<p>Provided recipes:</p>
+<ul>
+<li><code>make cov</code> generates coverage reports in text and html,
+as well as an svg badge. Will run tests if <code>.coverage</code>
+doesn’t exist.</li>
+<li><code>make docs-html</code> generates html documentation using
+pdoc</li>
+<li><code>make docs-md</code> generates markdown documentation using
+pdoc</li>
+<li><code>make docs-combined</code> generates single-file docs by using
+<code>pandoc</code> to process the <code>docs-md</code> output into
+other formats</li>
+<li><code>make docs</code> generates all documentation</li>
+<li><code>make docs-clean</code> cleans up the documentation generated
+files (keeps templates, resources, and <code>make_docs.py</code>
+script)</li>
+</ul>
+<h3 id="build-and-publish">Build and Publish</h3>
+<ul>
+<li><code>make publish</code> runs all checks, builds the project, and
+then publishes it. It also prompts for the new version number and
+handles tagging and pushing to the repository. Will also print your pypi
+token to the console, so you can copy and paste it into the prompt.</li>
+<li><code>make build</code> builds the project using Poetry, assuming
+checks have been run</li>
+<li><code>make verify-git</code> verifies the git status to ensure the
+repository is on the correct branch and is completely synced up and
+clean.</li>
+<li><code>clean</code> Cleans up the build artifacts, caches, and
+temporary files.</li>
+</ul>
+<h2 id="makefile-variables">Makefile Variables</h2>
+<ul>
+<li><code>PACKAGE_NAME</code> Name of the package (default is
+<code>myproject</code>, change this).</li>
+<li><code>PUBLISH_BRANCH</code> Branch to publish from (default is
+<code>main</code>).</li>
+<li><code>PYPI_TOKEN_FILE</code> File containing the PyPI token (default
+is <code>.pypi-token</code>).</li>
+<li><code>LAST_VERSION_FILE</code> File containing the last version
+(default is <code>.lastversion</code>).</li>
+<li><code>COVERAGE_REPORTS_DIR</code> Directory for coverage reports
+(default is <code>docs/coverage</code>).</li>
+<li><code>TESTS_DIR</code> Directory containing tests (default is
+<code>tests/</code>).</li>
+<li><code>TESTS_TEMP_DIR</code> Temporary directory for tests (default
+is <code>tests/_temp</code>), which will be cleaned up.</li>
+<li><code>PYPROJECT</code> Path to project config (default is
+<code>pyproject.toml</code>).</li>
+<li><code>VERSION</code> Extracted automatically from
+<code>pyproject.toml</code>.</li>
+<li><code>LAST_VERSION</code> Extracted from <code>.lastversion</code>,
+<code>NONE</code> if the file doesn’t exist.</li>
+<li><code>PYTHON_BASE</code> Base Python command (default is
+<code>python</code>).</li>
+<li><code>RUN_GLOBAL</code> Flag to determine whether to run Python
+globally or via Poetry (default is <code>0</code>).</li>
+<li><code>PYTHON</code> Python command determined by
+<code>RUN_GLOBAL</code>. Will have <code>poetry run</code> prepended if
+<code>RUN_GLOBAL</code> is <code>0</code>.</li>
+<li><code>PYTEST_OPTIONS</code> Optional parameters to pass to
+<code>pytest</code>.</li>
+<li><code>COV</code> Determines if coverage should be reported
+(<code>1</code> by default), prepends <code>--cov=.</code> to
+<code>PYTEST_OPTIONS</code> if <code>1</code>.</li>
+<li><code>VERBOSE</code> If defined, will append <code>--verbose</code>
+to <code>PYTEST_OPTIONS</code>.</li>
+</ul>
+<h2 id="submodules">Submodules</h2>
+<ul>
+<li><a href="#helloworld"><code>helloworld</code></a></li>
+</ul>
+<p><a
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.2/__init__.py">View
+Source on GitHub</a></p>
+<h1 id="myproject"><code>myproject</code></h1>
+<h3 id="makefile-template-for-python-projects-1">Makefile Template for
+Python Projects</h3>
+<p>I’ve ended up using the same makefile template for multiple Python
+projects, so I’ve decided to create a template repository for it.</p>
+<p>Relevant ideological decisions:</p>
+<ul>
+<li><strong>github actions should be minimal, and mostly consist of
+calling makefile recipes</strong></li>
+<li><a href="https://docs.astral.sh/uv/"><code>uv</code></a> for
+dependency management and packaging</li>
+<li><a href="https://docs.pytest.org"><code>pytest</code></a> for
+testing</li>
+<li><a href="https://github.com/python/mypy"><code>mypy</code></a> for
+static type checking</li>
+<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> and <a
+href="https://github.com/hadialqattan/pycln"><code>pycln</code></a> for
+formatting</li>
+<li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation
+generation</li>
+<li><a
+href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a>
+for automation (I know there are better build tools out there and it’s
+overkill, but <code>make</code> is universal)</li>
+<li><a href="https://github.com/git"><code>git</code></a> for version
+control (a spicy take, I know)</li>
+</ul>
+<h4 id="targets-1">Targets</h4>
+<h5 id="help-info-1">Help &amp; info</h5>
+<ul>
+<li><code>make help</code> Displays the help message listing all
+available make targets and variables.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">### list make targets:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> check                run format and lint checks, tests, and typing checks</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean                cleaning up</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> cov                  generate coverage reports</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep                  sync and export deps to <span class="va">$(</span><span class="ex">REQ_BASE</span><span class="va">)</span>, <span class="va">$(</span><span class="ex">REQ_EXTRAS</span><span class="va">)</span>, and <span class="va">$(</span><span class="ex">REQ_DEV</span><span class="va">)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check            checking uv.lock is good, exported requirements up to date</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs                 generate all documentation</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-clean           clean up docs</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-combined        generate combined docs in markdown and other formats</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-html            generate html docs</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-md              generate combined docs in markdown</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format               format the source code</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format-check         run format check</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> help</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> publish              run all checks, build, and then publish</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> setup                install and update via uv</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> test                 running tests</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> typing               running type checks</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> verify-git           checking git status</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> version              Current version is <span class="va">$(</span><span class="ex">VERSION</span><span class="va">)</span>, last auto-uploaded version is <span class="va">$(</span><span class="ex">LAST_VERSION</span><span class="va">)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">### makefile variables</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON</span> = uv run python</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON_VERSION</span> = 3.12.0 </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PACKAGE_NAME</span> = myproject</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">VERSION</span> = v0.0.2 </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="ex">LAST_VERSION</span> = v0.0.1 </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTEST_OPTIONS</span> =  <span class="at">--cov</span><span class="op">=</span>.</span></code></pre></div>
+<ul>
+<li><p><code>make</code> does the same as
+<code>make help</code></p></li>
+<li><p><code>make version</code> Displays the current version of the
+project and the last auto-uploaded version (via tag). It also generates
+a commit log since the last version (and uses this for tag descriptions
+when publishing)</p></li>
+</ul>
+<h5 id="setupdeps-1">Setup/deps</h5>
+<ul>
+<li><p><code>make setup</code> install and update via poetry and setup
+shell (from <code>pyproject.toml</code>)</p></li>
+<li><p><code>make dep</code> export dependencies for the base package,
+all extras, and dev requirements into
+<code>.github/requirements.txt</code>,
+<code>.github/requirements-extras.txt</code>, and
+<code>.github/requirements-dev.txt</code> respectively</p></li>
+<li><p><code>make dep-check</code> checks that the <code>uv.lock</code>
+file is up to date and that the exported requirements are up to
+date</p></li>
+</ul>
+<h5 id="formatting-1">Formatting</h5>
+<ul>
+<li><p><code>make format</code> formats the code using <code>ruff</code>
+and <code>pycln</code></p></li>
+<li><p><code>make format-check</code> checks the code formatting using
+<code>ruff</code> and `pycln</p></li>
+</ul>
+<h5 id="testing-and-linting-1">Testing and Linting</h5>
+<ul>
+<li><p><code>make test</code> runs tests using <code>pytest</code>, with
+data for coverage reports</p>
+<ul>
+<li>you can pass <code>COV=0</code> to disable coverage reports</li>
+</ul></li>
+<li><p><code>make typing</code> runs type checking using
+<code>mypy</code></p></li>
+<li><p><code>make check</code> runs format check, test, and type
+checks</p></li>
+</ul>
+<h5 id="docs-1">Docs</h5>
+<p>Provided files for pdoc usage are:</p>
+<ul>
+<li><code>docs/make_docs.py</code> which generates documentation with a
+slightly custom style, automatically adding metadata read from your
+<code>pyproject.toml</code> file</li>
+<li><code>docs/templates/</code> containing template files for both html
+and markdown docs</li>
+<li><code>docs/resources/</code> containing some of the base
+<code>pdoc</code> resources as well as some custom icons for
+admonitions</li>
+</ul>
+<p>Provided recipes:</p>
+<ul>
+<li><code>make cov</code> generates coverage reports in text and html,
+as well as an svg badge. Will run tests if <code>.coverage</code>
+doesn’t exist.</li>
+<li><code>make docs-html</code> generates html documentation using
+pdoc</li>
+<li><code>make docs-md</code> generates markdown documentation using
+pdoc</li>
+<li><code>make docs-combined</code> generates single-file docs by using
+<code>pandoc</code> to process the <code>docs-md</code> output into
+other formats</li>
+<li><code>make docs</code> generates all documentation</li>
+<li><code>make docs-clean</code> cleans up the documentation generated
+files (keeps templates, resources, and <code>make_docs.py</code>
+script)</li>
+</ul>
+<h5 id="build-and-publish-1">Build and Publish</h5>
+<ul>
+<li><code>make publish</code> runs all checks, builds the project, and
+then publishes it. It also prompts for the new version number and
+handles tagging and pushing to the repository. Will also print your pypi
+token to the console, so you can copy and paste it into the prompt.</li>
+<li><code>make build</code> builds the project using Poetry, assuming
+checks have been run</li>
+<li><code>make verify-git</code> verifies the git status to ensure the
+repository is on the correct branch and is completely synced up and
+clean.</li>
+<li><code>clean</code> Cleans up the build artifacts, caches, and
+temporary files.</li>
+</ul>
+<h4 id="makefile-variables-1">Makefile Variables</h4>
+<ul>
+<li><code>PACKAGE_NAME</code> Name of the package (default is
+<code>myproject</code>, change this).</li>
+<li><code>PUBLISH_BRANCH</code> Branch to publish from (default is
+<code>main</code>).</li>
+<li><code>PYPI_TOKEN_FILE</code> File containing the PyPI token (default
+is <code>.pypi-token</code>).</li>
+<li><code>LAST_VERSION_FILE</code> File containing the last version
+(default is <code>.lastversion</code>).</li>
+<li><code>COVERAGE_REPORTS_DIR</code> Directory for coverage reports
+(default is <code>docs/coverage</code>).</li>
+<li><code>TESTS_DIR</code> Directory containing tests (default is
+<code>tests/</code>).</li>
+<li><code>TESTS_TEMP_DIR</code> Temporary directory for tests (default
+is <code>tests/_temp</code>), which will be cleaned up.</li>
+<li><code>PYPROJECT</code> Path to project config (default is
+<code>pyproject.toml</code>).</li>
+<li><code>VERSION</code> Extracted automatically from
+<code>pyproject.toml</code>.</li>
+<li><code>LAST_VERSION</code> Extracted from <code>.lastversion</code>,
+<code>NONE</code> if the file doesn’t exist.</li>
+<li><code>PYTHON_BASE</code> Base Python command (default is
+<code>python</code>).</li>
+<li><code>RUN_GLOBAL</code> Flag to determine whether to run Python
+globally or via Poetry (default is <code>0</code>).</li>
+<li><code>PYTHON</code> Python command determined by
+<code>RUN_GLOBAL</code>. Will have <code>poetry run</code> prepended if
+<code>RUN_GLOBAL</code> is <code>0</code>.</li>
+<li><code>PYTEST_OPTIONS</code> Optional parameters to pass to
+<code>pytest</code>.</li>
+<li><code>COV</code> Determines if coverage should be reported
+(<code>1</code> by default), prepends <code>--cov=.</code> to
+<code>PYTEST_OPTIONS</code> if <code>1</code>.</li>
+<li><code>VERBOSE</code> If defined, will append <code>--verbose</code>
+to <code>PYTEST_OPTIONS</code>.</li>
+</ul>
+<p><a
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.2/__init__.py#L0-L2">View
+Source on GitHub</a></p>
+<blockquote>
+<p>docs for <a
+href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
+v0.0.2</p>
+</blockquote>
+<p><a
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.2/helloworld.py">View
+Source on GitHub</a></p>
+<h1 id="myproject.helloworld"><code>myproject.helloworld</code></h1>
+<p><a
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.2/helloworld.py#L0-L0">View
+Source on GitHub</a></p>
