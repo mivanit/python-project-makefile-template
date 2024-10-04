@@ -12,9 +12,10 @@ COVERAGE_REPORTS_DIR := docs/coverage
 TESTS_DIR := tests/
 # temp directory to clean up
 TESTS_TEMP_DIR := tests/_temp
-# dev and lint requirements.txt files
-REQ_DEV := .github/dev-requirements.txt
-REQ_LINT := .github/lint-requirements.txt
+# requirements.txt files for base package, all extras, and dev
+REQ_BASE := .github/requirements.txt
+REQ_EXTRAS := .github/requirements-extras.txt
+REQ_DEV := .github/requirements-dev.txt
 
 # probably don't change these:
 # --------------------------------------------------
@@ -107,34 +108,26 @@ version: gen-commit-log
 .PHONY: setup
 setup:
 	@echo "install and update via uv"
-	uv sync
+	uv sync --all-extras
 	@echo "To activate the virtual environment, run one of:"
 	@echo "  source .venv/bin/activate"
 	@echo "  source .venv/Scripts/activate"
 
-# exporting requirements -- useful for CI
-# --------------------------------------------------
-
-.PHONY: setup-format
-setup-format:
-	@echo "install only packages needed for formatting, direct via pip (useful for CI)"
-	$(PYTHON) -m pip install -r $(REQ_LINT)
-
-EXPORT_ARGS := --all-extras --with dev --with lint --without-hashes --without-urls
-
 .PHONY: dep
 dep:
-	@echo "exporting dev and extras deps to $(REQ_DEV), lint/format deps to $(REQ_LINT)"
-	poetry update
-	poetry export $(EXPORT_ARGS) --output $(REQ_DEV)
-	poetry export --only lint --without-hashes --without-urls --output $(REQ_LINT)
+	@echo "sync and export deps to $(REQ_BASE), $(REQ_EXTRAS), and $(REQ_DEV)"
+	uv sync
+	uv export --no-dev --no-hashes > $(REQ_BASE)
+	uv export --all-extras --no-dev --no-hashes > $(REQ_EXTRAS)
+	uv export --all-extras --no-hashes > $(REQ_DEV)
 
 .PHONY: dep-check
 dep-check:
-	@echo "checking poetry lock is good, exported requirements match poetry"
-	poetry check --lock
-	poetry export $(EXPORT_ARGS) | diff - $(REQ_DEV)
-	poetry export --only lint --without-hashes --without-urls | diff - $(REQ_LINT)
+	@echo "checking uv.lock is good, exported requirements up to date"
+	uv sync --locked
+	uv export --no-dev --no-hashes | diff - $(REQ_BASE)
+	uv export --all-extras --no-dev --no-hashes | diff - $(REQ_EXTRAS)
+	uv export --all-extras --no-hashes | diff - $(REQ_DEV)
 
 
 # checks (formatting/linting, typing, tests)
@@ -146,8 +139,8 @@ format:
 	$(PYTHON) -m ruff check --fix --config $(PYPROJECT) .
 	$(PYTHON) -m pycln --config $(PYPROJECT) --all .
 
-.PHONY: check-format
-check-format:
+.PHONY: format-check
+format-check:
 	@echo "run format check"
 	$(PYTHON) -m ruff check --config $(PYPROJECT) .
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
@@ -163,14 +156,13 @@ typing: clean gen-extra-tests
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) tests/
 
-
 .PHONY: test
 test: clean
 	@echo "running tests"
 	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
 
 .PHONY: check
-check: clean check-format test typing
+check: clean format-check test typing
 	@echo "run format and lint checks, tests, and typing checks"
 
 # coverage reports
@@ -204,7 +196,7 @@ verify-git:
 
 .PHONY: build
 build: 
-	poetry build
+	uv build
 
 .PHONY: publish
 publish: gen-commit-log check build verify-git version gen-version-info
