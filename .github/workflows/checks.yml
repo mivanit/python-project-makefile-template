@@ -79,34 +79,15 @@ jobs:
         run: make test
   
   # the following tests are only for making sure the makefile works properly. you can remove them.
-  make-cov:
-    name: make cov
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        versions:
-          - python: "3.11"
-          - python: "3.12"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.versions.python }}
-
-      - name: install
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          make setup
-
-      - name: coverage
-        run: make cov
-
   make-docs:
-    name: make docs
+    name: make docs (and coverage too)
     runs-on: ubuntu-latest
     strategy:
       matrix:
         versions:
+          - python: "3.8"
+          - python: "3.9"
+          - python: "3.10"
           - python: "3.11"
           - python: "3.12"
     steps:
