@@ -53,8 +53,8 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           make setup
 
-      - name: check-format
-        run: make check-format
+      - name: format-check
+        run: make format-check
 
   test:
     name: Test
