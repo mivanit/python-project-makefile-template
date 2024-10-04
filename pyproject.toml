@@ -20,15 +20,25 @@ cli = [
 
 [tool.uv]
 dev-dependencies = [
+	# lint
+	"pycln>=2.1.3",
+	"ruff>=0.4.8",
 	# test
 	"pytest>=8.2.2",
 	# coverage
 	"pytest-cov>=4.1.0",
 	"coverage-badge>=1.1.0",
-	# lint
-	"pycln>=2.1.3",
-	"ruff>=0.4.8",
+	# type checking
+	"mypy>=1.0.1",
+	# docs
+	'pdoc>=14.6.0',
 ]
+
+[project.urls]
+Homepage = "https://miv.name/python-project-makefile-template"
+Documentation = "https://miv.name/python-project-makefile-template"
+Repository = "https://github.com/mivanit/python-project-makefile-template"
+Issues = "https://github.com/mivanit/python-project-makefile-template/issues"
 
 [build-system]
 requires = ["hatchling"]

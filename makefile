@@ -6,6 +6,8 @@ PACKAGE_NAME := myproject
 
 # for checking you are on the right branch when publishing
 PUBLISH_BRANCH := main
+# where to put docs
+DOCS_DIR := docs
 # where to put the coverage reports
 COVERAGE_REPORTS_DIR := docs/coverage
 # where the tests are (assumes pytest)
@@ -29,6 +31,8 @@ PYPROJECT := pyproject.toml
 PYTHON_BASE := python
 # where the commit log will be stored
 COMMIT_LOG_FILE := .github/local/.commit_log
+# pandoc commands (for docs)
+PANDOC ?= pandoc
 
 
 # reading information and command line options
@@ -165,17 +169,57 @@ test: clean
 check: clean format-check test typing
 	@echo "run format and lint checks, tests, and typing checks"
 
-# coverage reports
+# coverage & docs
 # ==================================================
-# assumes you have already run the tests
+
+.PHONY: docs-html
+docs-html:
+	@echo "generate html docs"
+	$(PYTHON) docs/make_docs.py
+
+.PHONY: docs-md
+docs-md:
+	@echo "generate combined docs in markdown"
+	mkdir $(DOCS_DIR)/combined -p
+	$(PYTHON) docs/make_docs.py --combined
+
+
+.PHONY: docs-combined
+docs-combined: docs-md
+	@echo "generate combined docs in markdown and other formats"
+	@echo "requires pandoc in path"
+	$(PANDOC) -f markdown -t gfm $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME)_gfm.md
+	$(PANDOC) -f markdown -t plain $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).txt
+	$(PANDOC) -f markdown -t html $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).html
+
+# $(PANDOC) -f markdown -t pdf $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).pdf
 
 .PHONY: cov
 cov:
 	@echo "generate coverage reports"
-	@echo "requires tests to have been run"
+	@if [ ! -f .coverage ]; then \
+		echo ".coverage not found, running tests first..."; \
+		$(MAKE) test; \
+	fi
+	mkdir $(COVERAGE_REPORTS_DIR) -p
 	$(PYTHON) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
 	$(PYTHON) -m coverage_badge -f -o $(COVERAGE_REPORTS_DIR)/coverage.svg
-	$(PYTHON) -m coverage html	
+	$(PYTHON) -m coverage html --directory=$(COVERAGE_REPORTS_DIR)/html/
+	rm -rf $(COVERAGE_REPORTS_DIR)/html/.gitignore
+
+.PHONY: docs
+docs: cov docs-html docs-combined
+	@echo "generate all documentation"
+
+.PHONY: docs-clean
+docs-clean:
+	@echo "clean up docs"
+	rm -rf $(DOCS_DIR)/combined/
+	rm -rf $(DOCS_DIR)/$(PACKAGE_NAME)/
+	rm -rf $(COVERAGE_REPORTS_DIR)/
+	rm $(DOCS_DIR)/$(PACKAGE_NAME).html
+	rm $(DOCS_DIR)/index.html
+	rm $(DOCS_DIR)/search.js
 
 
 # build and publish

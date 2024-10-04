@@ -6,12 +6,17 @@ coverage==7.6.1
 coverage-badge==1.1.2
 fire==0.7.0
 iniconfig==2.0.0
+jinja2==3.1.4
 libcst==1.4.0
 markdown-it-py==3.0.0
+markupsafe==2.1.5
 mdurl==0.1.2
 muutils==0.6.12
+mypy==1.11.2
+mypy-extensions==1.0.0
 packaging==24.1
 pathspec==0.12.1
+pdoc==14.7.0
 pluggy==1.5.0
 pycln==2.4.0
 pygments==2.18.0

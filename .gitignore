@@ -1,2 +1,17 @@
-.commit_log
+# local stuff (pypi token, commit log)
+.github/local/**
+
+# caches
+__pycache__/
+**/__pycache__/
+**/.mypy_cache/
+**/.pytest_cache/
+.ruff_cache/
+
+# coverage
 .coverage
+
+# build
+build/
+dist/
+muutils.egg-info/
