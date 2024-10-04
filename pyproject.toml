@@ -1,6 +1,6 @@
 [project]
 name = "myproject"
-version = "0.0.1"
+version = "0.0.2"
 description = "template for python projects/packages"
 authors = [
 	{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
@@ -9,13 +9,13 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 dependencies = [
-	"muutils",
+	"muutils>=0.6.12",
 ]
 
 [project.optional-dependencies]
 # for example purposes only
 cli = [
-	"fire>=8.2.2",
+	"fire>=0.6.0",
 ]
 
 [tool.uv]

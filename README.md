@@ -5,12 +5,13 @@ I've ended up using the same makefile template for multiple Python projects, so 
 Relevant ideological decisions:
 
 - **github actions should be minimal, and mostly consist of calling makefile recipes**
-- `poetry` for dependency management and packaging
-- `pytest` for testing
-- `mypy` for static type checking
-- `ruff` and `pycln` for formatting
-- `make` for automation (I know there are better build tools out there and it's overkill, but `make` is universal)
-- `git` for version control (a spicy take, I know)
+- [`uv`](https://docs.astral.sh/uv/) for dependency management and packaging
+- [`pytest`](https://docs.pytest.org) for testing
+- [`mypy`](https://github.com/python/mypy) for static type checking
+- [`ruff`](https://docs.astral.sh/ruff/) and [`pycln`](https://github.com/hadialqattan/pycln) for formatting
+- [`pdoc`](https://pdoc.dev) for documentation generation
+- [`make`](https://en.wikipedia.org/wiki/Make_(software)) for automation (I know there are better build tools out there and it's overkill, but `make` is universal)
+- [`git`](https://github.com/git) for version control (a spicy take, I know)
 
 ## Targets
 

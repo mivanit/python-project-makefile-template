@@ -103,20 +103,14 @@ version: gen-commit-log
 
 # installation and setup
 # ==================================================
-# whether to enter the poetry shell after `make setup`
-USE_SHELL ?= 1
-ifdef NO_SHELL
-	USE_SHELL = 0
-endif
 
 .PHONY: setup
 setup:
-	@echo "install and update via poetry, setup shell"
-	poetry update
-	poetry install --all-extras
-	@if [ "$(USE_SHELL)" = "1" ]; then \
-		poetry shell; \
-	fi
+	@echo "install and update via uv"
+	uv sync
+	@echo "To activate the virtual environment, run one of:"
+	@echo "  source .venv/bin/activate"
+	@echo "  source .venv/Scripts/activate"
 
 # exporting requirements -- useful for CI
 # --------------------------------------------------
