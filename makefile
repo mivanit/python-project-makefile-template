@@ -1,4 +1,5 @@
-# configuration
+# ==================================================
+# configuration & variables
 # ==================================================
 # MODIFY THIS FILE TO SUIT YOUR PROJECT
 # it assumes that the source is in a directory named the same as the package name
@@ -36,8 +37,18 @@ COMMIT_LOG_FILE := $(LOCAL_DIR)/.commit_log
 # pandoc commands (for docs)
 PANDOC ?= pandoc
 
+# version vars
+# --------------------------------------------------
+# assuming your pyproject.toml has a line that looks like `version = "0.0.1"`, will get the version
+VERSION := NULL
+# read last auto-uploaded version from file
+LAST_VERSION := NULL
+# get the python version, now that we have picked the python command
+PYTHON_VERSION := NULL
 
-# reading information and command line options
+
+# ==================================================
+# reading command line options
 # ==================================================
 
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
@@ -50,16 +61,39 @@ else
 	PYTHON = $(PYTHON_BASE)
 endif
 
-# reading version
+# if you want different behavior for different python versions
 # --------------------------------------------------
-# assuming your pyproject.toml has a line that looks like `version = "0.0.1"`, will get the version
-VERSION := NULL
-# read last auto-uploaded version from file
-LAST_VERSION := NULL
-# get the python version, now that we have picked the python command
-PYTHON_VERSION := NULL
+# COMPATIBILITY_MODE := $(shell $(PYTHON) -c "import sys; print(1 if sys.version_info < (3, 10) else 0)")
+
+# options we might want to pass to pytest
+# --------------------------------------------------
+PYTEST_OPTIONS ?=
+COV ?= 1
+VERBOSE ?= 0
+
+ifeq ($(VERBOSE),1)
+	PYTEST_OPTIONS += --verbose
+endif
+
+ifeq ($(COV),1)
+    PYTEST_OPTIONS += --cov=.
+endif
+
+# ==================================================
+# default target (help)
+# ==================================================
+
+.PHONY: default
+default: help
+
+# ==================================================
+# getting version info
+# we do this in a separate target because it takes a bit of time
+# ==================================================
+
 .PHONY: gen-version-info
 gen-version-info:
+	@mkdir -p $(LOCAL_DIR)
 	$(eval VERSION := $(shell python -c "import re; print('v'+re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
@@ -74,29 +108,6 @@ gen-commit-log: gen-version-info
 	@mkdir -p $(LOCAL_DIR)
 	@python -c "import subprocess; open('$(COMMIT_LOG_FILE)', 'w').write('\n'.join(reversed(subprocess.check_output(['git', 'log', '$(LAST_VERSION)'.strip() + '..HEAD', '--pretty=format:- %s (%h)']).decode('utf-8').strip().split('\n'))))"
 
-# if you want different behavior for different python versions
-# --------------------------------------------------
-# COMPATIBILITY_MODE := $(shell $(PYTHON) -c "import sys; print(1 if sys.version_info < (3, 10) else 0)")
-
-# options we might want to pass to pytest
-# --------------------------------------------------
-PYTEST_OPTIONS ?= # using ?= means you can pass extra options from the command line
-COV ?= 1
-
-ifdef VERBOSE
-	PYTEST_OPTIONS += --verbose
-endif
-
-ifeq ($(COV),1)
-    PYTEST_OPTIONS += --cov=.
-endif
-
-
-# default target (help)
-# ==================================================
-
-.PHONY: default
-default: help
 
 .PHONY: version
 version: gen-commit-log
@@ -109,7 +120,8 @@ version: gen-commit-log
 	fi
 
 
-# installation and setup
+# ==================================================
+# dependencies and setup
 # ==================================================
 
 .PHONY: setup
@@ -137,6 +149,7 @@ dep-check:
 	uv export --all-extras --no-hashes | diff - $(REQ_DEV)
 
 
+# ==================================================
 # checks (formatting/linting, typing, tests)
 # ==================================================
 .PHONY: format
@@ -172,6 +185,7 @@ test: clean
 check: clean format-check test typing
 	@echo "run format and lint checks, tests, and typing checks"
 
+# ==================================================
 # coverage & docs
 # ==================================================
 
@@ -182,20 +196,18 @@ docs-html:
 
 .PHONY: docs-md
 docs-md:
-	@echo "generate combined docs in markdown"
+	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
 	$(PYTHON) docs/make_docs.py --combined
 
 
 .PHONY: docs-combined
 docs-combined: docs-md
-	@echo "generate combined docs in markdown and other formats"
+	@echo "generate combined (single-file) docs in markdown and convert to other formats"
 	@echo "requires pandoc in path"
 	$(PANDOC) -f markdown -t gfm $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME)_gfm.md
 	$(PANDOC) -f markdown -t plain $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).txt
 	$(PANDOC) -f markdown -t html $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).html
-
-# $(PANDOC) -f markdown -t pdf $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).pdf
 
 .PHONY: cov
 cov:
@@ -212,7 +224,7 @@ cov:
 
 .PHONY: docs
 docs: cov docs-html docs-combined
-	@echo "generate all documentation"
+	@echo "generate all documentation and coverage reports"
 
 .PHONY: docs-clean
 docs-clean:
@@ -225,6 +237,7 @@ docs-clean:
 	rm $(DOCS_DIR)/search.js
 
 
+# ==================================================
 # build and publish
 # ==================================================
 
@@ -296,7 +309,7 @@ clean:
 # no .PHONY because this will only be run before `make help`
 # it's a separate command because getting the versions takes a bit of time
 help-targets:
-	@echo -n "# list make targets"
+	@echo -n "# make targets"
 	@echo ":"
 	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
