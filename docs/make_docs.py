@@ -1,16 +1,15 @@
-from pathlib import Path
 import argparse
-import warnings
-import tomllib
 import inspect
 import re
+import tomllib
+import warnings
+from pathlib import Path
 
-
-import pdoc
-import pdoc.render
-import pdoc.doc
-import pdoc.extract
-import pdoc.render_helpers
+import pdoc  # type: ignore[import-not-found]
+import pdoc.doc  # type: ignore[import-not-found]
+import pdoc.extract  # type: ignore[import-not-found]
+import pdoc.render  # type: ignore[import-not-found]
+import pdoc.render_helpers  # type: ignore[import-not-found]
 from markupsafe import Markup
 
 # ====================================================================================================
@@ -43,6 +42,7 @@ def get_package_meta_global(config_path: str | Path = Path("pyproject.toml")):
     PACKAGE_NAME = pyproject_data["project"]["name"]
     PACKAGE_REPO_URL = pyproject_data["project"]["urls"]["Repository"]
     PACKAGE_CODE_URL = f"{PACKAGE_REPO_URL}/blob/{PACKAGE_VERSION}/"
+
 
 def add_package_meta_pdoc_globals(config_path: str | Path = Path("pyproject.toml")):
     "adds the package meta to the pdoc globals"
@@ -214,9 +214,11 @@ if __name__ == "__main__":
         edit_url_map={
             PACKAGE_NAME: PACKAGE_CODE_URL,
         },
-        template_directory=Path("docs/templates/html/")
-        if not parsed_args.combined
-        else Path("docs/templates/markdown/"),
+        template_directory=(
+            Path("docs/templates/html/")
+            if not parsed_args.combined
+            else Path("docs/templates/markdown/")
+        ),
         show_source=True,
         math=True,
         mermaid=True,
@@ -230,11 +232,13 @@ if __name__ == "__main__":
         )
     else:
         use_markdown_format()
-        pdoc_combined(PACKAGE_NAME, output_file=OUTPUT_DIR / "combined" / f"{PACKAGE_NAME}.md")
+        pdoc_combined(
+            PACKAGE_NAME, output_file=OUTPUT_DIR / "combined" / f"{PACKAGE_NAME}.md"
+        )
 
     if parsed_args.serve:
-        import os
         import http.server
+        import os
         import socketserver
 
         port: int = 8000
