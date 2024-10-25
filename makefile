@@ -31,10 +31,11 @@ TESTS_TEMP_DIR := _temp/
 PYPROJECT := pyproject.toml
 
 # requirements.txt files for base package, all extras, dev, and all
-REQ_BASE := .github/requirements.txt
-REQ_EXTRAS := .github/requirements-extras.txt
-REQ_DEV := .github/requirements-dev.txt
-REQ_ALL := .github/requirements-all.txt
+REQ_LOCATION := .github/requirements
+REQ_BASE := $(REQ_LOCATION)/requirements.txt
+REQ_EXTRAS := $(REQ_LOCATION)/requirements-extras.txt
+REQ_DEV := $(REQ_LOCATION)/requirements-dev.txt
+REQ_ALL := $(REQ_LOCATION)/requirements-all.txt
 
 # local files (don't push this to git)
 LOCAL_DIR := .github/local
@@ -125,7 +126,6 @@ gen-version-info:
 	$(eval VERSION := $(shell python -c "import re; print('v'+re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
-
 # getting commit log since the tag specified in $(LAST_VERSION_FILE)
 # will write to $(COMMIT_LOG_FILE)
 # when publishing, the contents of $(COMMIT_LOG_FILE) will be used as the tag description (but can be edited during the process)
@@ -170,6 +170,7 @@ setup: dep-check
 .PHONY: dep
 dep:
 	@echo "sync and export deps to $(REQ_BASE), $(REQ_EXTRAS), $(REQ_DEV), and $(REQ_ALL)"
+	mkdir -p $(REQ_LOCATION)
 	uv sync --all-extras
 	uv export --no-dev --no-hashes > $(REQ_BASE)
 	uv export --all-extras --no-dev --no-hashes > $(REQ_EXTRAS)
@@ -185,6 +186,12 @@ dep-check:
 	uv export --no-hashes | diff - $(REQ_DEV)
 	uv export --all-extras --no-hashes | diff - $(REQ_ALL)
 
+.PHONY: dep-clean
+dep-clean:
+	@echo "clean up lock files, .venv, and requirements files"
+	rm -rf .venv
+	rm -rf uv.lock
+	rm -rf $(REQ_LOCATION)/*.txt
 
 # ==================================================
 # checks (formatting/linting, typing, tests)
@@ -374,8 +381,8 @@ clean:
 	$(PYTHON_BASE) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('$(DOCS_DIR)').rglob('__pycache__')]"
 
 .PHONY: clean-all
-clean-all: clean docs-clean
-	@echo "clean up all temporary files and generated docs"
+clean-all: clean dep-clean docs-clean
+	@echo "clean up all temporary files, dep files, venv, and generated docs"
 
 
 # ==================================================
@@ -391,10 +398,9 @@ help-targets:
 	@echo ":"
 	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
-# immediately print out the help targets, and then local variables (but those take a bit longer)
-.PHONY: help
-help: help-targets gen-version-info
-	@echo -n ""
+
+.PHONY: info
+info: gen-version-info
 	@echo "# makefile variables"
 	@echo "    PYTHON = $(PYTHON)"
 	@echo "    PYTHON_VERSION = $(PYTHON_VERSION)"
@@ -403,6 +409,35 @@ help: help-targets gen-version-info
 	@echo "    LAST_VERSION = $(LAST_VERSION)"
 	@echo "    PYTEST_OPTIONS = $(PYTEST_OPTIONS)"
 
+.PHONY: info-long
+info-long: info
+	@echo "# other variables"
+	@echo "    PUBLISH_BRANCH = $(PUBLISH_BRANCH)"
+	@echo "    DOCS_DIR = $(DOCS_DIR)"
+	@echo "    COVERAGE_REPORTS_DIR = $(COVERAGE_REPORTS_DIR)"
+	@echo "    TESTS_DIR = $(TESTS_DIR)"
+	@echo "    TESTS_TEMP_DIR = $(TESTS_TEMP_DIR)"
+	@echo "    PYPROJECT = $(PYPROJECT)"
+	@echo "    REQ_LOCATION = $(REQ_LOCATION)"
+	@echo "    REQ_BASE = $(REQ_BASE)"
+	@echo "    REQ_EXTRAS = $(REQ_EXTRAS)"
+	@echo "    REQ_DEV = $(REQ_DEV)"
+	@echo "    REQ_ALL = $(REQ_ALL)"
+	@echo "    LOCAL_DIR = $(LOCAL_DIR)"
+	@echo "    PYPI_TOKEN_FILE = $(PYPI_TOKEN_FILE)"
+	@echo "    LAST_VERSION_FILE = $(LAST_VERSION_FILE)"
+	@echo "    PYTHON_BASE = $(PYTHON_BASE)"
+	@echo "    COMMIT_LOG_FILE = $(COMMIT_LOG_FILE)"
+	@echo "    PANDOC = $(PANDOC)"
+	@echo "    COV = $(COV)"
+	@echo "    VERBOSE = $(VERBOSE)"
+	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
+	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
+
+# immediately print out the help targets, and then local variables (but those take a bit longer)
+.PHONY: help
+help: help-targets info
+	@echo -n ""
 
 # ==================================================
 # custom targets

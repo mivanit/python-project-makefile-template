@@ -2,5 +2,5 @@
 #    uv export --all-extras --no-dev --no-hashes
 -e .
 fire==0.7.0
-muutils==0.6.12
-termcolor==2.4.0
+muutils==0.6.15
+termcolor==2.5.0
