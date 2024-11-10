@@ -373,12 +373,7 @@ clean:
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for p in pathlib.Path('$(PACKAGE_NAME)').rglob('*.py[co]')]"
-	$(PYTHON_BASE) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('$(PACKAGE_NAME)').rglob('__pycache__')]"
-	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for p in pathlib.Path('$(TESTS_DIR)').rglob('*.py[co]')]"
-	$(PYTHON_BASE) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('$(TESTS_DIR)').rglob('__pycache__')]"
-	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for p in pathlib.Path('$(DOCS_DIR)').rglob('*.py[co]')]"
-	$(PYTHON_BASE) -Bc "import pathlib; [p.rmdir() for p in pathlib.Path('$(DOCS_DIR)').rglob('__pycache__')]"
+	$(PYTHON_BASE) -Bc "import pathlib; [(p.unlink() for p in pathlib.Path(path).rglob(pattern)) for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*']]"
 
 .PHONY: clean-all
 clean-all: clean dep-clean docs-clean
