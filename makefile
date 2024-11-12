@@ -32,10 +32,6 @@ PYPROJECT := pyproject.toml
 
 # requirements.txt files for base package, all extras, dev, and all
 REQ_LOCATION := .github/requirements
-REQ_BASE := $(REQ_LOCATION)/requirements.txt
-REQ_EXTRAS := $(REQ_LOCATION)/requirements-extras.txt
-REQ_DEV := $(REQ_LOCATION)/requirements-dev.txt
-REQ_ALL := $(REQ_LOCATION)/requirements-all.txt
 
 # local files (don't push this to git)
 LOCAL_DIR := .github/local
@@ -65,6 +61,85 @@ VERSION := NULL
 LAST_VERSION := NULL
 # get the python version, now that we have picked the python command
 PYTHON_VERSION := NULL
+
+
+# python scripts we want to use inside the makefile
+# --------------------------------------------------
+define EXPORT_SCRIPT
+import sys
+import tomllib
+from pathlib import Path
+from typing import Union, List, Optional
+
+pyproject_path: Path = Path(sys.argv[1])
+output_dir: Path = Path(sys.argv[2])
+
+with open(pyproject_path, 'rb') as f:
+	pyproject_data: dict = tomllib.load(f)
+
+# all available groups
+all_groups: List[str] = list(pyproject_data.get('dependency-groups', {}).keys())
+all_extras: List[str] = list(pyproject_data.get('project', {}).get('optional-dependencies', {}).keys())
+
+# options for exporting
+export_opts: dict = pyproject_data.get('tool', {}).get('uv-exports', {})
+
+# what are we exporting?
+exports: List[str] = export_opts.get('exports', [])
+if not exports:
+	exports = [{'name': 'all', 'groups': [], 'extras': [], 'options': []}]
+
+# export each configuration
+for export in exports:
+	# get name and validate
+	name = export.get('name')
+	if not name or not name.isalnum():
+		print(f"Export configuration missing valid 'name' field {export}", file=sys.stderr)
+		continue
+
+	# get other options with default fallbacks
+	filename: str = export.get('filename') or f"requirements-{name}.txt"
+	groups: Union[List[str], bool, None] = export.get('groups', None)
+	extras: Union[List[str], bool] = export.get('extras', [])
+	options: List[str] = export.get('options', [])
+
+	# init command
+	cmd: List[str] = ['uv', 'export'] + export_opts.get('args', [])
+
+	# handle groups
+	if groups is not None:
+		groups_list: List[str] = []
+		if isinstance(groups, bool):
+			if groups:
+				groups_list = all_groups.copy()
+		else:
+			groups_list = groups
+		
+		for group in all_groups:
+			if group in groups_list:
+				cmd.extend(['--group', group])
+			else:
+				cmd.extend(['--no-group', group])
+
+	# handle extras
+	extras_list: List[str] = []
+	if isinstance(extras, bool):
+		if extras:
+			extras_list = all_extras.copy()
+	else:
+		extras_list = extras
+
+	for extra in extras_list:
+		cmd.extend(['--extra', extra])
+
+	cmd.extend(options)
+
+	output_path = output_dir / filename
+	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
+endef
+
+export EXPORT_SCRIPT
+
 
 
 # ==================================================
@@ -102,7 +177,7 @@ ifeq ($(VERBOSE),1)
 endif
 
 ifeq ($(COV),1)
-    PYTEST_OPTIONS += --cov=.
+	PYTEST_OPTIONS += --cov=.
 endif
 
 # ==================================================
@@ -126,6 +201,7 @@ gen-version-info:
 	$(eval VERSION := $(shell python -c "import re; print('v'+re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
+
 # getting commit log since the tag specified in $(LAST_VERSION_FILE)
 # will write to $(COMMIT_LOG_FILE)
 # when publishing, the contents of $(COMMIT_LOG_FILE) will be used as the tag description (but can be edited during the process)
@@ -169,13 +245,20 @@ setup: dep-check
 
 .PHONY: dep
 dep:
-	@echo "sync and export deps to $(REQ_BASE), $(REQ_EXTRAS), $(REQ_DEV), and $(REQ_ALL)"
-	mkdir -p $(REQ_LOCATION)
+	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras
-	uv export --no-dev --no-hashes > $(REQ_BASE)
-	uv export --all-extras --no-dev --no-hashes > $(REQ_EXTRAS)
-	uv export --no-hashes > $(REQ_DEV)
-	uv export --all-extras --no-hashes > $(REQ_ALL)
+	mkdir -p $(REQ_LOCATION)
+	python -c "$$EXPORT_SCRIPT" $(PYPROJECT) $(REQ_LOCATION) | sh -x
+
+.PHONY: dep-check
+dep-check:
+	@echo "Checking that exported requirements are up to date"
+	uv sync --all-extras
+	mkdir -p $(REQ_LOCATION)-TEMP
+	python -c "$$EXPORT_SCRIPT" $(PYPROJECT) .temp_requirements | sh -x
+	diff -r $(REQ_LOCATION)-TEMP $(REQ_LOCATION)
+	rm -rf $(REQ_LOCATION)-TEMP
+
 
 .PHONY: dep-check
 dep-check:
