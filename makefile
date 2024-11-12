@@ -65,9 +65,14 @@ PYTHON_VERSION := NULL
 
 # python scripts we want to use inside the makefile
 # --------------------------------------------------
+
+# create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define EXPORT_SCRIPT
 import sys
-import tomllib
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 from pathlib import Path
 from typing import Union, List, Optional
 
@@ -140,7 +145,55 @@ endef
 
 export EXPORT_SCRIPT
 
+# get the version from `pyproject.toml:project.version`
+define GET_VERSION_SCRIPT
+import re
+import sys
 
+try:
+	if sys.version_info >= (3, 11):
+		import tomllib
+	else:
+		import tomli as tomllib
+
+	pyproject_path = '$(PYPROJECT)'
+
+	with open(pyproject_path, 'rb') as f:
+		pyproject_data = tomllib.load(f)
+
+	print('v' + pyproject_data['project']['version'])
+except Exception as e:
+	print('NULL')
+	sys.exit(1)
+endef
+
+export GET_VERSION_SCRIPT
+
+
+# get the commit log since the last version from `$(LAST_VERSION_FILE)`
+define GET_COMMIT_LOG_SCRIPT
+import subprocess
+import sys
+
+last_version = sys.argv[1].strip()
+commit_log_file = '$(COMMIT_LOG_FILE)'
+
+if last_version == 'NULL':
+    print('!!! ERROR !!!', file=sys.stderr)
+    print('LAST_VERSION is NULL, can\'t get commit log!', file=sys.stderr)
+    sys.exit(1)
+
+try:
+    log_cmd = ['git', 'log', f'{last_version}..HEAD', '--pretty=format:- %s (%h)']
+    commits = subprocess.check_output(log_cmd).decode('utf-8').strip().split('\n')
+    with open(commit_log_file, 'w') as f:
+        f.write('\n'.join(reversed(commits)))
+except subprocess.CalledProcessError as e:
+    print(f'Error: {e}', file=sys.stderr)
+    sys.exit(1)
+endef
+
+export GET_COMMIT_LOG_SCRIPT
 
 # ==================================================
 # reading command line options
@@ -198,7 +251,7 @@ default: help
 .PHONY: gen-version-info
 gen-version-info:
 	@mkdir -p $(LOCAL_DIR)
-	$(eval VERSION := $(shell python -c "import re; print('v'+re.search(r'^version\s*=\s*\"(.+?)\"', open('$(PYPROJECT)').read(), re.MULTILINE).group(1))") )
+	$(eval VERSION := $(shell python -c "$$GET_VERSION_SCRIPT"))
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
 
@@ -214,7 +267,7 @@ gen-commit-log: gen-version-info
 		exit 1; \
 	fi
 	@mkdir -p $(LOCAL_DIR)
-	@python -c "import subprocess; open('$(COMMIT_LOG_FILE)', 'w').write('\n'.join(reversed(subprocess.check_output(['git', 'log', '$(LAST_VERSION)'.strip() + '..HEAD', '--pretty=format:- %s (%h)']).decode('utf-8').strip().split('\n'))))"
+	@python -c "$$GET_COMMIT_LOG_SCRIPT" "$(LAST_VERSION)"
 
 
 # force the version info to be read, printing it out
@@ -255,19 +308,10 @@ dep-check:
 	@echo "Checking that exported requirements are up to date"
 	uv sync --all-extras
 	mkdir -p $(REQ_LOCATION)-TEMP
-	python -c "$$EXPORT_SCRIPT" $(PYPROJECT) .temp_requirements | sh -x
+	python -c "$$EXPORT_SCRIPT" $(PYPROJECT) $(REQ_LOCATION)-TEMP | sh -x
 	diff -r $(REQ_LOCATION)-TEMP $(REQ_LOCATION)
 	rm -rf $(REQ_LOCATION)-TEMP
 
-
-.PHONY: dep-check
-dep-check:
-	@echo "checking uv.lock is good, exported requirements up to date"
-	uv sync --all-extras --locked
-	uv export --no-dev --no-hashes | diff - $(REQ_BASE)
-	uv export --all-extras --no-dev --no-hashes | diff - $(REQ_EXTRAS)
-	uv export --no-hashes | diff - $(REQ_DEV)
-	uv export --all-extras --no-hashes | diff - $(REQ_ALL)
 
 .PHONY: dep-clean
 dep-clean:
