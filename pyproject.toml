@@ -29,6 +29,8 @@ dev = [
 	"mypy>=1.0.1",
 	# docs
 	'pdoc>=14.6.0',
+	# tomli since no tomlib in python < 3.11
+	"tomli>=2.1.0; python_version < '3.11'",
 ]
 lint = [
 	# lint
