@@ -375,6 +375,13 @@ version: gen-commit-log
 # dependencies and setup
 # ==================================================
 
+.PHONY: setup
+setup: dep-check
+	@echo "install and update via uv"
+	@echo "To activate the virtual environment, run one of:"
+	@echo "  source .venv/bin/activate"
+	@echo "  source .venv/Scripts/activate"
+
 .PHONY: get-cuda-info
 get-cuda-info:
 	$(eval CUDA_PRESENT := $(shell if command -v nvcc > /dev/null 2>&1; then echo 1; else echo 0; fi))
