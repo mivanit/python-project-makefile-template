@@ -122,11 +122,13 @@ HTML_TO_MD_MAP: dict[str, str] = {
 
 
 def markup_safe(sig: inspect.Signature) -> str:
+    "mark some text as safe, no escaping needed"
     output: str = str(sig)
     return Markup(output)
 
 
 def use_markdown_format():
+    "set some functions to output markdown format"
     pdoc.render_helpers.format_signature = format_signature
     pdoc.render.env.filters["markup_safe"] = markup_safe
     pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
@@ -183,8 +185,9 @@ def ignore_warnings(config_path: str | Path = Path("pyproject.toml")):
 
 
 if __name__ == "__main__":
+    # parse args
+    # --------------------------------------------------
     argparser: argparse.ArgumentParser = argparse.ArgumentParser()
-    # whether to start an HTTP server to serve the documentation
     argparser.add_argument(
         "--serve",
         "-s",
@@ -205,6 +208,8 @@ if __name__ == "__main__":
     )
     parsed_args = argparser.parse_args()
 
+    # configure pdoc
+    # --------------------------------------------------
     add_package_meta_pdoc_globals()
 
     if not parsed_args.warn_all:
@@ -225,6 +230,8 @@ if __name__ == "__main__":
         search=True,
     )
 
+    # do the rendering
+    # --------------------------------------------------
     if not parsed_args.combined:
         pdoc.pdoc(
             PACKAGE_NAME,
@@ -236,6 +243,8 @@ if __name__ == "__main__":
             PACKAGE_NAME, output_file=OUTPUT_DIR / "combined" / f"{PACKAGE_NAME}.md"
         )
 
+    # http server if needed
+    # --------------------------------------------------
     if parsed_args.serve:
         import http.server
         import os
