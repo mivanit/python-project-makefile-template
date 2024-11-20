@@ -525,6 +525,8 @@ docs-clean:
 	rm $(DOCS_DIR)/$(PACKAGE_NAME).html
 	rm $(DOCS_DIR)/index.html
 	rm $(DOCS_DIR)/search.js
+	rm $(DOCS_DIR)/package_map.dot
+	rm $(DOCS_DIR)/package_map.html
 
 
 # ==================================================
