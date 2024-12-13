@@ -2,7 +2,7 @@
 #    uv export --no-hashes --group dev --group lint --extra cli
 -e .
 click==8.1.7
-colorama==0.4.6 ; sys_platform == 'win32' or platform_system == 'Windows'
+colorama==0.4.6 ; platform_system == 'Windows' or sys_platform == 'win32'
 coverage==7.6.4
 coverage-badge==1.1.2
 fire==0.7.0
