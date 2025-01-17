@@ -1,4 +1,4 @@
-  docs for myproject v0.0.3
+  docs for myproject v0.0.5
 
 Contents
 
@@ -578,7 +578,7 @@ Provided files for pdoc usage are:
 
 View Source on GitHub
 
-  docs for myproject v0.0.3
+  docs for myproject v0.0.5
 
 View Source on GitHub
 

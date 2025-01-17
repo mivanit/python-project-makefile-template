@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.3
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.5
 
 
 ## Contents
@@ -257,7 +257,7 @@ Provided files for pdoc usage are:
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.3/__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py)
 
 # `myproject` { #myproject }
 
@@ -509,13 +509,13 @@ Provided files for pdoc usage are:
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.3/__init__.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py#L0-L2)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.3
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.5
 
 
 
@@ -523,12 +523,12 @@ Provided files for pdoc usage are:
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.3/helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.3/helloworld.py#L0-L0)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/helloworld.py#L0-L0)
 
 
 
