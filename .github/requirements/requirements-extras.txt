@@ -2,5 +2,5 @@
 #    uv export --no-hashes --no-group dev --no-group lint --extra cli
 -e .
 fire==0.7.0
-muutils==0.6.15
+muutils==0.6.19
 termcolor==2.5.0
