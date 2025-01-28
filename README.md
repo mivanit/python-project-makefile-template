@@ -13,6 +13,24 @@ Relevant ideological decisions:
 - [`make`](https://en.wikipedia.org/wiki/Make_(software)) for automation (I know there are better build tools out there and it's overkill, but `make` is universal)
 - [`git`](https://github.com/git) for version control (a spicy take, I know)
 
+The whole idea behind this is rather than having a bunch of stuff in your readme describing what commands you need to run to do X, you have those commands in your makefile -- rather than just being human-readable, they are machine-readable.
+
+# How to use this:
+
+- `make` should already be on your system, unless you are on windows
+  - I recommend using [gitforwindows.org](https://gitforwindows.org), or just using WSL
+- you will need [uv](https://docs.astral.sh/uv/) and some form of python installed.
+- run `uv init` or otherwise set up a `pyproject.toml` file
+  - the `pyproject.toml` of this repo has a lot of dev dependencies that you might need, you may want to copy those
+- copy `makefile` from this repo into the root of your repo
+- modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
+  - there are also a variety of other variables you can modify -- most are at the top of the makefile
+- if you want automatic documentation generation, copy from this repo:
+  - `docs/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/templates/`: jinja2 templates for the docs
+  - `docs/resources/`: some css and icons for the docs
+
+
 # Makefile
 
 `make help` Displays the help message listing all available make targets and variables. running just `make` will also display this message.

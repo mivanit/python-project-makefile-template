@@ -1,3 +1,13 @@
+#|==================================================================|
+#| python project makefile template                                 |
+#| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
+#| https://github.com/mivanit/python-project-makefile-template      |
+#| version: 0.0.5                                                   |
+#| license: https://creativecommons.org/licenses/by-sa/4.0/         |
+#| modifications from the original should be denoted with `~~~~~`   |
+#| as this makes it easier to find edits when updating makefile     |
+#|==================================================================|
+
 # ==================================================
 # configuration & variables
 # ==================================================
@@ -619,7 +629,8 @@ clean-all: clean dep-clean docs-clean
 # listing targets is from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
 # no .PHONY because this will only be run before `make help`
-# it's a separate command because getting the versions takes a bit of time
+# it's a separate command because getting the `info` takes a bit of time
+# and we want to show the make targets right away without making the user wait for `info` to finish running
 help-targets:
 	@echo -n "# make targets"
 	@echo ":"
