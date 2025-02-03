@@ -261,3 +261,15 @@ Provided files for pdoc usage are:
 - `docs/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
 - `docs/templates/` containing template files for both html and markdown docs
 - `docs/resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
+
+
+# Development
+
+`makefile.template` is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.
+
+the scripts used to generate the makefile are located in `scripts/`, with the exception of `scripts/assemble_make.py` which is the script used to populate the makefile.
+
+If developing, modify the `makefile.template` file or scripts in `scripts/`, and then run
+```sh
+python scripts/assemble_make.py
+```
