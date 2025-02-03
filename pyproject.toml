@@ -1,4 +1,5 @@
 [project]
+# basic information, URLs down below because toml doesn't let you define the same table twice
 name = "myproject"
 version = "0.0.5"
 description = "template for python projects/packages"
@@ -8,11 +9,18 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.11"
 
+# dependencies
+
 dependencies = [
+	"numpy>=1.21.0",
+	"torch>=2.0.0",
 	"muutils>=0.6.12",
 ]
 
 [project.optional-dependencies]
+# handling torch
+torch-cu124 = [ "torch>=2.0.0" ]
+
 # for example purposes only
 cli = [
 	"fire>=0.6.0",
@@ -38,14 +46,34 @@ lint = [
 	"ruff>=0.4.8",
 ]
 
-[tool.uv]
-default-groups = ["dev", "lint"]
+
+# more project metadata
 
 [project.urls]
+
 Homepage = "https://miv.name/python-project-makefile-template"
 Documentation = "https://miv.name/python-project-makefile-template"
 Repository = "https://github.com/mivanit/python-project-makefile-template"
 Issues = "https://github.com/mivanit/python-project-makefile-template/issues"
+
+
+# tools
+
+[tool.uv]
+default-groups = ["dev", "lint"]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu124", extra = "torch-cu124" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+
+
 
 [build-system]
 requires = ["hatchling"]
@@ -67,15 +95,13 @@ args = [
 exports = [
 	# no groups, no extras, just the base dependencies
     { name = "base", groups = false, extras = false },
-	# all extras but no groups
-    { name = "extras", groups = false, extras = true },
-	# include the dev group (this is the default behavior)
-    { name = "dev", groups = ["dev"] },
+	# all groups
+	{ name = "groups", groups = true, extras = false },
 	# only the lint group -- custom options for this
 	{ name = "lint", options = ["--only-group", "lint"] },
-	# all groups and extras
-    { name = "all", filename="requirements.txt", groups = true, extras=true },
-	# all groups and extras, a different way
-	{ name = "all", groups = true, options = ["--all-extras"] },
+	# # all groups and extras
+    # { name = "all", filename="requirements.txt", groups = true, extras=true },
+	# # all groups and extras, a different way
+	# { name = "all", groups = true, options = ["--all-extras"] },
 ]
 
