@@ -89,18 +89,19 @@ CUDA_VERSION_SHORT := NULL
 
 
 # python scripts we want to use inside the makefile
+# when developing, these are populated by `scripts/assemble_make.py`
 # --------------------------------------------------
 
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
-#{{SCRIPT_EXPORT_REQUIREMENTS}}#
+##[[SCRIPT_EXPORT_REQUIREMENTS]]##
 endef
 
 export SCRIPT_EXPORT_REQUIREMENTS
 
 # get the version from `pyproject.toml:project.version`
 define SCRIPT_GET_VERSION
-#{{SCRIPT_GET_VERSION}}#
+##[[SCRIPT_GET_VERSION]]##
 endef
 
 export SCRIPT_GET_VERSION
@@ -108,14 +109,14 @@ export SCRIPT_GET_VERSION
 
 # get the commit log since the last version from `$(LAST_VERSION_FILE)`
 define SCRIPT_GET_COMMIT_LOG
-#{{SCRIPT_GET_COMMIT_LOG}}#
+##[[SCRIPT_GET_COMMIT_LOG]]##
 endef
 
 export SCRIPT_GET_COMMIT_LOG
 
 # get cuda information and whether torch sees it
 define SCRIPT_CHECK_TORCH
-#{{SCRIPT_CHECK_TORCH}}#
+##[[SCRIPT_CHECK_TORCH]]##
 endef
 
 export SCRIPT_CHECK_TORCH

@@ -3,7 +3,7 @@ from pathlib import Path
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
 SCRIPTS_DIR: Path = Path("scripts")
-TEMPLATE_SYNTAX: str = "#{{SCRIPT_{script_name}}}#"
+TEMPLATE_SYNTAX: str = "##[[SCRIPT_{script_name}]]##"
 IGNORE_SCRIPTS: set[str] = {"assemble_make"}
 
 

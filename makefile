@@ -89,10 +89,11 @@ CUDA_VERSION_SHORT := NULL
 
 
 # python scripts we want to use inside the makefile
+# when developing, these are populated by `scripts/assemble_make.py`
 # --------------------------------------------------
 
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
-define EXPORT_SCRIPT
+define SCRIPT_EXPORT_REQUIREMENTS
 import sys
 if sys.version_info >= (3, 11):
     import tomllib
@@ -168,10 +169,10 @@ for export in exports:
 	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
 endef
 
-export EXPORT_SCRIPT
+export SCRIPT_EXPORT_REQUIREMENTS
 
 # get the version from `pyproject.toml:project.version`
-define GET_VERSION_SCRIPT
+define SCRIPT_GET_VERSION
 import sys
 
 try:
@@ -191,11 +192,11 @@ except Exception as e:
 	sys.exit(1)
 endef
 
-export GET_VERSION_SCRIPT
+export SCRIPT_GET_VERSION
 
 
 # get the commit log since the last version from `$(LAST_VERSION_FILE)`
-define GET_COMMIT_LOG_SCRIPT
+define SCRIPT_GET_COMMIT_LOG
 import subprocess
 import sys
 
@@ -217,10 +218,10 @@ except subprocess.CalledProcessError as e:
     sys.exit(1)
 endef
 
-export GET_COMMIT_LOG_SCRIPT
+export SCRIPT_GET_COMMIT_LOG
 
 # get cuda information and whether torch sees it
-define CHECK_TORCH_SCRIPT
+define SCRIPT_CHECK_TORCH
 import os
 import sys
 print(f'python version: {sys.version}')
@@ -278,7 +279,7 @@ else:
 	sys.exit(1)
 endef
 
-export CHECK_TORCH_SCRIPT
+export SCRIPT_CHECK_TORCH
 
 
 # ==================================================
@@ -334,13 +335,13 @@ default: help
 
 # this recipe is weird. we need it because:
 # - a one liner for getting the version with toml is unwieldy, and using regex is fragile
-# - using $$GET_VERSION_SCRIPT within $(shell ...) doesn't work because of escaping issues
+# - using $$SCRIPT_GET_VERSION within $(shell ...) doesn't work because of escaping issues
 # - trying to write to the file inside the `gen-version-info` recipe doesn't work, 
 # 	shell eval happens before our `python -c ...` gets run and `cat` doesn't see the new file
 .PHONY: write-proj-version
 write-proj-version:
 	@mkdir -p $(VERSIONS_DIR)
-	@$(PYTHON) -c "$$GET_VERSION_SCRIPT" > $(VERSION_FILE)
+	@$(PYTHON) -c "$$SCRIPT_GET_VERSION" > $(VERSION_FILE)
 
 # gets version info from $(PYPROJECT), last version from $(LAST_VERSION_FILE), and python version
 # uses just `python` for everything except getting the python version. no echo here, because this is "private"
@@ -363,7 +364,7 @@ gen-commit-log: gen-version-info
 		exit 1; \
 	fi
 	@mkdir -p $(LOCAL_DIR)
-	@$(PYTHON) -c "$$GET_COMMIT_LOG_SCRIPT" "$(LAST_VERSION)"
+	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)"
 
 
 # force the version info to be read, printing it out
@@ -401,14 +402,14 @@ get-cuda-info:
 .PHONY: dep-check-torch
 dep-check-torch:
 	@echo "see if torch is installed, and which CUDA version and devices it sees"
-	$(PYTHON) -c "$$CHECK_TORCH_SCRIPT"
+	$(PYTHON) -c "$$SCRIPT_CHECK_TORCH"
 
 .PHONY: dep
 dep: get-cuda-info
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups
 	mkdir -p $(REQ_LOCATION)
-	$(PYTHON) -c "$$EXPORT_SCRIPT" $(PYPROJECT) $(REQ_LOCATION) | sh -x
+	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION) | sh -x
 	
 	@if [ "$(CUDA_PRESENT)" = "1" ]; then \
 		echo "CUDA is present, installing torch with CUDA $(CUDA_VERSION)"; \
@@ -421,7 +422,7 @@ dep-check:
 	@echo "Checking that exported requirements are up to date"
 	uv sync --all-extras --all-groups
 	mkdir -p $(REQ_LOCATION)-TEMP
-	$(PYTHON) -c "$$EXPORT_SCRIPT" $(PYPROJECT) $(REQ_LOCATION)-TEMP | sh -x
+	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION)-TEMP | sh -x
 	diff -r $(REQ_LOCATION)-TEMP $(REQ_LOCATION)
 	rm -rf $(REQ_LOCATION)-TEMP
 
