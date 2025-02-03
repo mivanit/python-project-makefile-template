@@ -1,7 +1,7 @@
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.0.5"
+	version = "0.0.6"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
@@ -98,8 +98,8 @@
 		# only the lint group -- custom options for this
 		{ name = "lint", options = ["--only-group", "lint"] },
 		# # all groups and extras
-		# { name = "all", filename="requirements.txt", groups = true, extras=true },
+		{ name = "all", filename="requirements.txt", groups = true, extras=true },
 		# # all groups and extras, a different way
-		# { name = "all", groups = true, options = ["--all-extras"] },
+		{ name = "all", groups = true, options = ["--all-extras"] },
 	]
 
