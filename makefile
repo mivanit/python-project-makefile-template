@@ -95,47 +95,52 @@ CUDA_VERSION_SHORT := NULL
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
 import sys
+
 if sys.version_info >= (3, 11):
-    import tomllib
+	import tomllib
 else:
-    import tomli as tomllib
+	import tomli as tomllib
 from pathlib import Path
-from typing import Union, List, Optional
+from typing import Union, List
 
 pyproject_path: Path = Path(sys.argv[1])
 output_dir: Path = Path(sys.argv[2])
 
-with open(pyproject_path, 'rb') as f:
+with open(pyproject_path, "rb") as f:
 	pyproject_data: dict = tomllib.load(f)
 
 # all available groups
-all_groups: List[str] = list(pyproject_data.get('dependency-groups', {}).keys())
-all_extras: List[str] = list(pyproject_data.get('project', {}).get('optional-dependencies', {}).keys())
+all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
+all_extras: List[str] = list(
+	pyproject_data.get("project", {}).get("optional-dependencies", {}).keys()
+)
 
 # options for exporting
-export_opts: dict = pyproject_data.get('tool', {}).get('uv-exports', {})
+export_opts: dict = pyproject_data.get("tool", {}).get("uv-exports", {})
 
 # what are we exporting?
-exports: List[str] = export_opts.get('exports', [])
+exports: List[str] = export_opts.get("exports", [])
 if not exports:
-	exports = [{'name': 'all', 'groups': [], 'extras': [], 'options': []}]
+	exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 
 # export each configuration
 for export in exports:
 	# get name and validate
-	name = export.get('name')
+	name = export.get("name")
 	if not name or not name.isalnum():
-		print(f"Export configuration missing valid 'name' field {export}", file=sys.stderr)
+		print(
+			f"Export configuration missing valid 'name' field {export}", file=sys.stderr
+		)
 		continue
 
 	# get other options with default fallbacks
-	filename: str = export.get('filename') or f"requirements-{name}.txt"
-	groups: Union[List[str], bool, None] = export.get('groups', None)
-	extras: Union[List[str], bool] = export.get('extras', [])
-	options: List[str] = export.get('options', [])
+	filename: str = export.get("filename") or f"requirements-{name}.txt"
+	groups: Union[List[str], bool, None] = export.get("groups", None)
+	extras: Union[List[str], bool] = export.get("extras", [])
+	options: List[str] = export.get("options", [])
 
 	# init command
-	cmd: List[str] = ['uv', 'export'] + export_opts.get('args', [])
+	cmd: List[str] = ["uv", "export"] + export_opts.get("args", [])
 
 	# handle groups
 	if groups is not None:
@@ -145,12 +150,12 @@ for export in exports:
 				groups_list = all_groups.copy()
 		else:
 			groups_list = groups
-		
+
 		for group in all_groups:
 			if group in groups_list:
-				cmd.extend(['--group', group])
+				cmd.extend(["--group", group])
 			else:
-				cmd.extend(['--no-group', group])
+				cmd.extend(["--no-group", group])
 
 	# handle extras
 	extras_list: List[str] = []
@@ -161,12 +166,13 @@ for export in exports:
 		extras_list = extras
 
 	for extra in extras_list:
-		cmd.extend(['--extra', extra])
+		cmd.extend(["--extra", extra])
 
 	cmd.extend(options)
 
 	output_path = output_dir / filename
 	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
+
 endef
 
 export SCRIPT_EXPORT_REQUIREMENTS
@@ -181,15 +187,16 @@ try:
 	else:
 		import tomli as tomllib
 
-	pyproject_path = '$(PYPROJECT)'
+	pyproject_path = "$(PYPROJECT)"
 
-	with open(pyproject_path, 'rb') as f:
+	with open(pyproject_path, "rb") as f:
 		pyproject_data = tomllib.load(f)
 
-	print('v' + pyproject_data['project']['version'], end='')
-except Exception as e:
-	print('NULL', end='')
+	print("v" + pyproject_data["project"]["version"], end="")
+except Exception:
+	print("NULL", end="")
 	sys.exit(1)
+
 endef
 
 export SCRIPT_GET_VERSION
@@ -201,21 +208,22 @@ import subprocess
 import sys
 
 last_version = sys.argv[1].strip()
-commit_log_file = '$(COMMIT_LOG_FILE)'
+commit_log_file = "$(COMMIT_LOG_FILE)"
 
-if last_version == 'NULL':
-    print('!!! ERROR !!!', file=sys.stderr)
-    print('LAST_VERSION is NULL, can\'t get commit log!', file=sys.stderr)
-    sys.exit(1)
+if last_version == "NULL":
+	print("!!! ERROR !!!", file=sys.stderr)
+	print("LAST_VERSION is NULL, can't get commit log!", file=sys.stderr)
+	sys.exit(1)
 
 try:
-    log_cmd = ['git', 'log', f'{last_version}..HEAD', '--pretty=format:- %s (%h)']
-    commits = subprocess.check_output(log_cmd).decode('utf-8').strip().split('\n')
-    with open(commit_log_file, 'w') as f:
-        f.write('\n'.join(reversed(commits)))
+	log_cmd = ["git", "log", f"{last_version}..HEAD", "--pretty=format:- %s (%h)"]
+	commits = subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
+	with open(commit_log_file, "w") as f:
+		f.write("\n".join(reversed(commits)))
 except subprocess.CalledProcessError as e:
-    print(f'Error: {e}', file=sys.stderr)
-    sys.exit(1)
+	print(f"Error: {e}", file=sys.stderr)
+	sys.exit(1)
+
 endef
 
 export SCRIPT_GET_COMMIT_LOG
@@ -224,59 +232,141 @@ export SCRIPT_GET_COMMIT_LOG
 define SCRIPT_CHECK_TORCH
 import os
 import sys
-print(f'python version: {sys.version}')
-print(f"\tpython executable path: {str(sys.executable)}")
-print(f"\tsys_platform: {sys.platform}")
-print(f'\tcurrent working directory: {os.getcwd()}')
-print(f'\tHost name: {os.name}')
-print(f'\tCPU count: {os.cpu_count()}')
-print()
+import re
+import subprocess
+from typing import Any, Callable, Dict, List, Optional, Union
+from pathlib import Path
 
-try:
-	import torch
-except Exception as e:
-	print('ERROR: error importing torch, terminating        ')
-	print('-'*50)
-	raise e
-	sys.exit(1)
 
-print(f'torch version: {torch.__version__}')
+def print_info_dict(
+		info: Dict[str, Union[Any, Dict[str, Any]]],
+		indent: str = "  ",
+		level: int = 1,
+	) -> None:
+	indent_str: str = indent * level
+	longest_key_len: int = max(map(len, info.keys()))
+	for key, value in info.items():
+		if isinstance(value, dict):
+			print(f"{indent_str}{key:<{longest_key_len}}:")
+			print_info_dict(value, indent, level + 1)
+		else:
+			print(f"{indent_str}{key:<{longest_key_len}} = {value}")
 
-print(f'\t{torch.cuda.is_available() = }')
+def get_nvcc_info() -> Dict[str, str]:
+    # Run the nvcc command.
+    result: subprocess.CompletedProcess[str] = subprocess.run(
+        ["nvcc", "--version"],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    output: str = result.stdout
+    lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
-if torch.cuda.is_available():
-	# print('\tCUDA is available on torch')
-	print(f'\tCUDA version via torch: {torch.version.cuda}')
+    # Ensure there are exactly 5 lines in the output.
+    assert len(lines) == 5, f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
 
-	if torch.cuda.device_count() > 0:
-		print(f"\tcurrent device: {torch.cuda.current_device() = }\n")
-		n_devices: int = torch.cuda.device_count()
-		print(f"detected {n_devices = }")
-		for current_device in range(n_devices):
-			try:
-				# print(f'checking current device {current_device} of {torch.cuda.device_count()} devices')
-				print(f'\tdevice {current_device}')
-				dev_prop = torch.cuda.get_device_properties(torch.device(0))
-				print(f'\t    name:                   {dev_prop.name}')
-				print(f'\t    version:                {dev_prop.major}.{dev_prop.minor}')
-				print(f'\t    total_memory:           {dev_prop.total_memory} ({dev_prop.total_memory:.1e})')
-				print(f'\t    multi_processor_count:  {dev_prop.multi_processor_count}')
-				print(f'\t    is_integrated:          {dev_prop.is_integrated}')
-				print(f'\t    is_multi_gpu_board:     {dev_prop.is_multi_gpu_board}')
-				print(f'\t')
-			except Exception as e:
-				print(f'Exception when trying to get properties of device {current_device}')
-				raise e
-		sys.exit(0)
-	else:
-		print(f'ERROR: {torch.cuda.device_count()} devices detected, invalid')
-		print('-'*50)
-		sys.exit(1)
+    # Compile shared regex for release info.
+    release_regex: re.Pattern = re.compile(r"Cuda compilation tools,\s*release\s*([^,]+),\s*(V.+)")
 
-else:
-	print('ERROR: CUDA is NOT available, terminating')
-	print('-'*50)
-	sys.exit(1)
+    # Define a mapping for each desired field:
+    # key -> (line index, regex pattern, group index, transformation function)
+    patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+        "build_time": (2, re.compile(r"Built on (.+)"), 1, lambda s: s.replace("_", " ")),
+        "release":    (3, release_regex, 1, str.strip),
+        "release_V":  (3, release_regex, 2, str.strip),
+        "build":      (4, re.compile(r"Build (.+)"), 1, str.strip),
+    }
+
+    info: Dict[str, str] = {}
+    for key, (line_index, pattern, group_index, transform) in patterns.items():
+        match: re.Match | None = pattern.search(lines[line_index])
+        if not match:
+            raise ValueError(f"Unable to parse {key} from nvcc output: {lines[line_index]}")
+        info[key] = transform(match.group(group_index))
+
+    info["release_short"] = info["release"].replace(".", "").strip()
+
+    return info
+
+
+def get_torch_info() -> tuple[List[Exception], Dict[str, str]]:
+	exceptions: List[Exception] = []
+	info: Dict[str, str] = {}
+
+	try:
+		import torch
+	
+		info["torch.__version__"] = torch.__version__
+		info["torch.cuda.is_available()"] = torch.cuda.is_available()
+
+		if torch.cuda.is_available():
+			info["torch.version.cuda"] = torch.version.cuda
+			info["torch.cuda.device_count()"] = torch.cuda.device_count()
+
+			if torch.cuda.device_count() > 0:
+				info["torch.cuda.current_device()"] = torch.cuda.current_device()
+				n_devices: int = torch.cuda.device_count()
+				info["n_devices"] = n_devices
+				for current_device in range(n_devices):
+					try:
+						current_device_info: Dict[str, str] = {}
+
+						dev_prop = torch.cuda.get_device_properties(torch.device(f"cuda:{current_device}"))
+
+						current_device_info["name"] = dev_prop.name
+						current_device_info["version"] = f"{dev_prop.major}.{dev_prop.minor}"
+						current_device_info["total_memory"] = f"{dev_prop.total_memory} ({dev_prop.total_memory:.1e})"
+						current_device_info["multi_processor_count"] = dev_prop.multi_processor_count
+						current_device_info["is_integrated"] = dev_prop.is_integrated
+						current_device_info["is_multi_gpu_board"] = dev_prop.is_multi_gpu_board
+
+						info[f"device cuda:{current_device}"] = current_device_info
+
+					except Exception as e:
+						exceptions.append(e)
+			else:
+				raise Exception(f"{torch.cuda.device_count() = } devices detected, invalid")
+
+		else:
+			raise Exception(f"CUDA is NOT available in torch: {torch.cuda.is_available() =}")
+
+	except Exception as e:
+		exceptions.append(e)
+
+	return exceptions, info
+
+
+
+print(f"python: {sys.version}")
+print_info_dict({
+	"python executable path: sys.executable": str(sys.executable),
+	"sys.platform": sys.platform,
+	"current working directory: os.getcwd()": os.getcwd(),
+	"Host name: os.name": os.name,
+	"CPU count: os.cpu_count()": str(os.cpu_count()),
+})
+
+nvcc_info: Dict[str, str] = get_nvcc_info()
+print("nvcc:")
+print_info_dict(nvcc_info)
+
+torch_exceptions, torch_info = get_torch_info()
+print("torch:")
+print_info_dict(torch_info)
+
+if torch_exceptions:
+	print("torch_exceptions:")
+	for e in torch_exceptions:
+		print(f"  {e}")
+
+
+
+
+
+
+
 endef
 
 export SCRIPT_CHECK_TORCH
@@ -407,14 +497,14 @@ dep-check-torch:
 .PHONY: dep
 dep: get-cuda-info
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
-	uv sync --all-extras --all-groups
+	uv sync --all-extras --all-groups --compile-bytecode
 	mkdir -p $(REQ_LOCATION)
 	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION) | sh -x
-	
-	@if [ "$(CUDA_PRESENT)" = "1" ]; then \
-		echo "CUDA is present, installing torch with CUDA $(CUDA_VERSION)"; \
-		uv pip install torch --upgrade --index https://download.pytorch.org/whl/cu$(CUDA_VERSION_SHORT); \
-	fi
+
+# @if [ "$(CUDA_PRESENT)" = "1" ]; then \
+# 	echo "CUDA is present, installing torch with CUDA $(CUDA_VERSION)"; \
+# 	uv pip install torch --upgrade --index https://download.pytorch.org/whl/cu$(CUDA_VERSION_SHORT); \
+# fi
 	
 
 .PHONY: dep-check
