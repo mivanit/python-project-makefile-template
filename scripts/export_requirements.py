@@ -1,45 +1,50 @@
 import sys
+
 if sys.version_info >= (3, 11):
-    import tomllib
+	import tomllib
 else:
-    import tomli as tomllib
+	import tomli as tomllib
 from pathlib import Path
-from typing import Union, List, Optional
+from typing import Union, List
 
 pyproject_path: Path = Path(sys.argv[1])
 output_dir: Path = Path(sys.argv[2])
 
-with open(pyproject_path, 'rb') as f:
+with open(pyproject_path, "rb") as f:
 	pyproject_data: dict = tomllib.load(f)
 
 # all available groups
-all_groups: List[str] = list(pyproject_data.get('dependency-groups', {}).keys())
-all_extras: List[str] = list(pyproject_data.get('project', {}).get('optional-dependencies', {}).keys())
+all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
+all_extras: List[str] = list(
+	pyproject_data.get("project", {}).get("optional-dependencies", {}).keys()
+)
 
 # options for exporting
-export_opts: dict = pyproject_data.get('tool', {}).get('uv-exports', {})
+export_opts: dict = pyproject_data.get("tool", {}).get("uv-exports", {})
 
 # what are we exporting?
-exports: List[str] = export_opts.get('exports', [])
+exports: List[str] = export_opts.get("exports", [])
 if not exports:
-	exports = [{'name': 'all', 'groups': [], 'extras': [], 'options': []}]
+	exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 
 # export each configuration
 for export in exports:
 	# get name and validate
-	name = export.get('name')
+	name = export.get("name")
 	if not name or not name.isalnum():
-		print(f"Export configuration missing valid 'name' field {export}", file=sys.stderr)
+		print(
+			f"Export configuration missing valid 'name' field {export}", file=sys.stderr
+		)
 		continue
 
 	# get other options with default fallbacks
-	filename: str = export.get('filename') or f"requirements-{name}.txt"
-	groups: Union[List[str], bool, None] = export.get('groups', None)
-	extras: Union[List[str], bool] = export.get('extras', [])
-	options: List[str] = export.get('options', [])
+	filename: str = export.get("filename") or f"requirements-{name}.txt"
+	groups: Union[List[str], bool, None] = export.get("groups", None)
+	extras: Union[List[str], bool] = export.get("extras", [])
+	options: List[str] = export.get("options", [])
 
 	# init command
-	cmd: List[str] = ['uv', 'export'] + export_opts.get('args', [])
+	cmd: List[str] = ["uv", "export"] + export_opts.get("args", [])
 
 	# handle groups
 	if groups is not None:
@@ -49,12 +54,12 @@ for export in exports:
 				groups_list = all_groups.copy()
 		else:
 			groups_list = groups
-		
+
 		for group in all_groups:
 			if group in groups_list:
-				cmd.extend(['--group', group])
+				cmd.extend(["--group", group])
 			else:
-				cmd.extend(['--no-group', group])
+				cmd.extend(["--no-group", group])
 
 	# handle extras
 	extras_list: List[str] = []
@@ -65,7 +70,7 @@ for export in exports:
 		extras_list = extras
 
 	for extra in extras_list:
-		cmd.extend(['--extra', extra])
+		cmd.extend(["--extra", extra])
 
 	cmd.extend(options)
 

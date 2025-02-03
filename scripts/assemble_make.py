@@ -14,6 +14,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
 			scripts[script.stem] = script.read_text()
 	return scripts
 
+
 def main():
 	template_contents: str = TEMPLATE_PATH.read_text()
 	scripts: dict[str, str] = read_scripts()
@@ -22,7 +23,9 @@ def main():
 			continue
 
 		template_replace: str = TEMPLATE_SYNTAX.format(script_name=script_name.upper())
-		assert template_replace in template_contents, f"Template syntax not found in {TEMPLATE_PATH}:\n{template_replace}"
+		assert template_replace in template_contents, (
+			f"Template syntax not found in {TEMPLATE_PATH}:\n{template_replace}"
+		)
 
 		template_contents = template_contents.replace(
 			template_replace,
@@ -34,4 +37,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-

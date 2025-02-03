@@ -6,12 +6,12 @@ try:
 	else:
 		import tomli as tomllib
 
-	pyproject_path = '$(PYPROJECT)'
+	pyproject_path = "$(PYPROJECT)"
 
-	with open(pyproject_path, 'rb') as f:
+	with open(pyproject_path, "rb") as f:
 		pyproject_data = tomllib.load(f)
 
-	print('v' + pyproject_data['project']['version'], end='')
-except Exception as e:
-	print('NULL', end='')
+	print("v" + pyproject_data["project"]["version"], end="")
+except Exception:
+	print("NULL", end="")
 	sys.exit(1)
