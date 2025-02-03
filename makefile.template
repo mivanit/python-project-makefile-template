@@ -204,7 +204,7 @@ gen-commit-log: gen-version-info
 		exit 1; \
 	fi
 	@mkdir -p $(LOCAL_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)"
+	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)" "$(COMMIT_LOG_FILE)"
 
 
 # force the version info to be read, printing it out

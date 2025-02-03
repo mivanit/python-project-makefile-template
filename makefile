@@ -207,8 +207,8 @@ define SCRIPT_GET_COMMIT_LOG
 import subprocess
 import sys
 
-last_version = sys.argv[1].strip()
-commit_log_file = "$(COMMIT_LOG_FILE)"
+last_version: str = sys.argv[1].strip()
+commit_log_file: str = sys.argv[2].strip()
 
 if last_version == "NULL":
 	print("!!! ERROR !!!", file=sys.stderr)
@@ -216,8 +216,8 @@ if last_version == "NULL":
 	sys.exit(1)
 
 try:
-	log_cmd = ["git", "log", f"{last_version}..HEAD", "--pretty=format:- %s (%h)"]
-	commits = subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
+	log_cmd: list[str] = ["git", "log", f"{last_version}..HEAD", "--pretty=format:- %s (%h)"]
+	commits: list[str] = subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
 	with open(commit_log_file, "w") as f:
 		f.write("\n".join(reversed(commits)))
 except subprocess.CalledProcessError as e:
@@ -338,28 +338,29 @@ def get_torch_info() -> tuple[List[Exception], Dict[str, str]]:
 	return exceptions, info
 
 
+if __name__ == "__main__":
 
-print(f"python: {sys.version}")
-print_info_dict({
-	"python executable path: sys.executable": str(sys.executable),
-	"sys.platform": sys.platform,
-	"current working directory: os.getcwd()": os.getcwd(),
-	"Host name: os.name": os.name,
-	"CPU count: os.cpu_count()": str(os.cpu_count()),
-})
+	print(f"python: {sys.version}")
+	print_info_dict({
+		"python executable path: sys.executable": str(sys.executable),
+		"sys.platform": sys.platform,
+		"current working directory: os.getcwd()": os.getcwd(),
+		"Host name: os.name": os.name,
+		"CPU count: os.cpu_count()": str(os.cpu_count()),
+	})
 
-nvcc_info: Dict[str, str] = get_nvcc_info()
-print("nvcc:")
-print_info_dict(nvcc_info)
+	nvcc_info: Dict[str, str] = get_nvcc_info()
+	print("nvcc:")
+	print_info_dict(nvcc_info)
 
-torch_exceptions, torch_info = get_torch_info()
-print("torch:")
-print_info_dict(torch_info)
+	torch_exceptions, torch_info = get_torch_info()
+	print("torch:")
+	print_info_dict(torch_info)
 
-if torch_exceptions:
-	print("torch_exceptions:")
-	for e in torch_exceptions:
-		print(f"  {e}")
+	if torch_exceptions:
+		print("torch_exceptions:")
+		for e in torch_exceptions:
+			print(f"  {e}")
 
 
 
@@ -454,7 +455,7 @@ gen-commit-log: gen-version-info
 		exit 1; \
 	fi
 	@mkdir -p $(LOCAL_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)"
+	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)" "$(COMMIT_LOG_FILE)"
 
 
 # force the version info to be read, printing it out
