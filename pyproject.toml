@@ -103,3 +103,11 @@
 		{ name = "all", groups = true, options = ["--all-extras"] },
 	]
 
+
+
+[tool.inline-todo]
+exclude = [
+	"docs/**",
+	".venv/**",
+	"scripts/get_todos.py",
+]

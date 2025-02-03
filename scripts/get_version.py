@@ -6,10 +6,10 @@ try:
 	else:
 		import tomli as tomllib
 
-	pyproject_path = "$(PYPROJECT)"
+	pyproject_path: str = sys.argv[1].strip()
 
 	with open(pyproject_path, "rb") as f:
-		pyproject_data = tomllib.load(f)
+		pyproject_data: dict = tomllib.load(f)
 
 	print("v" + pyproject_data["project"]["version"], end="")
 except Exception:

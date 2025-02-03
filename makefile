@@ -187,10 +187,10 @@ try:
 	else:
 		import tomli as tomllib
 
-	pyproject_path = "$(PYPROJECT)"
+	pyproject_path: str = sys.argv[1].strip()
 
 	with open(pyproject_path, "rb") as f:
-		pyproject_data = tomllib.load(f)
+		pyproject_data: dict = tomllib.load(f)
 
 	print("v" + pyproject_data["project"]["version"], end="")
 except Exception:
@@ -432,7 +432,7 @@ default: help
 .PHONY: write-proj-version
 write-proj-version:
 	@mkdir -p $(VERSIONS_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_VERSION" > $(VERSION_FILE)
+	@$(PYTHON) -c "$$SCRIPT_GET_VERSION" "$(PYPROJECT)" > $(VERSION_FILE)
 
 # gets version info from $(PYPROJECT), last version from $(LAST_VERSION_FILE), and python version
 # uses just `python` for everything except getting the python version. no echo here, because this is "private"
