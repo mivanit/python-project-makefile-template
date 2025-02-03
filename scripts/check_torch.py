@@ -106,28 +106,29 @@ def get_torch_info() -> tuple[List[Exception], Dict[str, str]]:
 	return exceptions, info
 
 
+if __name__ == "__main__":
 
-print(f"python: {sys.version}")
-print_info_dict({
-	"python executable path: sys.executable": str(sys.executable),
-	"sys.platform": sys.platform,
-	"current working directory: os.getcwd()": os.getcwd(),
-	"Host name: os.name": os.name,
-	"CPU count: os.cpu_count()": str(os.cpu_count()),
-})
+	print(f"python: {sys.version}")
+	print_info_dict({
+		"python executable path: sys.executable": str(sys.executable),
+		"sys.platform": sys.platform,
+		"current working directory: os.getcwd()": os.getcwd(),
+		"Host name: os.name": os.name,
+		"CPU count: os.cpu_count()": str(os.cpu_count()),
+	})
 
-nvcc_info: Dict[str, str] = get_nvcc_info()
-print("nvcc:")
-print_info_dict(nvcc_info)
+	nvcc_info: Dict[str, str] = get_nvcc_info()
+	print("nvcc:")
+	print_info_dict(nvcc_info)
 
-torch_exceptions, torch_info = get_torch_info()
-print("torch:")
-print_info_dict(torch_info)
+	torch_exceptions, torch_info = get_torch_info()
+	print("torch:")
+	print_info_dict(torch_info)
 
-if torch_exceptions:
-	print("torch_exceptions:")
-	for e in torch_exceptions:
-		print(f"  {e}")
+	if torch_exceptions:
+		print("torch_exceptions:")
+		for e in torch_exceptions:
+			print(f"  {e}")
 
 
 
