@@ -1,11 +1,14 @@
 from pathlib import Path
+import tomllib
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
 SCRIPTS_DIR: Path = Path("scripts")
-TEMPLATE_SYNTAX: str = "##[[SCRIPT_{script_name}]]##"
+TEMPLATE_SYNTAX: str = "##[[{var}]]##"
 IGNORE_SCRIPTS: set[str] = {"assemble_make"}
 
+with open("pyproject.toml", "rb") as f_pyproject:
+	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
 
 def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
 	scripts: dict[str, str] = {}
@@ -16,23 +19,34 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
 
 
 def main():
-	template_contents: str = TEMPLATE_PATH.read_text()
+	contents: str = TEMPLATE_PATH.read_text()
 	scripts: dict[str, str] = read_scripts()
+
+	# inline each script
 	for script_name, script_contents in scripts.items():
 		if script_name in IGNORE_SCRIPTS:
 			continue
 
-		template_replace: str = TEMPLATE_SYNTAX.format(script_name=script_name.upper())
-		assert template_replace in template_contents, (
+		template_replace: str = TEMPLATE_SYNTAX.format(
+			var=f"SCRIPT_{script_name.upper()}"
+		)
+		assert template_replace in contents, (
 			f"Template syntax not found in {TEMPLATE_PATH}:\n{template_replace}"
 		)
 
-		template_contents = template_contents.replace(
+		contents = contents.replace(
 			template_replace,
 			script_contents,
 		)
 
-	MAKEFILE_PATH.write_text(template_contents)
+	# version
+	version_str: str = f"#| version: v{VERSION}"
+	contents = contents.replace(
+		TEMPLATE_SYNTAX.format(var="VERSION"),
+		f"{version_str:<68}|",
+	)
+
+	MAKEFILE_PATH.write_text(contents)
 
 
 if __name__ == "__main__":
