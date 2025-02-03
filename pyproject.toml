@@ -1,107 +1,105 @@
 [project]
-# basic information, URLs down below because toml doesn't let you define the same table twice
-name = "myproject"
-version = "0.0.5"
-description = "template for python projects/packages"
-authors = [
-	{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
-]
-readme = "README.md"
-requires-python = ">=3.11"
+	# basic information, URLs down below because toml doesn't let you define the same table twice
+	name = "myproject"
+	version = "0.0.5"
+	description = "template for python projects/packages"
+	authors = [
+		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
+	]
+	readme = "README.md"
+	requires-python = ">=3.11"
 
-# dependencies
+	# dependencies
 
-dependencies = [
-	"numpy>=1.21.0",
-	"torch>=2.0.0",
-	"muutils>=0.6.12",
-]
+	dependencies = [
+		"numpy>=1.21.0",
+		"torch>=2.0.0",
+		"muutils>=0.6.12",
+	]
 
 [project.optional-dependencies]
-# handling torch
-torch-cu124 = [ "torch>=2.0.0" ]
+	# handling torch
+	torch-cu124 = [ "torch>=2.0.0" ]
 
-# for example purposes only
-cli = [
-	"fire>=0.6.0",
-]
+	# for example purposes only
+	cli = [
+		"fire>=0.6.0",
+	]
 
 [dependency-groups]
-dev = [
-	# test
-	"pytest>=8.2.2",
-	# coverage
-	"pytest-cov>=4.1.0",
-	"coverage-badge>=1.1.0",
-	# type checking
-	"mypy>=1.0.1",
-	# docs
-	'pdoc>=14.6.0',
-	# tomli since no tomlib in python < 3.11
-	"tomli>=2.1.0; python_version < '3.11'",
-]
-lint = [
-	# lint
-	"pycln>=2.1.3",
-	"ruff>=0.4.8",
-]
+	dev = [
+		# test
+		"pytest>=8.2.2",
+		# coverage
+		"pytest-cov>=4.1.0",
+		"coverage-badge>=1.1.0",
+		# type checking
+		"mypy>=1.0.1",
+		# docs
+		'pdoc>=14.6.0',
+		# tomli since no tomlib in python < 3.11
+		"tomli>=2.1.0; python_version < '3.11'",
+	]
+	lint = [
+		# lint
+		"pycln>=2.1.3",
+		"ruff>=0.4.8",
+	]
 
 
 # more project metadata
 
 [project.urls]
 
-Homepage = "https://miv.name/python-project-makefile-template"
-Documentation = "https://miv.name/python-project-makefile-template"
-Repository = "https://github.com/mivanit/python-project-makefile-template"
-Issues = "https://github.com/mivanit/python-project-makefile-template/issues"
+	Homepage = "https://miv.name/python-project-makefile-template"
+	Documentation = "https://miv.name/python-project-makefile-template"
+	Repository = "https://github.com/mivanit/python-project-makefile-template"
+	Issues = "https://github.com/mivanit/python-project-makefile-template/issues"
 
 
 # tools
 
 [tool.uv]
-default-groups = ["dev", "lint"]
+	default-groups = ["dev", "lint"]
 
-[tool.uv.sources]
-torch = [
-  { index = "pytorch-cu124", extra = "torch-cu124" },
-]
+	[tool.uv.sources]
+		torch = [ { index = "pytorch-cu124", extra = "torch-cu124" } ]
 
-[[tool.uv.index]]
-name = "pytorch-cu124"
-url = "https://download.pytorch.org/whl/cu124"
-explicit = true
+	[[tool.uv.index]]
+	name = "pytorch-cu124"
+	url = "https://download.pytorch.org/whl/cu124"
+	explicit = true
 
 
 
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+	requires = ["hatchling"]
+	build-backend = "hatchling.build"
 
 # ruff config
 [tool.ruff]
-exclude = ["__pycache__"]
+	exclude = ["__pycache__"]
 
-[tool.ruff.format]
-indent-style = "tab"
-skip-magic-trailing-comma = false
+	[tool.ruff.format]
+		indent-style = "tab"
+		skip-magic-trailing-comma = false
 
 # Custom export configurations
 [tool.uv-exports]
-args = [
-	"--no-hashes"
-]
-exports = [
-	# no groups, no extras, just the base dependencies
-    { name = "base", groups = false, extras = false },
-	# all groups
-	{ name = "groups", groups = true, extras = false },
-	# only the lint group -- custom options for this
-	{ name = "lint", options = ["--only-group", "lint"] },
-	# # all groups and extras
-    # { name = "all", filename="requirements.txt", groups = true, extras=true },
-	# # all groups and extras, a different way
-	# { name = "all", groups = true, options = ["--all-extras"] },
-]
+	args = [
+		"--no-hashes"
+	]
+	exports = [
+		# no groups, no extras, just the base dependencies
+		{ name = "base", groups = false, extras = false },
+		# all groups
+		{ name = "groups", groups = true, extras = false },
+		# only the lint group -- custom options for this
+		{ name = "lint", options = ["--only-group", "lint"] },
+		# # all groups and extras
+		# { name = "all", filename="requirements.txt", groups = true, extras=true },
+		# # all groups and extras, a different way
+		# { name = "all", groups = true, options = ["--all-extras"] },
+	]
 
