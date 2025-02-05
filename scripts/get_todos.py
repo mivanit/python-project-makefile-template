@@ -40,8 +40,8 @@ class Config:
 
     search_dir: Path = Path(".")
     out_file: Path = Path("docs/todo-inline.md")
-    tags: List[str] = field(default_factory=lambda: ["CRIT", "TODO", "FIXME"])
-    extensions: List[str] = field(default_factory=lambda: ["py", "cpp", "h", "hpp"])
+    tags: List[str] = field(default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"])
+    extensions: List[str] = field(default_factory=lambda: ["py", "md"])
     exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
     context_lines: int = 2
 
