@@ -88,7 +88,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property

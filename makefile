@@ -552,7 +552,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -1049,13 +1049,13 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info
+# see `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
 	$(PYTHON) docs/.resources/make_docs.py
 
-# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.
+# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
 # docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
@@ -1109,9 +1109,6 @@ docs-clean:
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
-
-
-# echo "The last line is: $$last_line"
 
 
 .PHONY: lmcat-tree
