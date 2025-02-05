@@ -109,7 +109,7 @@
 
 [tool.inline-todo]
 	search_dir = "."
-	out_file = "docs/other/todo-inline.md"
+	out_file = "docs/other/todo-inline.md" # changing this might mean it wont be accessible from the docs
 	context_lines = 2
 	extensions = ["py", "md"]
 	tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG"]
@@ -120,7 +120,7 @@
 	]
 
 [tool.lmcat]
-	output = "docs/other/lmcat.md"
+	output = "docs/other/lmcat.md" # changing this might mean it wont be accessible from the docs
 	ignore_patterns = [
 		"docs/**",
 		".venv/**",

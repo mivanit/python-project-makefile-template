@@ -25,12 +25,14 @@ TEMPLATE_MD: str = """\
 {% for filepath, item_list in file_map|dictsort %}
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
-- [ ] {{ itm.content }}  
-[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url | safe }})
+- {{ itm.stripped_title }}  
+  local link: [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) 
+  | view on GitHub: [{{ itm.file }}#L{{ itm.line_num }}]({{ itm.code_url | safe }})
+  | [Make Issue]({{ itm.issue_url | safe }})
 {% if itm.context %}
-```text
+  ```{{ itm.file_lang }}
 {{ itm.context.strip() }}
-```
+  ```
 {% endif %}
 {% endfor %}
 
@@ -41,10 +43,10 @@ TEMPLATE_MD: str = """\
 TEMPLATE_ISSUE: str = """\
 # source
 
-[`{file}#L{line_num}`]({repo_url}/blob/{branch}/{file}#L{line_num})
+[`{file}#L{line_num}`]({code_url})
 
 # context
-```python
+```{file_lang}
 {context}
 ```
 """
@@ -70,12 +72,32 @@ class Config:
 			"HACK": "enhancement",
 		}
 	)
+	extension_lang_map: dict[str, str] = field(
+		default_factory=lambda: {
+			"py": "python",
+			"md": "markdown",
+			"html": "html",
+			"css": "css",
+			"js": "javascript",
+		}
+	)
 
 	template_md: str = TEMPLATE_MD
 	# template for the output markdown file
 
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
+
+	template_code_url_: str = "{repo_url}/blob/{branch}/{file}#L{line_num}"
+	# template for the code url
+
+	@property
+	def template_code_url(self) -> str:
+		return (
+			self.template_code_url_
+			.replace("{repo_url}", self.repo_url)
+			.replace("{branch}", self.branch)
+		)
 	
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
@@ -146,30 +168,54 @@ class TodoItem:
 	context: str = ""
 
 	def serialize(self) -> Dict[str, Union[str, int]]:
-		return {**asdict(self), "issue_url": self.issue_url}
+		return {
+			**asdict(self),
+			"issue_url": self.issue_url,
+			"file_lang": self.file_lang,
+			"stripped_title": self.stripped_title,
+			"code_url": self.code_url,
+		}
+	
+	@property
+	def code_url(self) -> str:
+		"""Returns a URL to the code on GitHub"""
+		return CFG.template_code_url.format(
+			file=self.file,
+			line_num=self.line_num,
+		)
 
+	@property
+	def stripped_title(self) -> str:
+		"""Returns the title of the issue, stripped of the tag"""
+		return self.content.split(self.tag, 1)[-1].lstrip(":").strip()
 
 	@property
 	def issue_url(self) -> str:
 		"""Constructs a GitHub issue creation URL for a given TodoItem."""
-		title: str = self.content.split(self.tag, 1)[-1].lstrip(":").strip()
+		# title
+		title: str = self.stripped_title
 		if not title:
 			title = "Issue from inline todo"
+		# body
 		body: str = CFG.template_issue.format(
 			file=self.file,
 			line_num=self.line_num,
 			context=self.context,
-			repo_url=CFG.repo_url,
-			branch=CFG.branch,
+			code_url=self.code_url,
+			file_lang=self.file_lang,
 		).strip()
+		# labels
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
+		# assemble url
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
 	
 	@property
-	def content_stripped(self) -> str:
-		return self.content.strip()
+	def file_lang(self) -> str:
+		"""Returns the language for the file extension"""
+		ext: str = Path(self.file).suffix.lstrip(".")
+		return CFG.extension_lang_map.get(ext, "text")
 
 
 def scrape_file(
@@ -246,18 +292,40 @@ def main(config_file: Path) -> None:
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
 		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+
 	# write raw to jsonl
 	with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
 		for itm in all_items:
 			f.write(json.dumps(itm.serialize()) + "\n")
 
-	# group, render, and write md output
+	# group, render
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
 		all_items
 	)
 
 	rendered: str = Template(cfg.template_md).render(grouped=grouped)
+
+	# write md output
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+
+	# try to write html output
+	try:
+		from pdoc.markdown2 import Markdown
+
+		markdown: Markdown = Markdown(
+			extras=[
+				"fenced-code-blocks",
+				"header-ids",
+				"markdown-in-html", 
+				"tables"
+			],
+		)
+		html: str = markdown.convert(rendered)
+		
+		# Write HTML output
+		cfg.out_file.with_suffix(".html").write_text(str(html), encoding="utf-8")
+	except ImportError:
+		warnings.warn("pdoc not installed, skipping HTML output")
 
 	print("wrote to:")
 	print(cfg.out_file.with_suffix(".md").as_posix())

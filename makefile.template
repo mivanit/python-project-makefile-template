@@ -189,6 +189,13 @@ endef
 
 export SCRIPT_GET_TODOS
 
+# markdown to html using pdoc
+define SCRIPT_PDOC_MARKDOWN2_CLI
+##[[SCRIPT_PDOC_MARKDOWN2_CLI]]##
+endef
+
+export SCRIPT_PDOC_MARKDOWN2_CLI
+
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -434,7 +441,7 @@ todo:
 .PHONY: todo-pandoc
 todo-pandoc:
 	@last_line=$$(python -c "$$SCRIPT_GET_TODOS" | tail -n 1); \
-	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/todo.html
+	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/other/todo.html --css docs/resources/theme.css
 
 # echo "The last line is: $$last_line"
 
