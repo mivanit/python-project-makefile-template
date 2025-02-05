@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
             padding: 20px;
             background: #f5f5f5;
         }
+
         .controls {
             margin-bottom: 20px;
             display: flex;
@@ -22,36 +24,44 @@
             background: white;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        input, select {
+
+        input,
+        select {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        th, td {
+
+        th,
+        td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
         th {
             background: #f8f9fa;
             cursor: pointer;
             user-select: none;
             position: relative;
         }
+
         th:hover {
             background: #e9ecef;
         }
+
         th.sorted::after {
             content: '';
             position: absolute;
@@ -61,15 +71,19 @@
             border-left: 4px solid transparent;
             border-right: 4px solid transparent;
         }
+
         th.sorted.asc::after {
             border-bottom: 6px solid #666;
         }
+
         th.sorted.desc::after {
             border-top: 6px solid #666;
         }
+
         tr:hover {
             background: #f8f9fa;
         }
+
         .code-context {
             font-family: 'Consolas', 'Monaco', monospace;
             white-space: pre-wrap;
@@ -80,9 +94,11 @@
             font-size: 14px;
             display: none;
         }
+
         .code-context.expanded {
             display: block;
         }
+
         .expand-btn {
             background: none;
             border: none;
@@ -91,31 +107,39 @@
             color: #666;
             transition: transform 0.2s;
         }
+
         .expand-btn.expanded {
             transform: rotate(180deg);
         }
+
         .content-cell {
             display: flex;
             align-items: flex-start;
             gap: 8px;
         }
+
         .chevron {
             width: 8px;
             height: 8px;
             border: solid #666;
             border-width: 0 2px 2px 0;
             padding: 2px;
-            transform: rotate(45deg);  /* point down */
+            transform: rotate(45deg);
+            /* point down */
             transition: transform 0.2s;
             margin-top: 6px;
         }
+
         .expanded .chevron {
-            transform: rotate(225deg);  /* point up */
+            transform: rotate(225deg);
+            /* point up */
         }
+
         .controls-group {
             display: flex;
             gap: 10px;
         }
+
         .control-button {
             padding: 8px 16px;
             border: 1px solid #ddd;
@@ -125,16 +149,20 @@
             font-size: 14px;
             transition: background-color 0.2s;
         }
+
         .control-button:hover {
             background: #f8f9fa;
         }
+
         .highlight-line {
             background: #fff3cd;
         }
+
         .file-path {
             color: #666;
             font-size: 14px;
         }
+
         .tag {
             display: inline-block;
             padding: 2px 8px;
@@ -143,13 +171,16 @@
             font-weight: 600;
             background: #e9ecef;
         }
+
         .github-link {
             color: #0366d6;
             text-decoration: none;
         }
+
         .github-link:hover {
             text-decoration: underline;
         }
+
         th .resizer {
             position: absolute;
             right: 0;
@@ -161,6 +192,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="controls">
         <input type="text" id="searchInput" placeholder="Search..." style="flex: 1">
@@ -244,7 +276,7 @@
 
             let filteredTodos = todos.filter(todo => {
                 const matchesSearch = todo.content.toLowerCase().includes(searchTerm) ||
-                                   todo.file.toLowerCase().includes(searchTerm);
+                    todo.file.toLowerCase().includes(searchTerm);
                 const matchesTag = !tagFilter || todo.tag === tagFilter;
                 const matchesLang = !langFilter || todo.file_lang === langFilter;
                 return matchesSearch && matchesTag && matchesLang;
@@ -347,13 +379,14 @@
             });
         }
 
-        
-        
+
+
         // Initialize with data
         todos = //{{DATA}}//;
-        updateFilters();
+            updateFilters();
         renderTable();
         initResizableColumns();
     </script>
 </body>
+
 </html>
