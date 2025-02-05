@@ -552,7 +552,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/templates/todo-template.html")
+	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -763,6 +763,9 @@ def main(config_file: Path) -> None:
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
 		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+
+	# create dir
+	cfg.out_file.parent.mkdir(parents=True, exist_ok=True)
 
 	# write raw to jsonl
 	with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
@@ -1046,11 +1049,11 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/make_docs.py` and the templates in `docs/templates/html/` for more info
+# see `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/make_docs.py
+	$(PYTHON) docs/.resources/make_docs.py
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
@@ -1059,7 +1062,7 @@ docs-html:
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/make_docs.py --combined
+	$(PYTHON) docs/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -1091,22 +1094,15 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo-pandoc lmcat
+docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script
+# removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs"
-	rm -rf $(DOCS_DIR)/combined/
-	rm -rf $(DOCS_DIR)/$(PACKAGE_NAME)/
-	rm -rf $(COVERAGE_REPORTS_DIR)/
-	rm $(DOCS_DIR)/$(PACKAGE_NAME).html
-	rm $(DOCS_DIR)/index.html
-	rm $(DOCS_DIR)/search.js
-	rm $(DOCS_DIR)/package_map.dot
-	rm $(DOCS_DIR)/package_map.html
+	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name ".*" -exec rm -rf {} +
 
 
 .PHONY: todo
@@ -1114,10 +1110,6 @@ todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
 
-.PHONY: todo-pandoc
-todo-pandoc:
-	@last_line=$$(python -c "$$SCRIPT_GET_TODOS" | tail -n 1); \
-	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/other/todo.html --css docs/resources/theme.css
 
 # echo "The last line is: $$last_line"
 

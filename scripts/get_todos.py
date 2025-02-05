@@ -88,7 +88,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/templates/todo-template.html")
+	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -299,6 +299,9 @@ def main(config_file: Path) -> None:
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
 		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+
+	# create dir
+	cfg.out_file.parent.mkdir(parents=True, exist_ok=True)
 
 	# write raw to jsonl
 	with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:

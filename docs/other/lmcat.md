@@ -1,8 +1,8 @@
 # Stats
-- 21 files
-- 3651 (3.7K) lines
-- 124043 (124K) chars
-- 15274 (15K) `whitespace-split` tokens
+- 23 files
+- 3918 (3.9K) lines
+- 131549 (132K) chars
+- 15996 (16K) `whitespace-split` tokens
 
 # File Tree
 
@@ -20,22 +20,24 @@ python-project-makefile-template
 │    └── .version                    [    1L      6C     1T]
 ├── myproject                        
 │   ├── __init__.py                  [    3L     34C     5T]
-│   └── helloworld.py                [    4L     76C    12T]
+│   ├── helloworld.py                [   13L    359C    49T]
+│   └── other.py                     [    3L    127C    17T]
 ├── scripts                          
-│   ├── assemble_make.py             [   54L  1,356C   132T]
+│   ├── assemble_make.py             [   55L  1,368C   134T]
 │   ├── check_torch.py               [  157L  4,404C   419T]
 │   ├── export_requirements.py       [   78L  2,049C   237T]
 │   ├── get_commit_log.py            [   26L    647C    61T]
-│   ├── get_todos.py                 [  276L  7,077C   816T]
-│   └── get_version.py               [   17L    339C    37T]
+│   ├── get_todos.py                 [  342L  8,855C   989T]
+│   ├── get_version.py               [   17L    339C    37T]
+│   └── pdoc_markdown2_cli.py        [   60L  1,662C   144T]
 ├── tests                            
 │   └── test_nothing.py              [    2L     42C     5T]
 ├── LICENSE                          [  427L 20,133C 2,769T]
-├── README.md                        [  275L 12,058C 1,677T]
+├── README.md                        [  275L 12,104C 1,677T]
 ├── TODO.md                          [   77L  2,668C   266T]
-├── makefile                         [1,164L 36,350C 4,475T]
-├── makefile.template                [  614L 21,998C 2,914T]
-├── pyproject.toml                   [  130L  2,766C   346T]
+├── makefile                         [1,289L 39,675C 4,786T]
+├── makefile.template                [  610L 21,837C 2,902T]
+├── pyproject.toml                   [  130L  2,892C   370T]
 ```
 
 # File Contents
@@ -308,11 +310,26 @@ v0.0.6
 print("hello world")
 
 
+# another line which should be included in the body
 # TODO: an example todo that `make todo` should find
+def some_function():
+	raise NotImplementedError("This function is not implemented yet")
 
+
+
+# FIXME: an example that `make todo` should find
+def critical_function():
+	raise NotImplementedError("This function is not implemented yet")
 ``````{ end_of_file="myproject/helloworld.py" }
 
+``````{ path="myproject/other.py"  }
+# BUG: make todo should see this too
+def another_function():
+	raise NotImplementedError("This function is not implemented yet")
+``````{ end_of_file="myproject/other.py" }
+
 ``````{ path="scripts/assemble_make.py"  }
+import json
 from pathlib import Path
 import tomllib
 
@@ -671,12 +688,14 @@ TEMPLATE_MD: str = """\
 {% for filepath, item_list in file_map|dictsort %}
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
-- [ ] {{ itm.content }}  
-[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url | safe }})
+- {{ itm.stripped_title }}  
+  local link: [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) 
+  | view on GitHub: [{{ itm.file }}#L{{ itm.line_num }}]({{ itm.code_url | safe }})
+  | [Make Issue]({{ itm.issue_url | safe }})
 {% if itm.context %}
-```text
+  ```{{ itm.file_lang }}
 {{ itm.context.strip() }}
-```
+  ```
 {% endif %}
 {% endfor %}
 
@@ -687,10 +706,10 @@ TEMPLATE_MD: str = """\
 TEMPLATE_ISSUE: str = """\
 # source
 
-[`{file}#L{line_num}`]({repo_url}/blob/{branch}/{file}#L{line_num})
+[`{file}#L{line_num}`]({code_url})
 
 # context
-```python
+```{file_lang}
 {context}
 ```
 """
@@ -716,12 +735,39 @@ class Config:
 			"HACK": "enhancement",
 		}
 	)
+	extension_lang_map: dict[str, str] = field(
+		default_factory=lambda: {
+			"py": "python",
+			"md": "markdown",
+			"html": "html",
+			"css": "css",
+			"js": "javascript",
+		}
+	)
 
 	template_md: str = TEMPLATE_MD
 	# template for the output markdown file
 
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
+
+	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
+	# template source for the output html file (interactive table)
+
+	@property
+	def template_html(self) -> str:
+		return self.template_html_source.read_text(encoding="utf-8")
+
+	template_code_url_: str = "{repo_url}/blob/{branch}/{file}#L{line_num}"
+	# template for the code url
+
+	@property
+	def template_code_url(self) -> str:
+		return (
+			self.template_code_url_
+			.replace("{repo_url}", self.repo_url)
+			.replace("{branch}", self.branch)
+		)
 	
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
@@ -792,30 +838,54 @@ class TodoItem:
 	context: str = ""
 
 	def serialize(self) -> Dict[str, Union[str, int]]:
-		return {**asdict(self), "issue_url": self.issue_url}
+		return {
+			**asdict(self),
+			"issue_url": self.issue_url,
+			"file_lang": self.file_lang,
+			"stripped_title": self.stripped_title,
+			"code_url": self.code_url,
+		}
+	
+	@property
+	def code_url(self) -> str:
+		"""Returns a URL to the code on GitHub"""
+		return CFG.template_code_url.format(
+			file=self.file,
+			line_num=self.line_num,
+		)
 
+	@property
+	def stripped_title(self) -> str:
+		"""Returns the title of the issue, stripped of the tag"""
+		return self.content.split(self.tag, 1)[-1].lstrip(":").strip()
 
 	@property
 	def issue_url(self) -> str:
 		"""Constructs a GitHub issue creation URL for a given TodoItem."""
-		title: str = self.content.split(self.tag, 1)[-1].lstrip(":").strip()
+		# title
+		title: str = self.stripped_title
 		if not title:
 			title = "Issue from inline todo"
+		# body
 		body: str = CFG.template_issue.format(
 			file=self.file,
 			line_num=self.line_num,
 			context=self.context,
-			repo_url=CFG.repo_url,
-			branch=CFG.branch,
+			code_url=self.code_url,
+			file_lang=self.file_lang,
 		).strip()
+		# labels
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
+		# assemble url
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
 	
 	@property
-	def content_stripped(self) -> str:
-		return self.content.strip()
+	def file_lang(self) -> str:
+		"""Returns the language for the file extension"""
+		ext: str = Path(self.file).suffix.lstrip(".")
+		return CFG.extension_lang_map.get(ext, "text")
 
 
 def scrape_file(
@@ -841,7 +911,7 @@ def scrape_file(
 						file=file_path.as_posix(),
 						line_num=i + 1,
 						content=line.strip("\n"),
-						context=snippet,
+						context=snippet.strip("\n"),
 					)
 				)
 				break
@@ -892,18 +962,31 @@ def main(config_file: Path) -> None:
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
 		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+
+	# create dir
+	cfg.out_file.parent.mkdir(parents=True, exist_ok=True)
+
 	# write raw to jsonl
 	with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
 		for itm in all_items:
 			f.write(json.dumps(itm.serialize()) + "\n")
 
-	# group, render, and write md output
+	# group, render
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
 		all_items
 	)
 
 	rendered: str = Template(cfg.template_md).render(grouped=grouped)
+
+	# write md output
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+
+	# write html output
+	try:
+		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
+	except Exception as e:
+		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
 	print(cfg.out_file.with_suffix(".md").as_posix())
@@ -943,6 +1026,69 @@ except Exception:
 	sys.exit(1)
 
 ``````{ end_of_file="scripts/get_version.py" }
+
+``````{ path="scripts/pdoc_markdown2_cli.py"  }
+import argparse
+from pathlib import Path
+from typing import Optional
+
+from pdoc.markdown2 import Markdown, _safe_mode
+
+
+def convert_file(
+    input_path: Path, 
+    output_path: Path,
+    safe_mode: Optional[_safe_mode] = None,
+    encoding: str = "utf-8",
+) -> None:
+    """Convert a markdown file to HTML"""
+    # Read markdown input
+    text: str = input_path.read_text(encoding=encoding)
+    
+    # Convert to HTML using markdown2
+    markdown: Markdown = Markdown(
+        extras=[
+            "fenced-code-blocks",
+            "header-ids",
+            "markdown-in-html", 
+            "tables"
+        ],
+        safe_mode=safe_mode
+    )
+    html: str = markdown.convert(text)
+    
+    # Write HTML output
+    output_path.write_text(str(html), encoding=encoding)
+
+
+def main() -> None:
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Convert markdown files to HTML using pdoc's markdown2")
+    parser.add_argument("input", type=Path, help="Input markdown file path")
+    parser.add_argument("output", type=Path, help="Output HTML file path") 
+    parser.add_argument(
+        "--safe-mode",
+        choices=["escape", "replace"],
+        help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]"
+    )
+    parser.add_argument(
+        "--encoding",
+        default="utf-8",
+        help="Character encoding for reading/writing files (default: utf-8)"
+    )
+
+    args: argparse.Namespace = parser.parse_args()
+    
+    convert_file(
+        args.input,
+        args.output,
+        safe_mode=args.safe_mode,
+        encoding=args.encoding
+    )
+
+
+if __name__ == "__main__":
+    main()
+``````{ end_of_file="scripts/pdoc_markdown2_cli.py" }
 
 ``````{ path="tests/test_nothing.py"  }
 def test_nothing():
@@ -1410,9 +1556,9 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
 - if you want automatic documentation generation, copy from this repo:
-  - `docs/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/.resources/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
   - `docs/templates/`: jinja2 templates for the docs
-  - `docs/resources/`: some css and icons for the docs
+  - `docs/.resources/`: some css and icons for the docs
 
 
 # Makefile
@@ -1580,7 +1726,7 @@ $ make help
 
 - `docs-html`: Generate html docs  
   Generates a whole tree of documentation in html format.  
-  See `docs/make_docs.py` and the templates in `docs/templates/html/` for more info  
+  See `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info  
 
 - `docs-md`: Generate combined (single-file) docs in markdown  
   Instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.  
@@ -1602,7 +1748,7 @@ $ make help
   Runs the coverage report, then the docs, then the combined docs  
 
 - `docs-clean`: Remove generated docs  
-  Removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script  
+  Removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script  
   Distinct from `make clean`  
 
 ## Build and Publish
@@ -1642,9 +1788,9 @@ $ make help
 
 Provided files for pdoc usage are:
 
-- `docs/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
+- `docs/.resources/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
 - `docs/templates/` containing template files for both html and markdown docs
-- `docs/resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
+- `docs/.resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
 
 
 # Development
@@ -2231,12 +2377,14 @@ TEMPLATE_MD: str = """\
 {% for filepath, item_list in file_map|dictsort %}
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
-- [ ] {{ itm.content }}  
-[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url | safe }})
+- {{ itm.stripped_title }}  
+  local link: [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) 
+  | view on GitHub: [{{ itm.file }}#L{{ itm.line_num }}]({{ itm.code_url | safe }})
+  | [Make Issue]({{ itm.issue_url | safe }})
 {% if itm.context %}
-```text
+  ```{{ itm.file_lang }}
 {{ itm.context.strip() }}
-```
+  ```
 {% endif %}
 {% endfor %}
 
@@ -2247,10 +2395,10 @@ TEMPLATE_MD: str = """\
 TEMPLATE_ISSUE: str = """\
 # source
 
-[`{file}#L{line_num}`]({repo_url}/blob/{branch}/{file}#L{line_num})
+[`{file}#L{line_num}`]({code_url})
 
 # context
-```python
+```{file_lang}
 {context}
 ```
 """
@@ -2276,12 +2424,39 @@ class Config:
 			"HACK": "enhancement",
 		}
 	)
+	extension_lang_map: dict[str, str] = field(
+		default_factory=lambda: {
+			"py": "python",
+			"md": "markdown",
+			"html": "html",
+			"css": "css",
+			"js": "javascript",
+		}
+	)
 
 	template_md: str = TEMPLATE_MD
 	# template for the output markdown file
 
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
+
+	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
+	# template source for the output html file (interactive table)
+
+	@property
+	def template_html(self) -> str:
+		return self.template_html_source.read_text(encoding="utf-8")
+
+	template_code_url_: str = "{repo_url}/blob/{branch}/{file}#L{line_num}"
+	# template for the code url
+
+	@property
+	def template_code_url(self) -> str:
+		return (
+			self.template_code_url_
+			.replace("{repo_url}", self.repo_url)
+			.replace("{branch}", self.branch)
+		)
 	
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
@@ -2352,26 +2527,54 @@ class TodoItem:
 	context: str = ""
 
 	def serialize(self) -> Dict[str, Union[str, int]]:
-		return {**asdict(self), "issue_url": self.issue_url}
+		return {
+			**asdict(self),
+			"issue_url": self.issue_url,
+			"file_lang": self.file_lang,
+			"stripped_title": self.stripped_title,
+			"code_url": self.code_url,
+		}
+	
+	@property
+	def code_url(self) -> str:
+		"""Returns a URL to the code on GitHub"""
+		return CFG.template_code_url.format(
+			file=self.file,
+			line_num=self.line_num,
+		)
 
+	@property
+	def stripped_title(self) -> str:
+		"""Returns the title of the issue, stripped of the tag"""
+		return self.content.split(self.tag, 1)[-1].lstrip(":").strip()
 
 	@property
 	def issue_url(self) -> str:
 		"""Constructs a GitHub issue creation URL for a given TodoItem."""
-		title: str = self.content.split(self.tag, 1)[-1].lstrip(":").strip()
+		# title
+		title: str = self.stripped_title
 		if not title:
 			title = "Issue from inline todo"
+		# body
 		body: str = CFG.template_issue.format(
 			file=self.file,
 			line_num=self.line_num,
 			context=self.context,
-			repo_url=CFG.repo_url,
-			branch=CFG.branch,
+			code_url=self.code_url,
+			file_lang=self.file_lang,
 		).strip()
+		# labels
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
+		# assemble url
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
+	
+	@property
+	def file_lang(self) -> str:
+		"""Returns the language for the file extension"""
+		ext: str = Path(self.file).suffix.lstrip(".")
+		return CFG.extension_lang_map.get(ext, "text")
 
 
 def scrape_file(
@@ -2397,7 +2600,7 @@ def scrape_file(
 						file=file_path.as_posix(),
 						line_num=i + 1,
 						content=line.strip("\n"),
-						context=snippet,
+						context=snippet.strip("\n"),
 					)
 				)
 				break
@@ -2448,18 +2651,31 @@ def main(config_file: Path) -> None:
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
 		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+
+	# create dir
+	cfg.out_file.parent.mkdir(parents=True, exist_ok=True)
+
 	# write raw to jsonl
 	with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
 		for itm in all_items:
 			f.write(json.dumps(itm.serialize()) + "\n")
 
-	# group, render, and write md output
+	# group, render
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
 		all_items
 	)
 
 	rendered: str = Template(cfg.template_md).render(grouped=grouped)
+
+	# write md output
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+
+	# write html output
+	try:
+		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
+	except Exception as e:
+		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
 	print(cfg.out_file.with_suffix(".md").as_posix())
@@ -2480,6 +2696,72 @@ if __name__ == "__main__":
 endef
 
 export SCRIPT_GET_TODOS
+
+# markdown to html using pdoc
+define SCRIPT_PDOC_MARKDOWN2_CLI
+import argparse
+from pathlib import Path
+from typing import Optional
+
+from pdoc.markdown2 import Markdown, _safe_mode
+
+
+def convert_file(
+    input_path: Path, 
+    output_path: Path,
+    safe_mode: Optional[_safe_mode] = None,
+    encoding: str = "utf-8",
+) -> None:
+    """Convert a markdown file to HTML"""
+    # Read markdown input
+    text: str = input_path.read_text(encoding=encoding)
+    
+    # Convert to HTML using markdown2
+    markdown: Markdown = Markdown(
+        extras=[
+            "fenced-code-blocks",
+            "header-ids",
+            "markdown-in-html", 
+            "tables"
+        ],
+        safe_mode=safe_mode
+    )
+    html: str = markdown.convert(text)
+    
+    # Write HTML output
+    output_path.write_text(str(html), encoding=encoding)
+
+
+def main() -> None:
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Convert markdown files to HTML using pdoc's markdown2")
+    parser.add_argument("input", type=Path, help="Input markdown file path")
+    parser.add_argument("output", type=Path, help="Output HTML file path") 
+    parser.add_argument(
+        "--safe-mode",
+        choices=["escape", "replace"],
+        help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]"
+    )
+    parser.add_argument(
+        "--encoding",
+        default="utf-8",
+        help="Character encoding for reading/writing files (default: utf-8)"
+    )
+
+    args: argparse.Namespace = parser.parse_args()
+    
+    convert_file(
+        args.input,
+        args.output,
+        safe_mode=args.safe_mode,
+        encoding=args.encoding
+    )
+
+
+if __name__ == "__main__":
+    main()
+endef
+
+export SCRIPT_PDOC_MARKDOWN2_CLI
 
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
@@ -2655,11 +2937,11 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/make_docs.py` and the templates in `docs/templates/html/` for more info
+# see `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/make_docs.py
+	$(PYTHON) docs/.resources/make_docs.py
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
@@ -2668,7 +2950,7 @@ docs-html:
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/make_docs.py --combined
+	$(PYTHON) docs/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -2700,22 +2982,15 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo-pandoc lmcat
+docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script
+# removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs"
-	rm -rf $(DOCS_DIR)/combined/
-	rm -rf $(DOCS_DIR)/$(PACKAGE_NAME)/
-	rm -rf $(COVERAGE_REPORTS_DIR)/
-	rm $(DOCS_DIR)/$(PACKAGE_NAME).html
-	rm $(DOCS_DIR)/index.html
-	rm $(DOCS_DIR)/search.js
-	rm $(DOCS_DIR)/package_map.dot
-	rm $(DOCS_DIR)/package_map.html
+	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name ".*" -exec rm -rf {} +
 
 
 .PHONY: todo
@@ -2723,10 +2998,6 @@ todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
 
-.PHONY: todo-pandoc
-todo-pandoc:
-	@last_line=$$(python -c "$$SCRIPT_GET_TODOS" | tail -n 1); \
-	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/todo.html
 
 # echo "The last line is: $$last_line"
 
@@ -3098,6 +3369,13 @@ endef
 
 export SCRIPT_GET_TODOS
 
+# markdown to html using pdoc
+define SCRIPT_PDOC_MARKDOWN2_CLI
+##[[SCRIPT_PDOC_MARKDOWN2_CLI]]##
+endef
+
+export SCRIPT_PDOC_MARKDOWN2_CLI
+
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -3272,11 +3550,11 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/make_docs.py` and the templates in `docs/templates/html/` for more info
+# see `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/make_docs.py
+	$(PYTHON) docs/.resources/make_docs.py
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
@@ -3285,7 +3563,7 @@ docs-html:
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/make_docs.py --combined
+	$(PYTHON) docs/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -3317,22 +3595,15 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo-pandoc lmcat
+docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script
+# removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs"
-	rm -rf $(DOCS_DIR)/combined/
-	rm -rf $(DOCS_DIR)/$(PACKAGE_NAME)/
-	rm -rf $(COVERAGE_REPORTS_DIR)/
-	rm $(DOCS_DIR)/$(PACKAGE_NAME).html
-	rm $(DOCS_DIR)/index.html
-	rm $(DOCS_DIR)/search.js
-	rm $(DOCS_DIR)/package_map.dot
-	rm $(DOCS_DIR)/package_map.html
+	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name ".*" -exec rm -rf {} +
 
 
 .PHONY: todo
@@ -3340,10 +3611,6 @@ todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
 
-.PHONY: todo-pandoc
-todo-pandoc:
-	@last_line=$$(python -c "$$SCRIPT_GET_TODOS" | tail -n 1); \
-	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/todo.html
 
 # echo "The last line is: $$last_line"
 
@@ -3635,7 +3902,7 @@ help: help-targets info
 
 [tool.inline-todo]
 	search_dir = "."
-	out_file = "docs/other/todo-inline.md"
+	out_file = "docs/other/todo-inline.md" # changing this might mean it wont be accessible from the docs
 	context_lines = 2
 	extensions = ["py", "md"]
 	tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG"]
@@ -3646,7 +3913,7 @@ help: help-targets info
 	]
 
 [tool.lmcat]
-	output = "docs/other/lmcat.md"
+	output = "docs/other/lmcat.md" # changing this might mean it wont be accessible from the docs
 	ignore_patterns = [
 		"docs/**",
 		".venv/**",
