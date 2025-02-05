@@ -17,7 +17,6 @@ except ImportError:
 	import tomli as tomllib
 
 
-# template for the output markdown file
 TEMPLATE_MD: str = """\
 # Inline TODOs
 
@@ -27,7 +26,7 @@ TEMPLATE_MD: str = """\
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
 - [ ] {{ itm.content }}  
-  [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ make_issue_url(itm) }})
+[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url }})
 {% if itm.context %}
 ```text
 {{ itm.context.strip() }}
@@ -39,12 +38,16 @@ TEMPLATE_MD: str = """\
 {% endfor %}
 """
 
-# for the issue creation url
-REPO_URL: str = "UNKNOWN"
+TEMPLATE_ISSUE: str = """\
+# source
 
-# TODO: no way to change the branch used for links yet
-BRANCH: str = "main"
+[`{file}#L{line_num}`]({repo_url}/blob/{branch}/{file}#L{line_num})
 
+# context
+```python
+{context}
+```
+"""
 
 @dataclass
 class Config:
@@ -68,24 +71,37 @@ class Config:
 		}
 	)
 
+	template_md: str = TEMPLATE_MD
+	# template for the output markdown file
+
+	template_issue: str = TEMPLATE_ISSUE
+	# template for the issue creation
+	
+	repo_url: str = "UNKNOWN"
+	# for the issue creation url
+
+	branch: str = "main"
+	# branch for links to files on github
+
+
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
-		"this also has the side effect of setting the global `REPO_URL`"
-		global REPO_URL
+		output: Config
 		if config_file.is_file():
 			# read file and load if present
 			with config_file.open("rb") as f:
 				data: Dict[str, Any] = tomllib.load(f)
 
 			# try to get the repo url
+			repo_url: str = "UNKNOWN"
 			try:
 				urls: Dict[str, str] = {
 					k.lower(): v for k, v in data["project"]["urls"].items()
 				}
 				if "repository" in urls:
-					REPO_URL = urls["repository"]
+					repo_url = urls["repository"]
 				if "github" in urls:
-					REPO_URL = urls["github"]
+					repo_url = urls["github"]
 			except Exception as e:
 				warnings.warn(
 					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}"
@@ -95,28 +111,33 @@ class Config:
 			data_inline_todo: Dict[str, Any] = data.get("tool", {}).get(
 				"inline-todo", {}
 			)
-			return cls.load(data_inline_todo)
+
+			if "repo_url" not in data_inline_todo:
+				data_inline_todo["repo_url"] = repo_url
+
+			output = cls.load(data_inline_todo)
 		else:
 			# return default otherwise
-			return cls()
+			output = cls()
+
+		return output
 
 	@classmethod
 	def load(cls, data: dict) -> Config:
-		default: Config = cls()
-		return cls(
-			search_dir=Path(data.get("search_dir", default.search_dir.as_posix())),
-			out_file=Path(data.get("out_file", default.out_file.as_posix())),
-			tags=list(data.get("tags", default.tags)),
-			extensions=list(data.get("extensions", default.extensions)),
-			exclude=list(data.get("exclude", default.exclude)),
-			context_lines=int(data.get("context_lines", default.context_lines)),
-			tag_label_map=dict(data.get("tag_label_map", default.tag_label_map)),
-		)
+		data = {
+			k: Path(v) if k in {"search_dir", "out_file"} else v
+			for k, v in data.items()
+		}
+		
+		return cls(**data)
 
+
+CFG: Config = Config()
+# this is messy, but we use a global config so we can get `TodoItem().issue_url` to work
 
 @dataclass
 class TodoItem:
-	"""Holds one TODO occurrence"""
+	"""Holds one todo occurrence"""
 
 	tag: str
 	file: str
@@ -128,18 +149,23 @@ class TodoItem:
 		return asdict(self)
 
 
-def make_issue_url(itm: TodoItem, tag_label_map: dict[str, str]) -> str:
-	"""Constructs a GitHub issue creation URL for a given TodoItem."""
-	global REPO_URL
-	title: str = itm.content.split(itm.tag, 1)[-1].lstrip(":").strip()
-	if not title:
-		title = "Issue from inline todo"
-	item_url: str = f"{REPO_URL}/blob/{BRANCH}/{itm.file}#L{itm.line_num}"
-	body: str = f"# source\n[`{itm.file}#L{itm.line_num}`]({item_url})\n\n# context\n```python\n{itm.context.strip()}\n```"
-	label: str = tag_label_map.get(itm.tag, itm.tag)
-	query: dict[str, str] = {"title": title, "body": body, "labels": label}
-	query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
-	return f"{REPO_URL}/issues/new?{query_string}"
+	@property
+	def issue_url(self) -> str:
+		"""Constructs a GitHub issue creation URL for a given TodoItem."""
+		title: str = self.content.split(self.tag, 1)[-1].lstrip(":").strip()
+		if not title:
+			title = "Issue from inline todo"
+		body: str = CFG.template_issue.format(
+			file=self.file,
+			line_num=self.line_num,
+			context=self.context,
+			repo_url=CFG.repo_url,
+			branch=CFG.branch,
+		).strip()
+		label: str = CFG.tag_label_map.get(self.tag, self.tag)
+		query: Dict[str, str] = dict(title=title, body=body, labels=label)
+		query_string: str = urllib.parse.urlencode(query)
+		return f"{CFG.repo_url}/issues/new?{query_string}"
 
 
 def scrape_file(
@@ -204,8 +230,10 @@ def group_items_by_tag_and_file(
 
 
 def main(config_file: Path) -> None:
+	global CFG
 	# read configuration
 	cfg: Config = Config.read(config_file)
+	CFG = cfg
 
 	# get data
 	files: List[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
@@ -223,12 +251,8 @@ def main(config_file: Path) -> None:
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
 		all_items
 	)
-	make_issue_url_func: Callable[[TodoItem], str] = functools.partial(
-		make_issue_url, tag_label_map=cfg.tag_label_map
-	)
-	rendered: str = Template(TEMPLATE_MD).render(
-		grouped=grouped, make_issue_url=make_issue_url_func
-	)
+
+	rendered: str = Template(cfg.template_md).render(grouped=grouped)
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
 
 
