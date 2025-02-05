@@ -8,6 +8,15 @@
 #| as this makes it easier to find edits when updating makefile     |
 #|==================================================================|
 
+
+ ######  ########  ######
+##    ## ##       ##    ##
+##       ##       ##
+##       ######   ##   ####
+##       ##       ##    ##
+##    ## ##       ##    ##
+ ######  ##        ######
+
 # ==================================================
 # configuration & variables
 # ==================================================
@@ -29,10 +38,10 @@ DOCS_DIR := docs
 COVERAGE_REPORTS_DIR := docs/coverage
 
 # where the tests are, for pytest
-TESTS_DIR := tests/
+TESTS_DIR := tests
 
 # tests temp directory to clean up. will remove this in `make clean`
-TESTS_TEMP_DIR := _temp/
+TESTS_TEMP_DIR := $(TESTS_DIR)/_temp/
 
 # probably don't change these:
 # --------------------------------------------------
@@ -40,17 +49,21 @@ TESTS_TEMP_DIR := _temp/
 # where the pyproject.toml file is. no idea why you would change this but just in case
 PYPROJECT := pyproject.toml
 
-# requirements.txt files for base package, all extras, dev, and all
-REQ_LOCATION := .github/requirements
+# dir to store various configuration files
+# use of `.meta/` inspired by https://news.ycombinator.com/item?id=36472613
+META_DIR := .meta
 
-# local files (don't push this to git)
-LOCAL_DIR := .github/local
+# requirements.txt files for base package, all extras, dev, and all
+REQUIREMENTS_DIR := $(META_DIR)/requirements
+
+# local files (don't push this to git!)
+LOCAL_DIR := $(META_DIR)/local
 
 # will print this token when publishing. make sure not to commit this file!!!
 PYPI_TOKEN_FILE := $(LOCAL_DIR)/.pypi-token
 
 # version files
-VERSIONS_DIR := .github/versions
+VERSIONS_DIR := $(META_DIR)/versions
 
 # the last version that was auto-uploaded. will use this to create a commit log for version tag
 # see `gen-commit-log` target
@@ -72,54 +85,11 @@ PANDOC ?= pandoc
 # --------------------------------------------------
 
 # assuming your `pyproject.toml` has a line that looks like `version = "0.0.1"`, `gen-version-info` will extract this
-VERSION := NULL
+PROJ_VERSION := NULL
 # `gen-version-info` will read the last version from `$(LAST_VERSION_FILE)`, or `NULL` if it doesn't exist
 LAST_VERSION := NULL
 # get the python version, now that we have picked the python command
 PYTHON_VERSION := NULL
-
-# cuda version
-# --------------------------------------------------
-# 0 or 1
-CUDA_PRESENT :=
-# a version like "12.4" or "NULL"
-CUDA_VERSION := NULL
-# a version like "124" or "NULL"
-CUDA_VERSION_SHORT := NULL
-
-
-# python scripts we want to use inside the makefile
-# when developing, these are populated by `scripts/assemble_make.py`
-# --------------------------------------------------
-
-# create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
-define SCRIPT_EXPORT_REQUIREMENTS
-##[[SCRIPT_EXPORT_REQUIREMENTS]]##
-endef
-
-export SCRIPT_EXPORT_REQUIREMENTS
-
-# get the version from `pyproject.toml:project.version`
-define SCRIPT_GET_VERSION
-##[[SCRIPT_GET_VERSION]]##
-endef
-
-export SCRIPT_GET_VERSION
-
-
-# get the commit log since the last version from `$(LAST_VERSION_FILE)`
-define SCRIPT_GET_COMMIT_LOG
-##[[SCRIPT_GET_COMMIT_LOG]]##
-endef
-
-export SCRIPT_GET_COMMIT_LOG
-
-# get cuda information and whether torch sees it
-define SCRIPT_CHECK_TORCH
-##[[SCRIPT_CHECK_TORCH]]##
-endef
-
-export SCRIPT_CHECK_TORCH
 
 
 # ==================================================
@@ -168,6 +138,66 @@ endif
 .PHONY: default
 default: help
 
+
+
+ ######   ######  ########  #### ########  ########  ######
+##    ## ##    ## ##     ##  ##  ##     ##    ##    ##    ##
+##       ##       ##     ##  ##  ##     ##    ##    ##
+ ######  ##       ########   ##  ########     ##     ######
+      ## ##       ##   ##    ##  ##           ##          ##
+##    ## ##    ## ##    ##   ##  ##           ##    ##    ##
+ ######   ######  ##     ## #### ##           ##     ######
+
+# ==================================================
+# python scripts we want to use inside the makefile
+# when developing, these are populated by `scripts/assemble_make.py`
+# ==================================================
+
+# create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
+define SCRIPT_EXPORT_REQUIREMENTS
+##[[SCRIPT_EXPORT_REQUIREMENTS]]##
+endef
+
+export SCRIPT_EXPORT_REQUIREMENTS
+
+# get the version from `pyproject.toml:project.version`
+define SCRIPT_GET_VERSION
+##[[SCRIPT_GET_VERSION]]##
+endef
+
+export SCRIPT_GET_VERSION
+
+
+# get the commit log since the last version from `$(LAST_VERSION_FILE)`
+define SCRIPT_GET_COMMIT_LOG
+##[[SCRIPT_GET_COMMIT_LOG]]##
+endef
+
+export SCRIPT_GET_COMMIT_LOG
+
+# get cuda information and whether torch sees it
+define SCRIPT_CHECK_TORCH
+##[[SCRIPT_CHECK_TORCH]]##
+endef
+
+export SCRIPT_CHECK_TORCH
+
+# get todo's from the code
+define SCRIPT_GET_TODOS
+##[[SCRIPT_GET_TODOS]]##
+endef
+
+export SCRIPT_GET_TODOS
+
+
+##     ## ######## ########   ######  ####  #######  ##    ##
+##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
+##     ## ##       ##     ## ##        ##  ##     ## ####  ##
+##     ## ######   ########   ######   ##  ##     ## ## ## ##
+ ##   ##  ##       ##   ##         ##  ##  ##     ## ##  ####
+  ## ##   ##       ##    ##  ##    ##  ##  ##     ## ##   ###
+   ###    ######## ##     ##  ######  ####  #######  ##    ##
+
 # ==================================================
 # getting version info
 # we do this in a separate target because it takes a bit of time
@@ -188,7 +218,7 @@ write-proj-version:
 .PHONY: gen-version-info
 gen-version-info: write-proj-version
 	@mkdir -p $(LOCAL_DIR)
-	$(eval VERSION := $(shell cat $(VERSION_FILE)) )
+	$(eval PROJ_VERSION := $(shell cat $(VERSION_FILE)) )
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
 
@@ -211,16 +241,25 @@ gen-commit-log: gen-version-info
 # also force the commit log to be generated, and cat it out
 .PHONY: version
 version: gen-commit-log
-	@echo "Current version is $(VERSION), last auto-uploaded version is $(LAST_VERSION)"
+	@echo "Current version is $(PROJ_VERSION), last auto-uploaded version is $(LAST_VERSION)"
 	@echo "Commit log since last version from '$(COMMIT_LOG_FILE)':"
 	@cat $(COMMIT_LOG_FILE)
 	@echo ""
-	@if [ "$(VERSION)" = "$(LAST_VERSION)" ]; then \
+	@if [ "$(PROJ_VERSION)" = "$(LAST_VERSION)" ]; then \
 		echo "!!! ERROR !!!"; \
-		echo "Python package $(VERSION) is the same as last published version $(LAST_VERSION), exiting!"; \
+		echo "Python package $(PROJ_VERSION) is the same as last published version $(LAST_VERSION), exiting!"; \
 		exit 1; \
 	fi
 
+
+
+########  ######## ########   ######
+##     ## ##       ##     ## ##    ##
+##     ## ##       ##     ## ##
+##     ## ######   ########   ######
+##     ## ##       ##              ##
+##     ## ##       ##        ##    ##
+########  ######## ##         ######
 
 # ==================================================
 # dependencies and setup
@@ -233,12 +272,6 @@ setup: dep-check
 	@echo "  source .venv/bin/activate"
 	@echo "  source .venv/Scripts/activate"
 
-.PHONY: get-cuda-info
-get-cuda-info:
-	$(eval CUDA_PRESENT := $(shell if command -v nvcc > /dev/null 2>&1; then echo 1; else echo 0; fi))
-	$(eval CUDA_VERSION := $(if $(filter $(CUDA_PRESENT),1),$(shell nvcc --version 2>/dev/null | grep "release" | awk '{print $$5}' | sed 's/,//'),NULL))
-	$(eval CUDA_VERSION_SHORT := $(if $(filter $(CUDA_PRESENT),1),$(shell echo $(CUDA_VERSION) | sed 's/\.//'),NULL))
-
 .PHONY: dep-check-torch
 dep-check-torch:
 	@echo "see if torch is installed, and which CUDA version and devices it sees"
@@ -248,23 +281,18 @@ dep-check-torch:
 dep: get-cuda-info
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups --compile-bytecode
-	mkdir -p $(REQ_LOCATION)
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION) | sh -x
-
-# @if [ "$(CUDA_PRESENT)" = "1" ]; then \
-# 	echo "CUDA is present, installing torch with CUDA $(CUDA_VERSION)"; \
-# 	uv pip install torch --upgrade --index https://download.pytorch.org/whl/cu$(CUDA_VERSION_SHORT); \
-# fi
+	mkdir -p $(REQUIREMENTS_DIR)
+	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
 	
 
 .PHONY: dep-check
 dep-check:
 	@echo "Checking that exported requirements are up to date"
 	uv sync --all-extras --all-groups
-	mkdir -p $(REQ_LOCATION)-TEMP
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION)-TEMP | sh -x
-	diff -r $(REQ_LOCATION)-TEMP $(REQ_LOCATION)
-	rm -rf $(REQ_LOCATION)-TEMP
+	mkdir -p $(REQUIREMENTS_DIR)-TEMP
+	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR)-TEMP | sh -x
+	diff -r $(REQUIREMENTS_DIR)-TEMP $(REQUIREMENTS_DIR)
+	rm -rf $(REQUIREMENTS_DIR)-TEMP
 
 
 .PHONY: dep-clean
@@ -272,7 +300,16 @@ dep-clean:
 	@echo "clean up lock files, .venv, and requirements files"
 	rm -rf .venv
 	rm -rf uv.lock
-	rm -rf $(REQ_LOCATION)/*.txt
+	rm -rf $(REQUIREMENTS_DIR)/*.txt
+
+
+ ######  ##     ## ########  ######  ##    ##  ######
+##    ## ##     ## ##       ##    ## ##   ##  ##    ##
+##       ##     ## ##       ##       ##  ##   ##
+##       ######### ######   ##       #####     ######
+##       ##     ## ##       ##       ##  ##         ##
+##    ## ##     ## ##       ##    ## ##   ##  ##    ##
+ ######  ##     ## ########  ######  ##    ##  ######
 
 # ==================================================
 # checks (formatting/linting, typing, tests)
@@ -311,6 +348,15 @@ test: clean
 .PHONY: check
 check: clean format-check test typing
 	@echo "run format checks, tests, and typing checks"
+
+
+########   #######   ######   ######
+##     ## ##     ## ##    ## ##    ##
+##     ## ##     ## ##       ##
+##     ## ##     ## ##        ######
+##     ## ##     ## ##             ##
+##     ## ##     ## ##    ## ##    ##
+########   #######   ######   ######
 
 # ==================================================
 # coverage & docs
@@ -380,6 +426,30 @@ docs-clean:
 	rm $(DOCS_DIR)/package_map.html
 
 
+.PHONY: todos
+todos:
+	@echo "get all TODO's from the code"
+	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
+
+
+.PHONY: lmcat-tree
+lmcat-tree:
+	@echo "show in console the lmcat tree view"
+	$(PYTHON) -m lmcat -t
+
+.PHONY: lmcat
+lmcat:
+	@echo "write the lmcat full output to docs/lmcat.md"
+	$(PYTHON) -m lmcat > docs/lmcat.md
+
+########  ##     ## #### ##       ########
+##     ## ##     ##  ##  ##       ##     ##
+##     ## ##     ##  ##  ##       ##     ##
+########  ##     ##  ##  ##       ##     ##
+##     ## ##     ##  ##  ##       ##     ##
+##     ## ##     ##  ##  ##       ##     ##
+########   #######  #### ######## ########
+
 # ==================================================
 # build and publish
 # ==================================================
@@ -416,11 +486,11 @@ publish: gen-commit-log check build verify-git version gen-version-info
 	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
 	@echo "Now would also be the time to edit $(COMMIT_LOG_FILE), as that will be used as the tag description"
 	@read -p "Confirm: " NEW_VERSION; \
-	if [ "$$NEW_VERSION" = $(VERSION) ]; then \
+	if [ "$$NEW_VERSION" = $(PROJ_VERSION) ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Version confirmed. Proceeding with publish."; \
 	else \
-		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(VERSION)"; \
+		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(PROJ_VERSION)"; \
 		exit 1; \
 	fi;
 
@@ -429,11 +499,11 @@ publish: gen-commit-log check build verify-git version gen-version-info
 	echo $$(cat $(PYPI_TOKEN_FILE))
 
 	echo "Uploading!"; \
-	echo $(VERSION) > $(LAST_VERSION_FILE); \
+	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE); \
 	git add $(LAST_VERSION_FILE); \
-	git commit -m "Auto update to $(VERSION)"; \
-	git tag -a $(VERSION) -F $(COMMIT_LOG_FILE); \
-	git push origin $(VERSION); \
+	git commit -m "Auto update to $(PROJ_VERSION)"; \
+	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE); \
+	git push origin $(PROJ_VERSION); \
 	twine upload dist/* --verbose
 
 # ==================================================
@@ -463,6 +533,14 @@ clean-all: clean dep-clean docs-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
 
 
+##     ## ######## ##       ########
+##     ## ##       ##       ##     ##
+##     ## ##       ##       ##     ##
+######### ######   ##       ########
+##     ## ##       ##       ##
+##     ## ##       ##       ##
+##     ## ######## ######## ##
+
 # ==================================================
 # smart help command
 # ==================================================
@@ -484,14 +562,9 @@ info: gen-version-info get-cuda-info
 	@echo "    PYTHON = $(PYTHON)"
 	@echo "    PYTHON_VERSION = $(PYTHON_VERSION)"
 	@echo "    PACKAGE_NAME = $(PACKAGE_NAME)"
-	@echo "    VERSION = $(VERSION)"
+	@echo "    PROJ_VERSION = $(PROJ_VERSION)"
 	@echo "    LAST_VERSION = $(LAST_VERSION)"
 	@echo "    PYTEST_OPTIONS = $(PYTEST_OPTIONS)"
-	@echo "    CUDA_PRESENT = $(CUDA_PRESENT)"
-	@if [ "$(CUDA_PRESENT)" = "1" ]; then \
-		echo "    CUDA_VERSION = $(CUDA_VERSION)"; \
-		echo "    CUDA_VERSION_SHORT = $(CUDA_VERSION_SHORT)"; \
-	fi
 
 .PHONY: info-long
 info-long: info
@@ -502,11 +575,7 @@ info-long: info
 	@echo "    TESTS_DIR = $(TESTS_DIR)"
 	@echo "    TESTS_TEMP_DIR = $(TESTS_TEMP_DIR)"
 	@echo "    PYPROJECT = $(PYPROJECT)"
-	@echo "    REQ_LOCATION = $(REQ_LOCATION)"
-	@echo "    REQ_BASE = $(REQ_BASE)"
-	@echo "    REQ_EXTRAS = $(REQ_EXTRAS)"
-	@echo "    REQ_DEV = $(REQ_DEV)"
-	@echo "    REQ_ALL = $(REQ_ALL)"
+	@echo "    REQUIREMENTS_DIR = $(REQUIREMENTS_DIR)"
 	@echo "    LOCAL_DIR = $(LOCAL_DIR)"
 	@echo "    PYPI_TOKEN_FILE = $(PYPI_TOKEN_FILE)"
 	@echo "    LAST_VERSION_FILE = $(LAST_VERSION_FILE)"
@@ -522,6 +591,15 @@ info-long: info
 .PHONY: help
 help: help-targets info
 	@echo -n ""
+
+
+ ######  ##     ##  ######  ########  #######  ##     ##
+##    ## ##     ## ##    ##    ##    ##     ## ###   ###
+##       ##     ## ##          ##    ##     ## #### ####
+##       ##     ##  ######     ##    ##     ## ## ### ##
+##       ##     ##       ##    ##    ##     ## ##     ##
+##    ## ##     ## ##    ##    ##    ##     ## ##     ##
+ ######   #######   ######     ##     #######  ##     ##
 
 # ==================================================
 # custom targets
