@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import functools
+import urllib.parse
 import argparse
 import fnmatch
 from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union
+import warnings
 from jinja2 import Template
 
 try:
@@ -14,6 +17,7 @@ except ImportError:
 	import tomli as tomllib
 
 
+# template for the output markdown file
 TEMPLATE_MD: str = """\
 # Inline TODOs
 
@@ -23,7 +27,7 @@ TEMPLATE_MD: str = """\
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
 - [ ] {{ itm.content }}  
-  [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }})
+  [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ make_issue_url(itm) }})
 {% if itm.context %}
 ```text
 {{ itm.context.strip() }}
@@ -35,6 +39,11 @@ TEMPLATE_MD: str = """\
 {% endfor %}
 """
 
+# for the issue creation url
+REPO_URL: str = "UNKNOWN"
+
+# TODO: no way to change the branch used for links yet
+BRANCH: str = "main"
 
 @dataclass
 class Config:
@@ -48,15 +57,41 @@ class Config:
 	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
+	tag_label_map: dict[str, str] = field(
+		default_factory=lambda: {
+			"CRIT": "bug",
+			"TODO": "enhancement",
+			"FIXME": "bug",
+			"BUG": "bug",
+			"HACK": "enhancement",
+		}
+	)
 
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
+		"this also has the side effect of setting the global `REPO_URL`"
+		global REPO_URL
 		if config_file.is_file():
 			# read file and load if present
 			with config_file.open("rb") as f:
 				data: Dict[str, Any] = tomllib.load(f)
-			data: dict = data.get("tool", {}).get("inline-todo", {})
-			return cls.load(data)
+			
+			# try to get the repo url
+			try:
+				urls: Dict[str, str] = {
+					k.lower(): v
+					for k, v in data["project"]["urls"].items()
+				}
+				if "repository" in urls:
+					REPO_URL = urls["repository"]
+				if "github" in urls:
+					REPO_URL = urls["github"]
+			except Exception as e:
+				warnings.warn(f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}")
+
+			# load the inline-todo config if present 
+			data_inline_todo: Dict[str, Any] = data.get("tool", {}).get("inline-todo", {})
+			return cls.load(data_inline_todo)
 		else:
 			# return default otherwise
 			return cls()
@@ -71,6 +106,7 @@ class Config:
 			extensions=list(data.get("extensions", default.extensions)),
 			exclude=list(data.get("exclude", default.exclude)),
 			context_lines=int(data.get("context_lines", default.context_lines)),
+			tag_label_map=dict(data.get("tag_label_map", default.tag_label_map)),
 		)
 
 
@@ -87,6 +123,18 @@ class TodoItem:
 	def serialize(self) -> Dict[str, Union[str, int]]:
 		return asdict(self)
 
+def make_issue_url(itm: TodoItem, tag_label_map: dict[str, str]) -> str:
+	"""Constructs a GitHub issue creation URL for a given TodoItem."""
+	global REPO_URL
+	title: str = itm.content.split(itm.tag, 1)[-1].lstrip(":").strip()
+	if not title:
+		title = "Issue from inline todo"
+	item_url: str = f"{REPO_URL}/blob/{BRANCH}/{itm.file}#L{itm.line_num}"
+	body: str = f"# source\n[`{itm.file}#L{itm.line_num}`]({item_url})\n\n# context\n```python\n{itm.context.strip()}\n```"
+	label: str = tag_label_map.get(itm.tag, itm.tag)
+	query: dict[str, str] = {"title": title, "body": body, "labels": label}
+	query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
+	return f"{REPO_URL}/issues/new?{query_string}"
 
 def scrape_file(
 	file_path: Path,
@@ -169,7 +217,8 @@ def main(config_file: Path) -> None:
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
 		all_items
 	)
-	rendered: str = Template(TEMPLATE_MD).render(grouped=grouped)
+	make_issue_url_func: Callable[[TodoItem], str] = functools.partial(make_issue_url, tag_label_map=cfg.tag_label_map)
+	rendered: str = Template(TEMPLATE_MD).render(grouped=grouped, make_issue_url=make_issue_url_func)
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
 
 
