@@ -552,6 +552,13 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
+	template_html_source: Path = Path("docs/templates/todo-template.html")
+	# template source for the output html file (interactive table)
+
+	@property
+	def template_html(self) -> str:
+		return self.template_html_source.read_text(encoding="utf-8")
+
 	template_code_url_: str = "{repo_url}/blob/{branch}/{file}#L{line_num}"
 	# template for the code url
 
@@ -772,24 +779,9 @@ def main(config_file: Path) -> None:
 	# write md output
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
 
-	# try to write html output
-	try:
-		from pdoc.markdown2 import Markdown
-
-		markdown: Markdown = Markdown(
-			extras=[
-				"fenced-code-blocks",
-				"header-ids",
-				"markdown-in-html", 
-				"tables"
-			],
-		)
-		html: str = markdown.convert(rendered)
-		
-		# Write HTML output
-		cfg.out_file.with_suffix(".html").write_text(str(html), encoding="utf-8")
-	except ImportError:
-		warnings.warn("pdoc not installed, skipping HTML output")
+	# write html output
+	html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+	cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 
 	print("wrote to:")
 	print(cfg.out_file.with_suffix(".md").as_posix())
@@ -813,7 +805,6 @@ export SCRIPT_GET_TODOS
 
 # markdown to html using pdoc
 define SCRIPT_PDOC_MARKDOWN2_CLI
-#!/usr/bin/env python3
 import argparse
 from pathlib import Path
 from typing import Optional
