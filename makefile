@@ -8,6 +8,15 @@
 #| as this makes it easier to find edits when updating makefile     |
 #|==================================================================|
 
+
+ ######  ########  ######
+##    ## ##       ##    ##
+##       ##       ##
+##       ######   ##   ####
+##       ##       ##    ##
+##    ## ##       ##    ##
+ ######  ##        ######
+
 # ==================================================
 # configuration & variables
 # ==================================================
@@ -29,10 +38,10 @@ DOCS_DIR := docs
 COVERAGE_REPORTS_DIR := docs/coverage
 
 # where the tests are, for pytest
-TESTS_DIR := tests/
+TESTS_DIR := tests
 
 # tests temp directory to clean up. will remove this in `make clean`
-TESTS_TEMP_DIR := _temp/
+TESTS_TEMP_DIR := $(TESTS_DIR)/_temp/
 
 # probably don't change these:
 # --------------------------------------------------
@@ -40,17 +49,21 @@ TESTS_TEMP_DIR := _temp/
 # where the pyproject.toml file is. no idea why you would change this but just in case
 PYPROJECT := pyproject.toml
 
-# requirements.txt files for base package, all extras, dev, and all
-REQ_LOCATION := .github/requirements
+# dir to store various configuration files
+# use of `.meta/` inspired by https://news.ycombinator.com/item?id=36472613
+META_DIR := .meta
 
-# local files (don't push this to git)
-LOCAL_DIR := .github/local
+# requirements.txt files for base package, all extras, dev, and all
+REQUIREMENTS_DIR := $(META_DIR)/requirements
+
+# local files (don't push this to git!)
+LOCAL_DIR := $(META_DIR)/local
 
 # will print this token when publishing. make sure not to commit this file!!!
 PYPI_TOKEN_FILE := $(LOCAL_DIR)/.pypi-token
 
 # version files
-VERSIONS_DIR := .github/versions
+VERSIONS_DIR := $(META_DIR)/versions
 
 # the last version that was auto-uploaded. will use this to create a commit log for version tag
 # see `gen-commit-log` target
@@ -72,25 +85,73 @@ PANDOC ?= pandoc
 # --------------------------------------------------
 
 # assuming your `pyproject.toml` has a line that looks like `version = "0.0.1"`, `gen-version-info` will extract this
-VERSION := NULL
+PROJ_VERSION := NULL
 # `gen-version-info` will read the last version from `$(LAST_VERSION_FILE)`, or `NULL` if it doesn't exist
 LAST_VERSION := NULL
 # get the python version, now that we have picked the python command
 PYTHON_VERSION := NULL
 
-# cuda version
+
+# ==================================================
+# reading command line options
+# ==================================================
+
+# for formatting or something, we might want to run python without uv
+# RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
+RUN_GLOBAL ?= 0
+
+ifeq ($(RUN_GLOBAL),0)
+	PYTHON = uv run $(PYTHON_BASE)
+else
+	PYTHON = $(PYTHON_BASE)
+endif
+
+# if you want different behavior for different python versions
 # --------------------------------------------------
-# 0 or 1
-CUDA_PRESENT :=
-# a version like "12.4" or "NULL"
-CUDA_VERSION := NULL
-# a version like "124" or "NULL"
-CUDA_VERSION_SHORT := NULL
+# COMPATIBILITY_MODE := $(shell $(PYTHON) -c "import sys; print(1 if sys.version_info < (3, 10) else 0)")
+
+# options we might want to pass to pytest
+# --------------------------------------------------
+
+# base options for pytest, will be appended to if `COV` or `VERBOSE` are 1.
+# user can also set this when running make to add more options
+PYTEST_OPTIONS ?=
+
+# set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file
+COV ?= 1
+# set to `1` to run pytest with `--verbose`
+VERBOSE ?= 0
+
+ifeq ($(VERBOSE),1)
+	PYTEST_OPTIONS += --verbose
+endif
+
+ifeq ($(COV),1)
+	PYTEST_OPTIONS += --cov=.
+endif
+
+# ==================================================
+# default target (help)
+# ==================================================
+
+# first/default target is help
+.PHONY: default
+default: help
 
 
+
+ ######   ######  ########  #### ########  ########  ######
+##    ## ##    ## ##     ##  ##  ##     ##    ##    ##    ##
+##       ##       ##     ##  ##  ##     ##    ##    ##
+ ######  ##       ########   ##  ########     ##     ######
+      ## ##       ##   ##    ##  ##           ##          ##
+##    ## ##    ## ##    ##   ##  ##           ##    ##    ##
+ ######   ######  ##     ## #### ##           ##     ######
+
+# ==================================================
 # python scripts we want to use inside the makefile
 # when developing, these are populated by `scripts/assemble_make.py`
-# --------------------------------------------------
+# ==================================================
 
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
@@ -372,52 +433,196 @@ endef
 
 export SCRIPT_CHECK_TORCH
 
+# get todo's from the code
+define SCRIPT_GET_TODOS
+from __future__ import annotations
 
-# ==================================================
-# reading command line options
-# ==================================================
+import argparse
+import fnmatch
+from dataclasses import asdict, dataclass, field
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Union
+from jinja2 import Template
 
-# for formatting or something, we might want to run python without uv
-# RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
-RUN_GLOBAL ?= 0
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    import tomli as tomllib
 
-ifeq ($(RUN_GLOBAL),0)
-	PYTHON = uv run $(PYTHON_BASE)
-else
-	PYTHON = $(PYTHON_BASE)
-endif
 
-# if you want different behavior for different python versions
-# --------------------------------------------------
-# COMPATIBILITY_MODE := $(shell $(PYTHON) -c "import sys; print(1 if sys.version_info < (3, 10) else 0)")
+TEMPLATE_MD: str = """\
+# Inline TODOs
 
-# options we might want to pass to pytest
-# --------------------------------------------------
+{% for tag, file_map in grouped|dictsort %}
+# {{ tag }}
+{% for filepath, item_list in file_map|dictsort %}
+## `{{ filepath }}`
+{% for itm in item_list %}
+- [ ] (line {{ itm.line_num }}) `{{ itm.content }}`
+{% if itm.context %}
+```text
+{{ itm.context.rstrip() }}
+```
+{% endif %}
+{% endfor %}
 
-# base options for pytest, will be appended to if `COV` or `VERBOSE` are 1.
-# user can also set this when running make to add more options
-PYTEST_OPTIONS ?=
+{% endfor %}
+{% endfor %}
+"""
 
-# set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file
-COV ?= 1
-# set to `1` to run pytest with `--verbose`
-VERBOSE ?= 0
+@dataclass
+class Config:
+    """Configuration for the inline-todo scraper"""
 
-ifeq ($(VERBOSE),1)
-	PYTEST_OPTIONS += --verbose
-endif
+    search_dir: Path = Path(".")
+    out_file: Path = Path("docs/todo-inline.md")
+    tags: List[str] = field(default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"])
+    extensions: List[str] = field(default_factory=lambda: ["py", "md"])
+    exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
+    context_lines: int = 2
 
-ifeq ($(COV),1)
-	PYTEST_OPTIONS += --cov=.
-endif
+    @classmethod
+    def read(cls, config_file: Path) -> Config:        
+        if config_file.is_file():
+            # read file and load if present
+            with config_file.open("rb") as f:
+                data: Dict[str, Any] = tomllib.load(f)
+            data: dict = data.get("tool", {}).get("inline-todo", {})
+            return cls.load(data)
+        else:
+            # return default otherwise
+            return cls()
+    
+    @classmethod
+    def load(cls, data: dict) -> Config:
+        default: Config = cls()
+        return cls(
+            search_dir=Path(data.get("search_dir", default.search_dir.as_posix())),
+            out_file=Path(data.get("out_file", default.out_file.as_posix())),
+            tags=list(data.get("tags", default.tags)),
+            extensions=list(data.get("extensions", default.extensions)),
+            exclude=list(data.get("exclude", default.exclude)),
+            context_lines=int(data.get("context_lines", default.context_lines)),
+        )
 
-# ==================================================
-# default target (help)
-# ==================================================
+@dataclass
+class TodoItem:
+    """Holds one TODO occurrence"""
+    tag: str
+    file: str
+    line_num: int
+    content: str
+    context: str = ""
 
-# first/default target is help
-.PHONY: default
-default: help
+    def serialize(self) -> Dict[str, Union[str, int]]:
+        return asdict(self)
+
+
+def scrape_file(
+    file_path: Path,
+    tags: List[str],
+    context_lines: int,
+) -> List[TodoItem]:
+    """Scrapes a file for lines containing any of the specified tags"""
+    items: List[TodoItem] = []
+    if not file_path.is_file():
+        return items
+    lines: List[str] = file_path.read_text(encoding="utf-8").splitlines(True)
+
+    for i, line in enumerate(lines):
+        for tag in tags:
+            if tag in line[:200]:
+                start: int = max(0, i - context_lines)
+                end: int = min(len(lines), i + context_lines + 1)
+                snippet: str = "".join(lines[start:end])
+                items.append(
+                    TodoItem(
+                        tag=tag,
+                        file=file_path.as_posix(),
+                        line_num=i + 1,
+                        content=line.strip("\n"),
+                        context=snippet,
+                    )
+                )
+                break
+    return items
+
+
+def collect_files(
+    search_dir: Path,
+    extensions: List[str],
+    exclude: List[str],
+) -> List[Path]:
+    """Recursively collects all files with specified extensions, excluding matches via globs"""
+    results: List[Path] = []
+    for ext in extensions:
+        results.extend(search_dir.rglob(f"*.{ext}"))
+
+    filtered: List[Path] = []
+    for f in results:
+        # Skip if it matches any exclude glob
+        if not any(fnmatch.fnmatch(f.as_posix(), pattern) for pattern in exclude):
+            filtered.append(f)
+    return filtered
+
+
+def group_items_by_tag_and_file(items: List[TodoItem]) -> Dict[str, Dict[str, List[TodoItem]]]:
+    """Groups items by tag, then by file"""
+    grouped: Dict[str, Dict[str, List[TodoItem]]] = {}
+    for itm in items:
+        grouped.setdefault(itm.tag, {}).setdefault(itm.file, []).append(itm)
+    for tag_dict in grouped.values():
+        for file_list in tag_dict.values():
+            file_list.sort(key=lambda x: x.line_num)
+    return grouped
+
+
+def main(config_file: Path) -> None:
+    # read configuration
+    cfg: Config = Config.read(config_file)
+
+    # get data
+    files: List[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
+    all_items: List[TodoItem] = []
+    n_files: int = len(files)
+    for i, fpath in enumerate(files):
+        print(f"Scraping {i+1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
+        all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+    # write raw to jsonl
+    with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
+        for itm in all_items:
+            f.write(json.dumps(itm.serialize()) + "\n")
+
+    # group, render, and write md output
+    grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(all_items)
+    rendered: str = Template(TEMPLATE_MD).render(grouped=grouped)
+    cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    # parse args
+    parser: argparse.ArgumentParser = argparse.ArgumentParser("inline_todo")
+    parser.add_argument(
+        "--config-file",
+        default="pyproject.toml",
+        help="Path to the TOML config, will look under [tool.inline-todo].",
+    )
+    args: argparse.Namespace = parser.parse_args()
+    # call main
+    main(Path(args.config_file))
+endef
+
+export SCRIPT_GET_TODOS
+
+
+##     ## ######## ########   ######  ####  #######  ##    ##
+##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
+##     ## ##       ##     ## ##        ##  ##     ## ####  ##
+##     ## ######   ########   ######   ##  ##     ## ## ## ##
+ ##   ##  ##       ##   ##         ##  ##  ##     ## ##  ####
+  ## ##   ##       ##    ##  ##    ##  ##  ##     ## ##   ###
+   ###    ######## ##     ##  ######  ####  #######  ##    ##
 
 # ==================================================
 # getting version info
@@ -439,7 +644,7 @@ write-proj-version:
 .PHONY: gen-version-info
 gen-version-info: write-proj-version
 	@mkdir -p $(LOCAL_DIR)
-	$(eval VERSION := $(shell cat $(VERSION_FILE)) )
+	$(eval PROJ_VERSION := $(shell cat $(VERSION_FILE)) )
 	$(eval LAST_VERSION := $(shell [ -f $(LAST_VERSION_FILE) ] && cat $(LAST_VERSION_FILE) || echo NULL) )
 	$(eval PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')") )
 
@@ -462,16 +667,25 @@ gen-commit-log: gen-version-info
 # also force the commit log to be generated, and cat it out
 .PHONY: version
 version: gen-commit-log
-	@echo "Current version is $(VERSION), last auto-uploaded version is $(LAST_VERSION)"
+	@echo "Current version is $(PROJ_VERSION), last auto-uploaded version is $(LAST_VERSION)"
 	@echo "Commit log since last version from '$(COMMIT_LOG_FILE)':"
 	@cat $(COMMIT_LOG_FILE)
 	@echo ""
-	@if [ "$(VERSION)" = "$(LAST_VERSION)" ]; then \
+	@if [ "$(PROJ_VERSION)" = "$(LAST_VERSION)" ]; then \
 		echo "!!! ERROR !!!"; \
-		echo "Python package $(VERSION) is the same as last published version $(LAST_VERSION), exiting!"; \
+		echo "Python package $(PROJ_VERSION) is the same as last published version $(LAST_VERSION), exiting!"; \
 		exit 1; \
 	fi
 
+
+
+########  ######## ########   ######
+##     ## ##       ##     ## ##    ##
+##     ## ##       ##     ## ##
+##     ## ######   ########   ######
+##     ## ##       ##              ##
+##     ## ##       ##        ##    ##
+########  ######## ##         ######
 
 # ==================================================
 # dependencies and setup
@@ -484,38 +698,27 @@ setup: dep-check
 	@echo "  source .venv/bin/activate"
 	@echo "  source .venv/Scripts/activate"
 
-.PHONY: get-cuda-info
-get-cuda-info:
-	$(eval CUDA_PRESENT := $(shell if command -v nvcc > /dev/null 2>&1; then echo 1; else echo 0; fi))
-	$(eval CUDA_VERSION := $(if $(filter $(CUDA_PRESENT),1),$(shell nvcc --version 2>/dev/null | grep "release" | awk '{print $$5}' | sed 's/,//'),NULL))
-	$(eval CUDA_VERSION_SHORT := $(if $(filter $(CUDA_PRESENT),1),$(shell echo $(CUDA_VERSION) | sed 's/\.//'),NULL))
-
 .PHONY: dep-check-torch
 dep-check-torch:
 	@echo "see if torch is installed, and which CUDA version and devices it sees"
 	$(PYTHON) -c "$$SCRIPT_CHECK_TORCH"
 
 .PHONY: dep
-dep: get-cuda-info
+dep:
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups --compile-bytecode
-	mkdir -p $(REQ_LOCATION)
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION) | sh -x
-
-# @if [ "$(CUDA_PRESENT)" = "1" ]; then \
-# 	echo "CUDA is present, installing torch with CUDA $(CUDA_VERSION)"; \
-# 	uv pip install torch --upgrade --index https://download.pytorch.org/whl/cu$(CUDA_VERSION_SHORT); \
-# fi
+	mkdir -p $(REQUIREMENTS_DIR)
+	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
 	
 
 .PHONY: dep-check
 dep-check:
 	@echo "Checking that exported requirements are up to date"
 	uv sync --all-extras --all-groups
-	mkdir -p $(REQ_LOCATION)-TEMP
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQ_LOCATION)-TEMP | sh -x
-	diff -r $(REQ_LOCATION)-TEMP $(REQ_LOCATION)
-	rm -rf $(REQ_LOCATION)-TEMP
+	mkdir -p $(REQUIREMENTS_DIR)-TEMP
+	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR)-TEMP | sh -x
+	diff -r $(REQUIREMENTS_DIR)-TEMP $(REQUIREMENTS_DIR)
+	rm -rf $(REQUIREMENTS_DIR)-TEMP
 
 
 .PHONY: dep-clean
@@ -523,7 +726,16 @@ dep-clean:
 	@echo "clean up lock files, .venv, and requirements files"
 	rm -rf .venv
 	rm -rf uv.lock
-	rm -rf $(REQ_LOCATION)/*.txt
+	rm -rf $(REQUIREMENTS_DIR)/*.txt
+
+
+ ######  ##     ## ########  ######  ##    ##  ######
+##    ## ##     ## ##       ##    ## ##   ##  ##    ##
+##       ##     ## ##       ##       ##  ##   ##
+##       ######### ######   ##       #####     ######
+##       ##     ## ##       ##       ##  ##         ##
+##    ## ##     ## ##       ##    ## ##   ##  ##    ##
+ ######  ##     ## ########  ######  ##    ##  ######
 
 # ==================================================
 # checks (formatting/linting, typing, tests)
@@ -552,7 +764,7 @@ format-check:
 typing: clean
 	@echo "running type checks"
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)/
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)
 
 .PHONY: test
 test: clean
@@ -562,6 +774,15 @@ test: clean
 .PHONY: check
 check: clean format-check test typing
 	@echo "run format checks, tests, and typing checks"
+
+
+########   #######   ######   ######
+##     ## ##     ## ##    ## ##    ##
+##     ## ##     ## ##       ##
+##     ## ##     ## ##        ######
+##     ## ##     ## ##             ##
+##     ## ##     ## ##    ## ##    ##
+########   #######   ######   ######
 
 # ==================================================
 # coverage & docs
@@ -631,6 +852,30 @@ docs-clean:
 	rm $(DOCS_DIR)/package_map.html
 
 
+.PHONY: todo
+todo:
+	@echo "get all TODO's from the code"
+	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
+
+
+.PHONY: lmcat-tree
+lmcat-tree:
+	@echo "show in console the lmcat tree view"
+	$(PYTHON) -m lmcat -t --output STDOUT
+
+.PHONY: lmcat
+lmcat:
+	@echo "write the lmcat full output to pyproject.toml:[tool.lmcat.output]"
+	$(PYTHON) -m lmcat
+
+########  ##     ## #### ##       ########
+##     ## ##     ##  ##  ##       ##     ##
+##     ## ##     ##  ##  ##       ##     ##
+########  ##     ##  ##  ##       ##     ##
+##     ## ##     ##  ##  ##       ##     ##
+##     ## ##     ##  ##  ##       ##     ##
+########   #######  #### ######## ########
+
 # ==================================================
 # build and publish
 # ==================================================
@@ -667,11 +912,11 @@ publish: gen-commit-log check build verify-git version gen-version-info
 	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
 	@echo "Now would also be the time to edit $(COMMIT_LOG_FILE), as that will be used as the tag description"
 	@read -p "Confirm: " NEW_VERSION; \
-	if [ "$$NEW_VERSION" = $(VERSION) ]; then \
+	if [ "$$NEW_VERSION" = $(PROJ_VERSION) ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Version confirmed. Proceeding with publish."; \
 	else \
-		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(VERSION)"; \
+		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(PROJ_VERSION)"; \
 		exit 1; \
 	fi;
 
@@ -680,11 +925,11 @@ publish: gen-commit-log check build verify-git version gen-version-info
 	echo $$(cat $(PYPI_TOKEN_FILE))
 
 	echo "Uploading!"; \
-	echo $(VERSION) > $(LAST_VERSION_FILE); \
+	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE); \
 	git add $(LAST_VERSION_FILE); \
-	git commit -m "Auto update to $(VERSION)"; \
-	git tag -a $(VERSION) -F $(COMMIT_LOG_FILE); \
-	git push origin $(VERSION); \
+	git commit -m "Auto update to $(PROJ_VERSION)"; \
+	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE); \
+	git push origin $(PROJ_VERSION); \
 	twine upload dist/* --verbose
 
 # ==================================================
@@ -714,6 +959,14 @@ clean-all: clean dep-clean docs-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
 
 
+##     ## ######## ##       ########
+##     ## ##       ##       ##     ##
+##     ## ##       ##       ##     ##
+######### ######   ##       ########
+##     ## ##       ##       ##
+##     ## ##       ##       ##
+##     ## ######## ######## ##
+
 # ==================================================
 # smart help command
 # ==================================================
@@ -730,19 +983,14 @@ help-targets:
 
 
 .PHONY: info
-info: gen-version-info get-cuda-info
+info: gen-version-info
 	@echo "# makefile variables"
 	@echo "    PYTHON = $(PYTHON)"
 	@echo "    PYTHON_VERSION = $(PYTHON_VERSION)"
 	@echo "    PACKAGE_NAME = $(PACKAGE_NAME)"
-	@echo "    VERSION = $(VERSION)"
+	@echo "    PROJ_VERSION = $(PROJ_VERSION)"
 	@echo "    LAST_VERSION = $(LAST_VERSION)"
 	@echo "    PYTEST_OPTIONS = $(PYTEST_OPTIONS)"
-	@echo "    CUDA_PRESENT = $(CUDA_PRESENT)"
-	@if [ "$(CUDA_PRESENT)" = "1" ]; then \
-		echo "    CUDA_VERSION = $(CUDA_VERSION)"; \
-		echo "    CUDA_VERSION_SHORT = $(CUDA_VERSION_SHORT)"; \
-	fi
 
 .PHONY: info-long
 info-long: info
@@ -753,11 +1001,7 @@ info-long: info
 	@echo "    TESTS_DIR = $(TESTS_DIR)"
 	@echo "    TESTS_TEMP_DIR = $(TESTS_TEMP_DIR)"
 	@echo "    PYPROJECT = $(PYPROJECT)"
-	@echo "    REQ_LOCATION = $(REQ_LOCATION)"
-	@echo "    REQ_BASE = $(REQ_BASE)"
-	@echo "    REQ_EXTRAS = $(REQ_EXTRAS)"
-	@echo "    REQ_DEV = $(REQ_DEV)"
-	@echo "    REQ_ALL = $(REQ_ALL)"
+	@echo "    REQUIREMENTS_DIR = $(REQUIREMENTS_DIR)"
 	@echo "    LOCAL_DIR = $(LOCAL_DIR)"
 	@echo "    PYPI_TOKEN_FILE = $(PYPI_TOKEN_FILE)"
 	@echo "    LAST_VERSION_FILE = $(LAST_VERSION_FILE)"
@@ -773,6 +1017,15 @@ info-long: info
 .PHONY: help
 help: help-targets info
 	@echo -n ""
+
+
+ ######  ##     ##  ######  ########  #######  ##     ##
+##    ## ##     ## ##    ##    ##    ##     ## ###   ###
+##       ##     ## ##          ##    ##     ## #### ####
+##       ##     ##  ######     ##    ##     ## ## ### ##
+##       ##     ##       ##    ##    ##     ## ##     ##
+##    ## ##     ## ##    ##    ##    ##     ## ##     ##
+ ######   #######   ######     ##     #######  ##     ##
 
 # ==================================================
 # custom targets
