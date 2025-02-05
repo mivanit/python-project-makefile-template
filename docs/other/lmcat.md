@@ -1,8 +1,8 @@
 # Stats
-- 23 files
-- 3918 (3.9K) lines
-- 131549 (132K) chars
-- 15996 (16K) `whitespace-split` tokens
+- 22 files
+- 3634 (3.6K) lines
+- 121210 (121K) chars
+- 14678 (15K) `whitespace-split` tokens
 
 # File Tree
 
@@ -20,23 +20,22 @@ python-project-makefile-template
 │    └── .version                    [    1L      6C     1T]
 ├── myproject                        
 │   ├── __init__.py                  [    3L     34C     5T]
-│   ├── helloworld.py                [   13L    359C    49T]
-│   └── other.py                     [    3L    127C    17T]
+│   ├── helloworld.py                [   12L    359C    49T]
+│   └── other.py                     [    3L    128C    17T]
 ├── scripts                          
-│   ├── assemble_make.py             [   55L  1,368C   134T]
+│   ├── assemble_make.py             [   54L  1,356C   132T]
 │   ├── check_torch.py               [  157L  4,404C   419T]
 │   ├── export_requirements.py       [   78L  2,049C   237T]
 │   ├── get_commit_log.py            [   26L    647C    61T]
-│   ├── get_todos.py                 [  342L  8,855C   989T]
+│   ├── get_todos.py                 [  342L  8,820C   986T]
 │   ├── get_version.py               [   17L    339C    37T]
-│   └── pdoc_markdown2_cli.py        [   60L  1,662C   144T]
+│   └── pdoc_markdown2_cli.py        [   54L  1,448C   144T]
 ├── tests                            
 │   └── test_nothing.py              [    2L     42C     5T]
 ├── LICENSE                          [  427L 20,133C 2,769T]
-├── README.md                        [  275L 12,104C 1,677T]
-├── TODO.md                          [   77L  2,668C   266T]
-├── makefile                         [1,289L 39,675C 4,786T]
-├── makefile.template                [  610L 21,837C 2,902T]
+├── README.md                        [   88L  5,059C   659T]
+├── makefile                         [1,281L 39,428C 4,776T]
+├── makefile.template                [  607L 21,839C 2,895T]
 ├── pyproject.toml                   [  130L  2,892C   370T]
 ```
 
@@ -316,20 +315,20 @@ def some_function():
 	raise NotImplementedError("This function is not implemented yet")
 
 
-
 # FIXME: an example that `make todo` should find
 def critical_function():
 	raise NotImplementedError("This function is not implemented yet")
+
 ``````{ end_of_file="myproject/helloworld.py" }
 
 ``````{ path="myproject/other.py"  }
 # BUG: make todo should see this too
 def another_function():
 	raise NotImplementedError("This function is not implemented yet")
+
 ``````{ end_of_file="myproject/other.py" }
 
 ``````{ path="scripts/assemble_make.py"  }
-import json
 from pathlib import Path
 import tomllib
 
@@ -663,14 +662,13 @@ except subprocess.CalledProcessError as e:
 ``````{ path="scripts/get_todos.py"  }
 from __future__ import annotations
 
-import functools
 import urllib.parse
 import argparse
 import fnmatch
 from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List, Union
 import warnings
 from jinja2 import Template
 
@@ -714,6 +712,7 @@ TEMPLATE_ISSUE: str = """\
 ```
 """
 
+
 @dataclass
 class Config:
 	"""Configuration for the inline-todo scraper"""
@@ -751,7 +750,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -763,18 +762,15 @@ class Config:
 
 	@property
 	def template_code_url(self) -> str:
-		return (
-			self.template_code_url_
-			.replace("{repo_url}", self.repo_url)
-			.replace("{branch}", self.branch)
+		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
+			"{branch}", self.branch
 		)
-	
+
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
 
 	branch: str = "main"
 	# branch for links to files on github
-
 
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
@@ -820,12 +816,13 @@ class Config:
 			k: Path(v) if k in {"search_dir", "out_file"} else v
 			for k, v in data.items()
 		}
-		
+
 		return cls(**data)
 
 
 CFG: Config = Config()
 # this is messy, but we use a global config so we can get `TodoItem().issue_url` to work
+
 
 @dataclass
 class TodoItem:
@@ -845,7 +842,7 @@ class TodoItem:
 			"stripped_title": self.stripped_title,
 			"code_url": self.code_url,
 		}
-	
+
 	@property
 	def code_url(self) -> str:
 		"""Returns a URL to the code on GitHub"""
@@ -880,7 +877,7 @@ class TodoItem:
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
-	
+
 	@property
 	def file_lang(self) -> str:
 		"""Returns the language for the file extension"""
@@ -983,7 +980,9 @@ def main(config_file: Path) -> None:
 
 	# write html output
 	try:
-		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		html_rendered: str = cfg.template_html.replace(
+			"//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items])
+		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
@@ -1036,58 +1035,53 @@ from pdoc.markdown2 import Markdown, _safe_mode
 
 
 def convert_file(
-    input_path: Path, 
-    output_path: Path,
-    safe_mode: Optional[_safe_mode] = None,
-    encoding: str = "utf-8",
+	input_path: Path,
+	output_path: Path,
+	safe_mode: Optional[_safe_mode] = None,
+	encoding: str = "utf-8",
 ) -> None:
-    """Convert a markdown file to HTML"""
-    # Read markdown input
-    text: str = input_path.read_text(encoding=encoding)
-    
-    # Convert to HTML using markdown2
-    markdown: Markdown = Markdown(
-        extras=[
-            "fenced-code-blocks",
-            "header-ids",
-            "markdown-in-html", 
-            "tables"
-        ],
-        safe_mode=safe_mode
-    )
-    html: str = markdown.convert(text)
-    
-    # Write HTML output
-    output_path.write_text(str(html), encoding=encoding)
+	"""Convert a markdown file to HTML"""
+	# Read markdown input
+	text: str = input_path.read_text(encoding=encoding)
+
+	# Convert to HTML using markdown2
+	markdown: Markdown = Markdown(
+		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
+		safe_mode=safe_mode,
+	)
+	html: str = markdown.convert(text)
+
+	# Write HTML output
+	output_path.write_text(str(html), encoding=encoding)
 
 
 def main() -> None:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Convert markdown files to HTML using pdoc's markdown2")
-    parser.add_argument("input", type=Path, help="Input markdown file path")
-    parser.add_argument("output", type=Path, help="Output HTML file path") 
-    parser.add_argument(
-        "--safe-mode",
-        choices=["escape", "replace"],
-        help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]"
-    )
-    parser.add_argument(
-        "--encoding",
-        default="utf-8",
-        help="Character encoding for reading/writing files (default: utf-8)"
-    )
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
+		description="Convert markdown files to HTML using pdoc's markdown2"
+	)
+	parser.add_argument("input", type=Path, help="Input markdown file path")
+	parser.add_argument("output", type=Path, help="Output HTML file path")
+	parser.add_argument(
+		"--safe-mode",
+		choices=["escape", "replace"],
+		help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]",
+	)
+	parser.add_argument(
+		"--encoding",
+		default="utf-8",
+		help="Character encoding for reading/writing files (default: utf-8)",
+	)
 
-    args: argparse.Namespace = parser.parse_args()
-    
-    convert_file(
-        args.input,
-        args.output,
-        safe_mode=args.safe_mode,
-        encoding=args.encoding
-    )
+	args: argparse.Namespace = parser.parse_args()
+
+	convert_file(
+		args.input, args.output, safe_mode=args.safe_mode, encoding=args.encoding
+	)
 
 
 if __name__ == "__main__":
-    main()
+	main()
+
 ``````{ end_of_file="scripts/pdoc_markdown2_cli.py" }
 
 ``````{ path="tests/test_nothing.py"  }
@@ -1551,14 +1545,15 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - I recommend using [gitforwindows.org](https://gitforwindows.org), or just using WSL
 - you will need [uv](https://docs.astral.sh/uv/) and some form of python installed.
 - run `uv init` or otherwise set up a `pyproject.toml` file
-  - the `pyproject.toml` of this repo has a lot of dev dependencies that you might need, you may want to copy those
+  - the `pyproject.toml` of this repo has dev dependencies that you might need, you may want to copy those
+  - it's also got some configuration that is worth looking at
 - copy `makefile` from this repo into the root of your repo
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
-- if you want automatic documentation generation, copy from this repo:
-  - `docs/.resources/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
-  - `docs/templates/`: jinja2 templates for the docs
-  - `docs/.resources/`: some css and icons for the docs
+- if you want automatic documentation generation, copy `docs/.resources/`. it contains:
+  - `docs/.resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/.resources/templates/`: jinja2 templates for the docs, template for the todolist
+  - `docs/.resources/css/`, `docs/.resources/svg/`: some css and icons for the docs
 
 
 # Makefile
@@ -1569,229 +1564,41 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 $ make help
 # make targets:
     make build                build the package
-    make check                run format and lint checks, tests, and typing checks
+    make check                run format checks, tests, and typing checks
     make clean                clean up temporary files
+    make clean-all            clean up all temporary files, dep files, venv, and generated docs
     make cov                  generate coverage reports
-    make dep                  sync and export deps to $(REQ_BASE), $(REQ_EXTRAS), and $(REQ_DEV)
-    make dep-check            checking uv.lock is good, exported requirements up to date
+    make dep                  Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'
+    make dep-check            Checking that exported requirements are up to date
+    make dep-check-torch      see if torch is installed, and which CUDA version and devices it sees
+    make dep-clean            clean up lock files, .venv, and requirements files
     make docs                 generate all documentation and coverage reports
     make docs-clean           remove generated docs
     make docs-combined        generate combined (single-file) docs in markdown and convert to other formats
     make docs-html            generate html docs
     make docs-md              generate combined (single-file) docs in markdown
     make format               format the source code
-    make format-check         run format check
+    make format-check         check if the source code is formatted correctly
     make help
+    make info                 # makefile variables
+    make info-long            # other variables
+    make lmcat                write the lmcat full output to pyproject.toml:[tool.lmcat.output]
+    make lmcat-tree           show in console the lmcat tree view
     make publish              run all checks, build, and then publish
     make setup                install and update via uv
     make test                 running tests
+    make todo                 get all TODO's from the code
     make typing               running type checks
     make verify-git           checking git status
-    make version              Current version is $(VERSION), last auto-uploaded version is $(LAST_VERSION)
+    make version              Current version is $(PROJ_VERSION), last auto-uploaded version is $(LAST_VERSION)
 # makefile variables
     PYTHON = uv run python
     PYTHON_VERSION = 3.12.0 
     PACKAGE_NAME = myproject
-    VERSION = v0.0.2 
-    LAST_VERSION = v0.0.1 
+    PROJ_VERSION = v0.0.6 
+    LAST_VERSION = v0.0.5
     PYTEST_OPTIONS =  --cov=.
 ```
-
-## Configuration & Variables
-
-- `PACKAGE_NAME`: The name of the package  
-  `PACKAGE_NAME := myproject`
-
-- `PUBLISH_BRANCH`: The branch to check when publishing  
-  `PUBLISH_BRANCH := main`
-
-- `DOCS_DIR`: Where to put docs  
-  `DOCS_DIR := docs`
-
-- `COVERAGE_REPORTS_DIR`: Where to put the coverage reports  
-  This will be published with the docs. Modify the `docs` targets and `.gitignore` if you don't want that  
-  `COVERAGE_REPORTS_DIR := docs/coverage`
-
-- `TESTS_DIR`: Where the tests are, for pytest  
-  `TESTS_DIR := tests/`
-
-- `TESTS_TEMP_DIR`: Tests temp directory to clean up  
-  Will remove this in `make clean`  
-  `TESTS_TEMP_DIR := tests/_temp`
-
-### probably don't change these:
-
-- `PYPROJECT`: Where the pyproject.toml file is  
-  `PYPROJECT := pyproject.toml`
-
-- `REQ_BASE`: Requirements.txt file for base package  
-  `REQ_BASE := .github/requirements.txt`
-
-- `REQ_EXTRAS`: Requirements.txt file for all extras  
-  `REQ_EXTRAS := .github/requirements-extras.txt`
-
-- `REQ_DEV`: Requirements.txt file for dev  
-  `REQ_DEV := .github/requirements-dev.txt`
-
-- `LOCAL_DIR`: Local files (don't push this to git)  
-  `LOCAL_DIR := .github/local`
-
-- `PYPI_TOKEN_FILE`: Will print this token when publishing  
-  Make sure not to commit this file!  
-  `PYPI_TOKEN_FILE := $(LOCAL_DIR)/.pypi-token`
-
-- `LAST_VERSION_FILE`: The last version that was auto-uploaded  
-  Will use this to create a commit log for version tag  
-  `LAST_VERSION_FILE := .github/.lastversion`
-
-- `PYTHON_BASE`: Base python to use  
-  Will add `uv run` in front of this if `RUN_GLOBAL` is not set to 1  
-  `PYTHON_BASE := python`
-
-- `COMMIT_LOG_FILE`: Where the commit log will be stored  
-  `COMMIT_LOG_FILE := $(LOCAL_DIR)/.commit_log`
-
-- `PANDOC`: Pandoc commands (for docs)  
-  `PANDOC ?= pandoc`
-
-### version vars - extracted automatically from `pyproject.toml`, `$(LAST_VERSION_FILE)`, and $(PYTHON)
-
-- `VERSION`: Extracted automatically from `pyproject.toml`  
-  `VERSION := NULL`
-
-- `LAST_VERSION`: Read from `$(LAST_VERSION_FILE)`, or `NULL` if it doesn't exist  
-  `LAST_VERSION := NULL`
-
-- `PYTHON_VERSION`: Get the python version, now that we have picked the python command  
-  `PYTHON_VERSION := NULL`
-
-- `RUN_GLOBAL`: For formatting or something, we might want to run python without uv  
-  RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`  
-  `RUN_GLOBAL ?= 0`
-
-- `PYTEST_OPTIONS`: Base options for pytest, will be appended to if `COV` or `VERBOSE` are 1  
-  User can also set this when running make to add more options  
-  `PYTEST_OPTIONS ?=`
-
-- `COV`: Set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file  
-  `COV ?= 1`
-
-- `VERBOSE`: Set to `1` to run pytest with `--verbose`  
-  `VERBOSE ?= 0`
-
-## Default Target (Help)
-
-- `default`: First/default target is help  
-
-## Getting Version Info
-
-- `gen-version-info`: Gets version info from $(PYPROJECT), last version from $(LAST_VERSION_FILE), and python version  
-  Uses just `python` for everything except getting the python version. No echo here, because this is "private"  
-
-- `gen-commit-log`: Getting commit log since the tag specified in $(LAST_VERSION_FILE)  
-  Will write to $(COMMIT_LOG_FILE)  
-  When publishing, the contents of $(COMMIT_LOG_FILE) will be used as the tag description (but can be edited during the process)  
-  Uses just `python`. No echo here, because this is "private"  
-
-- `version`: Force the version info to be read, printing it out  
-  Also force the commit log to be generated, and cat it out  
-
-## Dependencies and Setup
-
-- `setup`: Install and update via uv  
-
-- `dep`: Sync and export deps to $(REQ_BASE), $(REQ_EXTRAS), and $(REQ_DEV)  
-
-- `dep-check`: Checking uv.lock is good, exported requirements up to date  
-
-## Checks (Formatting/Linting, Typing, Tests)
-
-- `format`: Format the source code  
-  Runs ruff and pycln to format the code  
-
-- `format-check`: Check if the source code is formatted correctly  
-  Runs ruff and pycln to check if the code is formatted correctly  
-
-- `typing`: Running type checks  
-  Runs type checks with mypy  
-  At some point, need to add back --check-untyped-defs to mypy call  
-  But it complains when we specify arguments by keyword where positional is fine  
-  Not sure how to fix this  
-
-- `test`: Running tests  
-
-- `check`: Run format checks, tests, and typing checks  
-
-## Coverage & Docs
-
-- `docs-html`: Generate html docs  
-  Generates a whole tree of documentation in html format.  
-  See `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info  
-
-- `docs-md`: Generate combined (single-file) docs in markdown  
-  Instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.  
-  This is useful if you want to have a copy that you can grep/search, but those docs are much messier.  
-  docs-combined will use pandoc to convert them to other formats.  
-
-- `docs-combined`: Generate combined (single-file) docs in markdown and convert to other formats  
-  After running docs-md, this will convert the combined markdown file to other formats:  
-  gfm (github-flavored markdown), plain text, and html  
-  Requires pandoc in path, pointed to by $(PANDOC)  
-  pdf output would be nice but requires other deps  
-
-- `cov`: Generate coverage reports  
-  Generates coverage reports as html and text with `pytest-cov`, and a badge with `coverage-badge`  
-  If `.coverage` is not found, will run tests first  
-  Also removes the `.gitignore` file that `coverage html` creates, since we count that as part of the docs  
-
-- `docs`: Generate all documentation and coverage reports  
-  Runs the coverage report, then the docs, then the combined docs  
-
-- `docs-clean`: Remove generated docs  
-  Removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script  
-  Distinct from `make clean`  
-
-## Build and Publish
-
-- `verify-git`: Checking git status  
-  Verifies that the current branch is $(PUBLISH_BRANCH) and that git is clean  
-  Used before publishing  
-
-- `build`: Build the package  
-
-- `publish`: Run all checks, build, and then publish  
-  Gets the commit log, checks everything, builds, and then publishes with twine  
-  Will ask the user to confirm the new version number (and this allows for editing the tag info)  
-  Will also print the contents of $(PYPI_TOKEN_FILE) to the console for the user to copy and paste in when prompted by twine  
-
-## Cleanup of Temp Files
-
-- `clean`: Clean up temporary files  
-  Cleans up temp files from formatter, type checking, tests, coverage  
-  Removes all built files  
-  Removes $(TESTS_TEMP_DIR) to remove temporary test files  
-  Recursively removes all `__pycache__` directories and `*.pyc` or `*.pyo` files  
-  Distinct from `make docs-clean`, which only removes generated documentation files  
-
-## Smart Help Command
-
-- `help-targets`: List make targets  
-  Listing targets is from stackoverflow  
-  https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile  
-  No .PHONY because this will only be run before `make help`  
-  It's a separate command because getting the versions takes a bit of time  
-
-- `help`: Print out the help targets, and then local variables (but those take a bit longer)  
-  Immediately print out the help targets, and then local variables (but those take a bit longer)
-
-## Docs generation
-
-Provided files for pdoc usage are:
-
-- `docs/.resources/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
-- `docs/templates/` containing template files for both html and markdown docs
-- `docs/.resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
-
 
 # Development
 
@@ -1804,86 +1611,6 @@ If developing, modify the `makefile.template` file or scripts in `scripts/`, and
 python scripts/assemble_make.py
 ```
 ``````{ end_of_file="README.md" }
-
-``````{ path="TODO.md"  }
-for more robust pytorch checking, from
-https://community.frame.work/t/amd-rocm-for-local-training-and-inferencing/58377/3
-
-```python
-import torch, grp, pwd, os, subprocess
-
-devices = []
-try:
-    print("\n\nChecking ROCM support...")
-    result = subprocess.run(["rocminfo"], stdout=subprocess.PIPE)
-    cmd_str = result.stdout.decode("utf-8")
-    cmd_split = cmd_str.split("Agent ")
-    for part in cmd_split:
-        item_single = part[0:1]
-        item_double = part[0:2]
-        if item_single.isnumeric() or item_double.isnumeric():
-            new_split = cmd_str.split("Agent " + item_double)
-            device = (
-                new_split[1]
-                .split("Marketing Name:")[0]
-                .replace("  Name:                    ", "")
-                .replace("\n", "")
-                .replace("                  ", "")
-                .split("Uuid:")[0]
-                .split("*******")[1]
-            )
-            devices.append(device)
-    if len(devices) > 0:
-        print("GOOD: ROCM devices found: ", len(devices))
-    else:
-        print("BAD: No ROCM devices found.")
-
-    print("Checking PyTorch...")
-    x = torch.rand(5, 3)
-    has_torch = False
-    len_x = len(x)
-    if len_x == 5:
-        has_torch = True
-        for i in x:
-            if len(i) == 3:
-                has_torch = True
-            else:
-                has_torch = False
-    if has_torch:
-        print("GOOD: PyTorch is working fine.")
-    else:
-        print("BAD: PyTorch is NOT working.")
-
-    print("Checking user groups...")
-    user = os.getlogin()
-    groups = [g.gr_name for g in grp.getgrall() if user in g.gr_mem]
-    gid = pwd.getpwnam(user).pw_gid
-    groups.append(grp.getgrgid(gid).gr_name)
-    if "render" in groups and "video" in groups:
-        print("GOOD: The user", user, "is in RENDER and VIDEO groups.")
-    else:
-        print(
-            "BAD: The user",
-            user,
-            "is NOT in RENDER and VIDEO groups. This is necessary in order to PyTorch use HIP resources",
-        )
-
-    if torch.cuda.is_available():
-        print("GOOD: PyTorch ROCM support found.")
-        t = torch.tensor([5, 5, 5], dtype=torch.int64, device="cuda")
-        print("Testing PyTorch ROCM support...")
-        if str(t) == "tensor([5, 5, 5], device='cuda:0')":
-            print("Everything fine! You can run PyTorch code inside of: ")
-            for idx, device in enumerate(devices):
-                print(f"---> {device}")
-    else:
-        print("BAD: PyTorch ROCM support NOT found.")
-except:
-    print(
-        "Cannot find rocminfo command information. Unable to determine if AMDGPU drivers with ROCM support were installed."
-    )
-```
-``````{ end_of_file="TODO.md" }
 
 ``````{ path="makefile"  }
 #|==================================================================|
@@ -1923,7 +1650,7 @@ DOCS_DIR := docs
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
-COVERAGE_REPORTS_DIR := docs/coverage
+COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 
 # where the tests are, for pytest
 TESTS_DIR := tests
@@ -2352,14 +2079,13 @@ export SCRIPT_CHECK_TORCH
 define SCRIPT_GET_TODOS
 from __future__ import annotations
 
-import functools
 import urllib.parse
 import argparse
 import fnmatch
 from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List, Union
 import warnings
 from jinja2 import Template
 
@@ -2403,6 +2129,7 @@ TEMPLATE_ISSUE: str = """\
 ```
 """
 
+
 @dataclass
 class Config:
 	"""Configuration for the inline-todo scraper"""
@@ -2440,7 +2167,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/..resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -2452,18 +2179,15 @@ class Config:
 
 	@property
 	def template_code_url(self) -> str:
-		return (
-			self.template_code_url_
-			.replace("{repo_url}", self.repo_url)
-			.replace("{branch}", self.branch)
+		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
+			"{branch}", self.branch
 		)
-	
+
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
 
 	branch: str = "main"
 	# branch for links to files on github
-
 
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
@@ -2509,12 +2233,13 @@ class Config:
 			k: Path(v) if k in {"search_dir", "out_file"} else v
 			for k, v in data.items()
 		}
-		
+
 		return cls(**data)
 
 
 CFG: Config = Config()
 # this is messy, but we use a global config so we can get `TodoItem().issue_url` to work
+
 
 @dataclass
 class TodoItem:
@@ -2534,7 +2259,7 @@ class TodoItem:
 			"stripped_title": self.stripped_title,
 			"code_url": self.code_url,
 		}
-	
+
 	@property
 	def code_url(self) -> str:
 		"""Returns a URL to the code on GitHub"""
@@ -2569,7 +2294,7 @@ class TodoItem:
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
-	
+
 	@property
 	def file_lang(self) -> str:
 		"""Returns the language for the file extension"""
@@ -2672,7 +2397,9 @@ def main(config_file: Path) -> None:
 
 	# write html output
 	try:
-		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		html_rendered: str = cfg.template_html.replace(
+			"//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items])
+		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
@@ -2707,58 +2434,53 @@ from pdoc.markdown2 import Markdown, _safe_mode
 
 
 def convert_file(
-    input_path: Path, 
-    output_path: Path,
-    safe_mode: Optional[_safe_mode] = None,
-    encoding: str = "utf-8",
+	input_path: Path,
+	output_path: Path,
+	safe_mode: Optional[_safe_mode] = None,
+	encoding: str = "utf-8",
 ) -> None:
-    """Convert a markdown file to HTML"""
-    # Read markdown input
-    text: str = input_path.read_text(encoding=encoding)
-    
-    # Convert to HTML using markdown2
-    markdown: Markdown = Markdown(
-        extras=[
-            "fenced-code-blocks",
-            "header-ids",
-            "markdown-in-html", 
-            "tables"
-        ],
-        safe_mode=safe_mode
-    )
-    html: str = markdown.convert(text)
-    
-    # Write HTML output
-    output_path.write_text(str(html), encoding=encoding)
+	"""Convert a markdown file to HTML"""
+	# Read markdown input
+	text: str = input_path.read_text(encoding=encoding)
+
+	# Convert to HTML using markdown2
+	markdown: Markdown = Markdown(
+		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
+		safe_mode=safe_mode,
+	)
+	html: str = markdown.convert(text)
+
+	# Write HTML output
+	output_path.write_text(str(html), encoding=encoding)
 
 
 def main() -> None:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Convert markdown files to HTML using pdoc's markdown2")
-    parser.add_argument("input", type=Path, help="Input markdown file path")
-    parser.add_argument("output", type=Path, help="Output HTML file path") 
-    parser.add_argument(
-        "--safe-mode",
-        choices=["escape", "replace"],
-        help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]"
-    )
-    parser.add_argument(
-        "--encoding",
-        default="utf-8",
-        help="Character encoding for reading/writing files (default: utf-8)"
-    )
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
+		description="Convert markdown files to HTML using pdoc's markdown2"
+	)
+	parser.add_argument("input", type=Path, help="Input markdown file path")
+	parser.add_argument("output", type=Path, help="Output HTML file path")
+	parser.add_argument(
+		"--safe-mode",
+		choices=["escape", "replace"],
+		help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]",
+	)
+	parser.add_argument(
+		"--encoding",
+		default="utf-8",
+		help="Character encoding for reading/writing files (default: utf-8)",
+	)
 
-    args: argparse.Namespace = parser.parse_args()
-    
-    convert_file(
-        args.input,
-        args.output,
-        safe_mode=args.safe_mode,
-        encoding=args.encoding
-    )
+	args: argparse.Namespace = parser.parse_args()
+
+	convert_file(
+		args.input, args.output, safe_mode=args.safe_mode, encoding=args.encoding
+	)
 
 
 if __name__ == "__main__":
-    main()
+	main()
+
 endef
 
 export SCRIPT_PDOC_MARKDOWN2_CLI
@@ -2937,20 +2659,20 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info
+# see `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
 
-# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.
+# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
 # docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -2997,9 +2719,6 @@ docs-clean:
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
-
-
-# echo "The last line is: $$last_line"
 
 
 .PHONY: lmcat-tree
@@ -3215,7 +2934,7 @@ DOCS_DIR := docs
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
-COVERAGE_REPORTS_DIR := docs/coverage
+COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 
 # where the tests are, for pytest
 TESTS_DIR := tests
@@ -3550,20 +3269,20 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info
+# see `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
 
-# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.
+# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
 # docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -3610,9 +3329,6 @@ docs-clean:
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
-
-
-# echo "The last line is: $$last_line"
 
 
 .PHONY: lmcat-tree

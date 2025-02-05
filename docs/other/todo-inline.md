@@ -25,9 +25,9 @@ def another_function():
 ## [`myproject/helloworld.py`](/myproject/helloworld.py)
 
 - an example that `make todo` should find  
-  local link: [`/myproject/helloworld.py#11`](/myproject/helloworld.py#11) 
-  | view on GitHub: [myproject/helloworld.py#L11](https://github.com/mivanit/python-project-makefile-template/blob/main/myproject/helloworld.py#L11)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=an%20example%20that%20%60make%20todo%60%20should%20find&body=%23%20source%0A%0A%5B%60myproject%2Fhelloworld.py%23L11%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fmyproject%2Fhelloworld.py%23L11%29%0A%0A%23%20context%0A%60%60%60python%0A%23%20FIXME%3A%20an%20example%20that%20%60make%20todo%60%20should%20find%0Adef%20critical_function%28%29%3A%0A%09raise%20NotImplementedError%28%22This%20function%20is%20not%20implemented%20yet%22%29%0A%60%60%60&labels=bug)
+  local link: [`/myproject/helloworld.py#10`](/myproject/helloworld.py#10) 
+  | view on GitHub: [myproject/helloworld.py#L10](https://github.com/mivanit/python-project-makefile-template/blob/main/myproject/helloworld.py#L10)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=an%20example%20that%20%60make%20todo%60%20should%20find&body=%23%20source%0A%0A%5B%60myproject%2Fhelloworld.py%23L10%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fmyproject%2Fhelloworld.py%23L10%29%0A%0A%23%20context%0A%60%60%60python%0A%23%20FIXME%3A%20an%20example%20that%20%60make%20todo%60%20should%20find%0Adef%20critical_function%28%29%3A%0A%09raise%20NotImplementedError%28%22This%20function%20is%20not%20implemented%20yet%22%29%0A%60%60%60&labels=bug)
 
   ```python
 # FIXME: an example that `make todo` should find
@@ -53,6 +53,24 @@ def critical_function():
 # TODO: an example todo that `make todo` should find
 def some_function():
 	raise NotImplementedError("This function is not implemented yet")
+  ```
+
+
+
+
+## [`README.md`](/README.md)
+
+- 's from the code  
+  local link: [`/README.md#66`](/README.md#66) 
+  | view on GitHub: [README.md#L66](https://github.com/mivanit/python-project-makefile-template/blob/main/README.md#L66)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=%27s%20from%20the%20code&body=%23%20source%0A%0A%5B%60README.md%23L66%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2FREADME.md%23L66%29%0A%0A%23%20context%0A%60%60%60markdown%0A%20%20%20%20make%20setup%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20install%20and%20update%20via%20uv%0A%20%20%20%20make%20test%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20running%20tests%0A%20%20%20%20make%20todo%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20get%20all%20TODO%27s%20from%20the%20code%0A%20%20%20%20make%20typing%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20running%20type%20checks%0A%20%20%20%20make%20verify-git%20%20%20%20%20%20%20%20%20%20%20checking%20git%20status%0A%60%60%60&labels=enhancement)
+
+  ```markdown
+make setup                install and update via uv
+    make test                 running tests
+    make todo                 get all TODO's from the code
+    make typing               running type checks
+    make verify-git           checking git status
   ```
 
 
