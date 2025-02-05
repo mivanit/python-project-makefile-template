@@ -51,7 +51,7 @@ class Config:
             # read file and load if present
             with config_file.open("rb") as f:
                 data: Dict[str, Any] = tomllib.load(f)
-            data: dict = data.get("tool", {}).get("inline_todo", {})
+            data: dict = data.get("tool", {}).get("inline-todo", {})
             return cls.load(data)
         else:
             # return default otherwise
