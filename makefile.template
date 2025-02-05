@@ -278,7 +278,7 @@ dep-check-torch:
 	$(PYTHON) -c "$$SCRIPT_CHECK_TORCH"
 
 .PHONY: dep
-dep: get-cuda-info
+dep:
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups --compile-bytecode
 	mkdir -p $(REQUIREMENTS_DIR)
@@ -338,7 +338,7 @@ format-check:
 typing: clean
 	@echo "running type checks"
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)/
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)
 
 .PHONY: test
 test: clean
@@ -557,7 +557,7 @@ help-targets:
 
 
 .PHONY: info
-info: gen-version-info get-cuda-info
+info: gen-version-info
 	@echo "# makefile variables"
 	@echo "    PYTHON = $(PYTHON)"
 	@echo "    PYTHON_VERSION = $(PYTHON_VERSION)"
