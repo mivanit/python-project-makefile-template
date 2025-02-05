@@ -1,7 +1,7 @@
 # Stats
 - 22 files
 - 3634 (3.6K) lines
-- 121210 (121K) chars
+- 121211 (121K) chars
 - 14678 (15K) `whitespace-split` tokens
 
 # File Tree
@@ -36,7 +36,7 @@ python-project-makefile-template
 ├── README.md                        [   88L  5,059C   659T]
 ├── makefile                         [1,281L 39,428C 4,776T]
 ├── makefile.template                [  607L 21,839C 2,895T]
-├── pyproject.toml                   [  130L  2,892C   370T]
+├── pyproject.toml                   [  130L  2,893C   370T]
 ```
 
 # File Contents
@@ -1617,7 +1617,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.0.6                                                  |
+#| version: v0.1.0                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -3510,7 +3510,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.0.6"
+	version = "0.1.0"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
@@ -3629,7 +3629,7 @@ help: help-targets info
 	]
 
 [tool.lmcat]
-	output = "docs/other/lmcat.md" # changing this might mean it wont be accessible from the docs
+	output = "docs/other/lmcat.txt" # changing this might mean it wont be accessible from the docs
 	ignore_patterns = [
 		"docs/**",
 		".venv/**",

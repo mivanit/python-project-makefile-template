@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.6
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.1.0
 
 
 ## Contents
@@ -100,7 +100,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/__init__.py)
 
 # `myproject` { #myproject }
 
@@ -194,13 +194,13 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/__init__.py#L0-L2)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.6
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.1.0
 
 
 
@@ -213,12 +213,12 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py#L0-L11)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/helloworld.py#L0-L11)
 
 
 
@@ -228,7 +228,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py#L6-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/helloworld.py#L6-L7)
 
 
 
@@ -239,14 +239,14 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py#L11-L12)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/helloworld.py#L11-L12)
 
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.6
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.1.0
 
 
 
@@ -258,12 +258,12 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/other.py)
 
 # `myproject.other` { #myproject.other }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/other.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/other.py#L0-L2)
 
 
 
@@ -273,7 +273,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/other.py#L2-L3)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.0/other.py#L2-L3)
 
 
 

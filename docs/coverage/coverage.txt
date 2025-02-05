@@ -2,6 +2,7 @@ Name                      Stmts   Miss  Cover   Missing
 -------------------------------------------------------
 myproject\__init__.py         0      0   100%
 myproject\helloworld.py       5      5     0%   1-12
+myproject\other.py            2      2     0%   2-3
 tests\test_nothing.py         2      0   100%
 -------------------------------------------------------
-TOTAL                         7      5    29%
+TOTAL                         9      7    22%
