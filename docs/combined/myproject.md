@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.5
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.6
 
 
 ## Contents
@@ -16,6 +16,24 @@ Relevant ideological decisions:
 - [`pdoc`](https://pdoc.dev) for documentation generation
 - [`make`](https://en.wikipedia.org/wiki/Make_(software)) for automation (I know there are better build tools out there and it's overkill, but `make` is universal)
 - [`git`](https://github.com/git) for version control (a spicy take, I know)
+
+The whole idea behind this is rather than having a bunch of stuff in your readme describing what commands you need to run to do X, you have those commands in your makefile -- rather than just being human-readable, they are machine-readable.
+
+# How to use this:
+
+- `make` should already be on your system, unless you are on windows
+  - I recommend using [gitforwindows.org](https://gitforwindows.org), or just using WSL
+- you will need [uv](https://docs.astral.sh/uv/) and some form of python installed.
+- run `uv init` or otherwise set up a `pyproject.toml` file
+  - the `pyproject.toml` of this repo has a lot of dev dependencies that you might need, you may want to copy those
+- copy `makefile` from this repo into the root of your repo
+- modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
+  - there are also a variety of other variables you can modify -- most are at the top of the makefile
+- if you want automatic documentation generation, copy from this repo:
+  - `docs/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/templates/`: jinja2 templates for the docs
+  - `docs/resources/`: some css and icons for the docs
+
 
 # Makefile
 
@@ -249,6 +267,17 @@ Provided files for pdoc usage are:
 - `docs/resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
 
 
+# Development
+
+`makefile.template` is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.
+
+the scripts used to generate the makefile are located in `scripts/`, with the exception of `scripts/assemble_make.py` which is the script used to populate the makefile.
+
+If developing, modify the `makefile.template` file or scripts in `scripts/`, and then run
+```sh
+python scripts/assemble_make.py
+```
+
 
 ## Submodules
 
@@ -257,7 +286,7 @@ Provided files for pdoc usage are:
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py)
 
 # `myproject` { #myproject }
 
@@ -275,6 +304,24 @@ Relevant ideological decisions:
 - [`pdoc`](https://pdoc.dev) for documentation generation
 - [`make`](https://en.wikipedia.org/wiki/Make_(software)) for automation (I know there are better build tools out there and it's overkill, but `make` is universal)
 - [`git`](https://github.com/git) for version control (a spicy take, I know)
+
+The whole idea behind this is rather than having a bunch of stuff in your readme describing what commands you need to run to do X, you have those commands in your makefile -- rather than just being human-readable, they are machine-readable.
+
+### How to use this:
+
+- `make` should already be on your system, unless you are on windows
+  - I recommend using [gitforwindows.org](https://gitforwindows.org), or just using WSL
+- you will need [uv](https://docs.astral.sh/uv/) and some form of python installed.
+- run `uv init` or otherwise set up a `pyproject.toml` file
+  - the `pyproject.toml` of this repo has a lot of dev dependencies that you might need, you may want to copy those
+- copy `makefile` from this repo into the root of your repo
+- modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
+  - there are also a variety of other variables you can modify -- most are at the top of the makefile
+- if you want automatic documentation generation, copy from this repo:
+  - `docs/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/templates/`: jinja2 templates for the docs
+  - `docs/resources/`: some css and icons for the docs
+
 
 ### Makefile
 
@@ -508,27 +555,38 @@ Provided files for pdoc usage are:
 - `docs/resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
 
 
+### Development
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py#L0-L2)
+`makefile.template` is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.
 
+the scripts used to generate the makefile are located in `scripts/`, with the exception of `scripts/assemble_make.py` which is the script used to populate the makefile.
 
-
-
-
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.5
-
-
-
-
+If developing, modify the `makefile.template` file or scripts in `scripts/`, and then run
+```sh
+python scripts/assemble_make.py
+```
 
 
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py#L0-L2)
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/helloworld.py)
+
+
+
+
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.0.6
+
+
+
+
+
+
+
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/helloworld.py#L0-L0)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py#L0-L3)
 
 
 

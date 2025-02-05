@@ -490,7 +490,7 @@ TEMPLATE_MD: str = """\
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
 - [ ] {{ itm.content }}  
-[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url }})
+[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url | safe }})
 {% if itm.context %}
 ```text
 {{ itm.context.strip() }}
@@ -610,7 +610,7 @@ class TodoItem:
 	context: str = ""
 
 	def serialize(self) -> Dict[str, Union[str, int]]:
-		return asdict(self)
+		return {**asdict(self), "issue_url": self.issue_url}
 
 
 	@property
@@ -625,10 +625,10 @@ class TodoItem:
 			context=self.context,
 			repo_url=CFG.repo_url,
 			branch=CFG.branch,
-		)
+		).strip()
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
-		query_string: str = urllib.parse.urlencode(query) #, quote_via=urllib.parse.quote)
+		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
 
 
@@ -718,6 +718,9 @@ def main(config_file: Path) -> None:
 
 	rendered: str = Template(cfg.template_md).render(grouped=grouped)
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+
+	print("wrote to:")
+	print(cfg.out_file.with_suffix(".md").as_posix())
 
 
 if __name__ == "__main__":
@@ -955,7 +958,7 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo lmcat
+docs: cov docs-html docs-combined todo-pandoc lmcat
 	@echo "generate all documentation and coverage reports"
 
 # removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script
@@ -977,6 +980,13 @@ docs-clean:
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
+
+.PHONY: todo-pandoc
+todo-pandoc:
+	@last_line=$$(python -c "$$SCRIPT_GET_TODOS" | tail -n 1); \
+	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/todo.html
+
+# echo "The last line is: $$last_line"
 
 
 .PHONY: lmcat-tree

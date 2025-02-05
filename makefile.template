@@ -408,7 +408,7 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo lmcat
+docs: cov docs-html docs-combined todo-pandoc lmcat
 	@echo "generate all documentation and coverage reports"
 
 # removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script
@@ -430,6 +430,13 @@ docs-clean:
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
+
+.PHONY: todo-pandoc
+todo-pandoc:
+	@last_line=$$(python -c "$$SCRIPT_GET_TODOS" | tail -n 1); \
+	$(PANDOC) $$last_line -f gfm -t html -o $(DOCS_DIR)/todo.html
+
+# echo "The last line is: $$last_line"
 
 
 .PHONY: lmcat-tree

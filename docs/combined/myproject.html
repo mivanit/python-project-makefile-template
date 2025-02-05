@@ -1,7 +1,7 @@
 <blockquote>
 <p>docs for <a
 href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
-v0.0.5</p>
+v0.0.6</p>
 </blockquote>
 <h2 id="contents">Contents</h2>
 <h1 id="makefile-template-for-python-projects">Makefile Template for
@@ -29,6 +29,44 @@ for automation (I know there are better build tools out there and it’s
 overkill, but <code>make</code> is universal)</li>
 <li><a href="https://github.com/git"><code>git</code></a> for version
 control (a spicy take, I know)</li>
+</ul>
+<p>The whole idea behind this is rather than having a bunch of stuff in
+your readme describing what commands you need to run to do X, you have
+those commands in your makefile – rather than just being human-readable,
+they are machine-readable.</p>
+<h1 id="how-to-use-this">How to use this:</h1>
+<ul>
+<li><code>make</code> should already be on your system, unless you are
+on windows
+<ul>
+<li>I recommend using <a
+href="https://gitforwindows.org">gitforwindows.org</a>, or just using
+WSL</li>
+</ul></li>
+<li>you will need <a href="https://docs.astral.sh/uv/">uv</a> and some
+form of python installed.</li>
+<li>run <code>uv init</code> or otherwise set up a
+<code>pyproject.toml</code> file
+<ul>
+<li>the <code>pyproject.toml</code> of this repo has a lot of dev
+dependencies that you might need, you may want to copy those</li>
+</ul></li>
+<li>copy <code>makefile</code> from this repo into the root of your
+repo</li>
+<li>modify <code>PACKAGE_NAME := myproject</code> at the top of the
+makefile to match your package name
+<ul>
+<li>there are also a variety of other variables you can modify – most
+are at the top of the makefile</li>
+</ul></li>
+<li>if you want automatic documentation generation, copy from this repo:
+<ul>
+<li><code>docs/make_docs.py</code>: script to generate the docs using
+pdoc. reads everything it needs from your
+<code>pyproject.toml</code></li>
+<li><code>docs/templates/</code>: jinja2 templates for the docs</li>
+<li><code>docs/resources/</code>: some css and icons for the docs</li>
+</ul></li>
 </ul>
 <h1 id="makefile">Makefile</h1>
 <p><code>make help</code> Displays the help message listing all
@@ -287,12 +325,23 @@ and markdown docs</li>
 <code>pdoc</code> resources as well as some custom icons for
 admonitions</li>
 </ul>
+<h1 id="development">Development</h1>
+<p><code>makefile.template</code> is the template file for the makefile,
+which contains everything except python scripts which will be inserted
+into the makefile.</p>
+<p>the scripts used to generate the makefile are located in
+<code>scripts/</code>, with the exception of
+<code>scripts/assemble_make.py</code> which is the script used to
+populate the makefile.</p>
+<p>If developing, modify the <code>makefile.template</code> file or
+scripts in <code>scripts/</code>, and then run</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/assemble_make.py</span></code></pre></div>
 <h2 id="submodules">Submodules</h2>
 <ul>
 <li><a href="#helloworld"><code>helloworld</code></a></li>
 </ul>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py">View
 Source on GitHub</a></p>
 <h1 id="myproject"><code>myproject</code></h1>
 <h3 id="makefile-template-for-python-projects-1">Makefile Template for
@@ -321,39 +370,77 @@ overkill, but <code>make</code> is universal)</li>
 <li><a href="https://github.com/git"><code>git</code></a> for version
 control (a spicy take, I know)</li>
 </ul>
+<p>The whole idea behind this is rather than having a bunch of stuff in
+your readme describing what commands you need to run to do X, you have
+those commands in your makefile – rather than just being human-readable,
+they are machine-readable.</p>
+<h3 id="how-to-use-this-1">How to use this:</h3>
+<ul>
+<li><code>make</code> should already be on your system, unless you are
+on windows
+<ul>
+<li>I recommend using <a
+href="https://gitforwindows.org">gitforwindows.org</a>, or just using
+WSL</li>
+</ul></li>
+<li>you will need <a href="https://docs.astral.sh/uv/">uv</a> and some
+form of python installed.</li>
+<li>run <code>uv init</code> or otherwise set up a
+<code>pyproject.toml</code> file
+<ul>
+<li>the <code>pyproject.toml</code> of this repo has a lot of dev
+dependencies that you might need, you may want to copy those</li>
+</ul></li>
+<li>copy <code>makefile</code> from this repo into the root of your
+repo</li>
+<li>modify <code>PACKAGE_NAME := myproject</code> at the top of the
+makefile to match your package name
+<ul>
+<li>there are also a variety of other variables you can modify – most
+are at the top of the makefile</li>
+</ul></li>
+<li>if you want automatic documentation generation, copy from this repo:
+<ul>
+<li><code>docs/make_docs.py</code>: script to generate the docs using
+pdoc. reads everything it needs from your
+<code>pyproject.toml</code></li>
+<li><code>docs/templates/</code>: jinja2 templates for the docs</li>
+<li><code>docs/resources/</code>: some css and icons for the docs</li>
+</ul></li>
+</ul>
 <h3 id="makefile-1">Makefile</h3>
 <p><code>make help</code> Displays the help message listing all
 available make targets and variables. running just <code>make</code>
 will also display this message.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">### make targets:</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> build                build the package</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> check                run format and lint checks, tests, and typing checks</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean                clean up temporary files</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> cov                  generate coverage reports</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep                  sync and export deps to <span class="va">$(</span><span class="ex">REQ_BASE</span><span class="va">)</span>, <span class="va">$(</span><span class="ex">REQ_EXTRAS</span><span class="va">)</span>, and <span class="va">$(</span><span class="ex">REQ_DEV</span><span class="va">)</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check            checking uv.lock is good, exported requirements up to date</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs                 generate all documentation and coverage reports</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-clean           remove generated docs</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-combined        generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown and convert to other formats</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-html            generate html docs</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-md              generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format               format the source code</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format-check         run format check</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> help</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> publish              run all checks, build, and then publish</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> setup                install and update via uv</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> test                 running tests</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> typing               running type checks</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> verify-git           checking git status</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> version              Current version is <span class="va">$(</span><span class="ex">VERSION</span><span class="va">)</span>, last auto-uploaded version is <span class="va">$(</span><span class="ex">LAST_VERSION</span><span class="va">)</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">### makefile variables</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON</span> = uv run python</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON_VERSION</span> = 3.12.0 </span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PACKAGE_NAME</span> = myproject</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="ex">VERSION</span> = v0.0.2 </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">LAST_VERSION</span> = v0.0.1 </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTEST_OPTIONS</span> =  <span class="at">--cov</span><span class="op">=</span>.</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">### make targets:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> build                build the package</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> check                run format and lint checks, tests, and typing checks</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean                clean up temporary files</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> cov                  generate coverage reports</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep                  sync and export deps to <span class="va">$(</span><span class="ex">REQ_BASE</span><span class="va">)</span>, <span class="va">$(</span><span class="ex">REQ_EXTRAS</span><span class="va">)</span>, and <span class="va">$(</span><span class="ex">REQ_DEV</span><span class="va">)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check            checking uv.lock is good, exported requirements up to date</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs                 generate all documentation and coverage reports</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-clean           remove generated docs</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-combined        generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown and convert to other formats</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-html            generate html docs</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-md              generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format               format the source code</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format-check         run format check</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> help</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> publish              run all checks, build, and then publish</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> setup                install and update via uv</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> test                 running tests</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> typing               running type checks</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> verify-git           checking git status</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> version              Current version is <span class="va">$(</span><span class="ex">VERSION</span><span class="va">)</span>, last auto-uploaded version is <span class="va">$(</span><span class="ex">LAST_VERSION</span><span class="va">)</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">### makefile variables</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON</span> = uv run python</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTHON_VERSION</span> = 3.12.0 </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PACKAGE_NAME</span> = myproject</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="ex">VERSION</span> = v0.0.2 </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">LAST_VERSION</span> = v0.0.1 </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PYTEST_OPTIONS</span> =  <span class="at">--cov</span><span class="op">=</span>.</span></code></pre></div>
 <h4 id="configuration-variables-1">Configuration &amp; Variables</h4>
 <ul>
 <li><p><code>PACKAGE_NAME</code>: The name of the package<br />
@@ -578,18 +665,29 @@ and markdown docs</li>
 <code>pdoc</code> resources as well as some custom icons for
 admonitions</li>
 </ul>
+<h3 id="development-1">Development</h3>
+<p><code>makefile.template</code> is the template file for the makefile,
+which contains everything except python scripts which will be inserted
+into the makefile.</p>
+<p>the scripts used to generate the makefile are located in
+<code>scripts/</code>, with the exception of
+<code>scripts/assemble_make.py</code> which is the script used to
+populate the makefile.</p>
+<p>If developing, modify the <code>makefile.template</code> file or
+scripts in <code>scripts/</code>, and then run</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/assemble_make.py</span></code></pre></div>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py#L0-L2">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py#L0-L2">View
 Source on GitHub</a></p>
 <blockquote>
 <p>docs for <a
 href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
-v0.0.5</p>
+v0.0.6</p>
 </blockquote>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/helloworld.py">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py">View
 Source on GitHub</a></p>
 <h1 id="myproject.helloworld"><code>myproject.helloworld</code></h1>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/helloworld.py#L0-L0">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/helloworld.py#L0-L3">View
 Source on GitHub</a></p>

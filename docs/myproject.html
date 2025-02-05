@@ -46,7 +46,7 @@
 </script></head>
 <body>
 <div class="package-version">
-    docs for <a href="https://github.com/mivanit/python-project-makefile-template">myproject</a> v0.0.5<br>
+    docs for <a href="https://github.com/mivanit/python-project-makefile-template">myproject</a> v0.0.6<br>
 </div>
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button">
@@ -61,6 +61,7 @@
             <h2>Contents</h2>
             <ul>
   <li><a href="#makefile-template-for-python-projects">Makefile Template for Python Projects</a></li>
+  <li><a href="#how-to-use-this">How to use this:</a></li>
   <li><a href="#makefile">Makefile</a>
   <ul>
     <li><a href="#configuration-variables">Configuration &amp; Variables</a></li>
@@ -74,6 +75,7 @@
     <li><a href="#smart-help-command">Smart Help Command</a></li>
     <li><a href="#docs-generation">Docs generation</a></li>
   </ul></li>
+  <li><a href="#development">Development</a></li>
 </ul>
 
 
@@ -92,7 +94,7 @@
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py">View Source on GitHub</a>
+                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py">View Source on GitHub</a>
                     <h1 class="modulename">
 myproject    </h1>
 
@@ -111,6 +113,33 @@ myproject    </h1>
 <li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation generation</li>
 <li><a href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a> for automation (I know there are better build tools out there and it's overkill, but <code>make</code> is universal)</li>
 <li><a href="https://github.com/git"><code>git</code></a> for version control (a spicy take, I know)</li>
+</ul>
+
+<p>The whole idea behind this is rather than having a bunch of stuff in your readme describing what commands you need to run to do X, you have those commands in your makefile -- rather than just being human-readable, they are machine-readable.</p>
+
+<h1 id="how-to-use-this">How to use this:</h1>
+
+<ul>
+<li><code>make</code> should already be on your system, unless you are on windows
+<ul>
+<li>I recommend using <a href="https://gitforwindows.org">gitforwindows.org</a>, or just using WSL</li>
+</ul></li>
+<li>you will need <a href="https://docs.astral.sh/uv/">uv</a> and some form of python installed.</li>
+<li>run <code>uv init</code> or otherwise set up a <code>pyproject.toml</code> file
+<ul>
+<li>the <code>pyproject.toml</code> of this repo has a lot of dev dependencies that you might need, you may want to copy those</li>
+</ul></li>
+<li>copy <code>makefile</code> from this repo into the root of your repo</li>
+<li>modify <code>PACKAGE_NAME := myproject</code> at the top of the makefile to match your package name
+<ul>
+<li>there are also a variety of other variables you can modify -- most are at the top of the makefile</li>
+</ul></li>
+<li>if you want automatic documentation generation, copy from this repo:
+<ul>
+<li><code>docs/make_docs.py</code>: script to generate the docs using pdoc. reads everything it needs from your <code>pyproject.toml</code></li>
+<li><code>docs/templates/</code>: jinja2 templates for the docs</li>
+<li><code>docs/resources/</code>: some css and icons for the docs</li>
+</ul></li>
 </ul>
 
 <h1 id="makefile">Makefile</h1>
@@ -332,6 +361,19 @@ Immediately print out the help targets, and then local variables (but those take
 <li><code>docs/templates/</code> containing template files for both html and markdown docs</li>
 <li><code>docs/resources/</code> containing some of the base <code>pdoc</code> resources as well as some custom icons for admonitions</li>
 </ul>
+
+<h1 id="development">Development</h1>
+
+<p><code>makefile.template</code> is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.</p>
+
+<p>the scripts used to generate the makefile are located in <code>scripts/</code>, with the exception of <code>scripts/assemble_make.py</code> which is the script used to populate the makefile.</p>
+
+<p>If developing, modify the <code>makefile.template</code> file or scripts in <code>scripts/</code>, and then run</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>python<span class="w"> </span>scripts/assemble_make.py
+</code></pre>
+</div>
 </div>
 
                         <input id="mod-myproject-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -339,7 +381,7 @@ Immediately print out the help targets, and then local variables (but those take
                         <div class="source-button-container">
             <label class="pdoc-button view-source-button" for="mod-myproject-view-source"><span>View Source</span></label>
             <div class="github-button-wrapper">
-                <a class="pdoc-button github-link-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.5/__init__.py#L0-L2" target="_blank">
+                <a class="pdoc-button github-link-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.0.6/__init__.py#L0-L2" target="_blank">
                     <span>View on GitHub</span>
                 </a>
             </div>

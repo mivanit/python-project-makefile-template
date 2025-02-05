@@ -26,7 +26,7 @@ TEMPLATE_MD: str = """\
 ## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
 - [ ] {{ itm.content }}  
-[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url }})
+[`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }}) | [Make Issue]({{ itm.issue_url | safe }})
 {% if itm.context %}
 ```text
 {{ itm.context.strip() }}
@@ -146,7 +146,7 @@ class TodoItem:
 	context: str = ""
 
 	def serialize(self) -> Dict[str, Union[str, int]]:
-		return asdict(self)
+		return {**asdict(self), "issue_url": self.issue_url}
 
 
 	@property
@@ -164,8 +164,12 @@ class TodoItem:
 		).strip()
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
-		query_string: str = urllib.parse.urlencode(query)
+		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
+	
+	@property
+	def content_stripped(self) -> str:
+		return self.content.strip()
 
 
 def scrape_file(
@@ -254,6 +258,9 @@ def main(config_file: Path) -> None:
 
 	rendered: str = Template(cfg.template_md).render(grouped=grouped)
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+
+	print("wrote to:")
+	print(cfg.out_file.with_suffix(".md").as_posix())
 
 
 if __name__ == "__main__":
