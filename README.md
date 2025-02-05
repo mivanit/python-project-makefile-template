@@ -26,9 +26,9 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
 - if you want automatic documentation generation, copy from this repo:
-  - `docs/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/.resources/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
   - `docs/templates/`: jinja2 templates for the docs
-  - `docs/resources/`: some css and icons for the docs
+  - `docs/.resources/`: some css and icons for the docs
 
 
 # Makefile
@@ -196,7 +196,7 @@ $ make help
 
 - `docs-html`: Generate html docs  
   Generates a whole tree of documentation in html format.  
-  See `docs/make_docs.py` and the templates in `docs/templates/html/` for more info  
+  See `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info  
 
 - `docs-md`: Generate combined (single-file) docs in markdown  
   Instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.  
@@ -218,7 +218,7 @@ $ make help
   Runs the coverage report, then the docs, then the combined docs  
 
 - `docs-clean`: Remove generated docs  
-  Removed all generated documentation files, but leaves the templates and the `docs/make_docs.py` script  
+  Removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script  
   Distinct from `make clean`  
 
 ## Build and Publish
@@ -258,9 +258,9 @@ $ make help
 
 Provided files for pdoc usage are:
 
-- `docs/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
+- `docs/.resources/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
 - `docs/templates/` containing template files for both html and markdown docs
-- `docs/resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
+- `docs/.resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
 
 
 # Development
