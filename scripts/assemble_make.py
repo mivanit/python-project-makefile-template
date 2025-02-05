@@ -10,6 +10,7 @@ IGNORE_SCRIPTS: set[str] = {"assemble_make"}
 with open("pyproject.toml", "rb") as f_pyproject:
 	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
 
+
 def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
 	scripts: dict[str, str] = {}
 	for script in scripts_dir.iterdir():
