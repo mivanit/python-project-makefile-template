@@ -150,6 +150,15 @@
         .github-link:hover {
             text-decoration: underline;
         }
+        th .resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -307,11 +316,44 @@
                 renderTable();
             });
         });
+        function initResizableColumns() {
+            const table = document.getElementById('todoTable');
+            const thElements = table.querySelectorAll('th');
+            thElements.forEach((th) => {
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                th.appendChild(resizer);
 
-        // Initialize with dummy data
+                resizer.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const startX = e.pageX;
+                    const startWidth = th.offsetWidth;
+
+                    function onMouseMove(e) {
+                        // Enforce a minimum width of 40px
+                        const newWidth = Math.max(startWidth + (e.pageX - startX), 40);
+                        th.style.width = newWidth + 'px';
+                    }
+
+                    function onMouseUp() {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+            });
+        }
+
+        
+        
+        // Initialize with data
         todos = //{{DATA}}//;
         updateFilters();
         renderTable();
+        initResizableColumns();
     </script>
 </body>
 </html>
