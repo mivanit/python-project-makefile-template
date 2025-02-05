@@ -45,6 +45,7 @@ REPO_URL: str = "UNKNOWN"
 # TODO: no way to change the branch used for links yet
 BRANCH: str = "main"
 
+
 @dataclass
 class Config:
 	"""Configuration for the inline-todo scraper"""
@@ -75,22 +76,25 @@ class Config:
 			# read file and load if present
 			with config_file.open("rb") as f:
 				data: Dict[str, Any] = tomllib.load(f)
-			
+
 			# try to get the repo url
 			try:
 				urls: Dict[str, str] = {
-					k.lower(): v
-					for k, v in data["project"]["urls"].items()
+					k.lower(): v for k, v in data["project"]["urls"].items()
 				}
 				if "repository" in urls:
 					REPO_URL = urls["repository"]
 				if "github" in urls:
 					REPO_URL = urls["github"]
 			except Exception as e:
-				warnings.warn(f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}")
+				warnings.warn(
+					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}"
+				)
 
-			# load the inline-todo config if present 
-			data_inline_todo: Dict[str, Any] = data.get("tool", {}).get("inline-todo", {})
+			# load the inline-todo config if present
+			data_inline_todo: Dict[str, Any] = data.get("tool", {}).get(
+				"inline-todo", {}
+			)
 			return cls.load(data_inline_todo)
 		else:
 			# return default otherwise
@@ -123,6 +127,7 @@ class TodoItem:
 	def serialize(self) -> Dict[str, Union[str, int]]:
 		return asdict(self)
 
+
 def make_issue_url(itm: TodoItem, tag_label_map: dict[str, str]) -> str:
 	"""Constructs a GitHub issue creation URL for a given TodoItem."""
 	global REPO_URL
@@ -135,6 +140,7 @@ def make_issue_url(itm: TodoItem, tag_label_map: dict[str, str]) -> str:
 	query: dict[str, str] = {"title": title, "body": body, "labels": label}
 	query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 	return f"{REPO_URL}/issues/new?{query_string}"
+
 
 def scrape_file(
 	file_path: Path,
@@ -217,8 +223,12 @@ def main(config_file: Path) -> None:
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
 		all_items
 	)
-	make_issue_url_func: Callable[[TodoItem], str] = functools.partial(make_issue_url, tag_label_map=cfg.tag_label_map)
-	rendered: str = Template(TEMPLATE_MD).render(grouped=grouped, make_issue_url=make_issue_url_func)
+	make_issue_url_func: Callable[[TodoItem], str] = functools.partial(
+		make_issue_url, tag_label_map=cfg.tag_label_map
+	)
+	rendered: str = Template(TEMPLATE_MD).render(
+		grouped=grouped, make_issue_url=make_issue_url_func
+	)
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
 
 
