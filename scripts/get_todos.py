@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import functools
 import urllib.parse
 import argparse
 import fnmatch
 from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List, Union
 import warnings
 from jinja2 import Template
 
@@ -50,6 +49,7 @@ TEMPLATE_ISSUE: str = """\
 {context}
 ```
 """
+
 
 @dataclass
 class Config:
@@ -100,18 +100,15 @@ class Config:
 
 	@property
 	def template_code_url(self) -> str:
-		return (
-			self.template_code_url_
-			.replace("{repo_url}", self.repo_url)
-			.replace("{branch}", self.branch)
+		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
+			"{branch}", self.branch
 		)
-	
+
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
 
 	branch: str = "main"
 	# branch for links to files on github
-
 
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
@@ -157,12 +154,13 @@ class Config:
 			k: Path(v) if k in {"search_dir", "out_file"} else v
 			for k, v in data.items()
 		}
-		
+
 		return cls(**data)
 
 
 CFG: Config = Config()
 # this is messy, but we use a global config so we can get `TodoItem().issue_url` to work
+
 
 @dataclass
 class TodoItem:
@@ -182,7 +180,7 @@ class TodoItem:
 			"stripped_title": self.stripped_title,
 			"code_url": self.code_url,
 		}
-	
+
 	@property
 	def code_url(self) -> str:
 		"""Returns a URL to the code on GitHub"""
@@ -217,7 +215,7 @@ class TodoItem:
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
-	
+
 	@property
 	def file_lang(self) -> str:
 		"""Returns the language for the file extension"""
@@ -320,7 +318,9 @@ def main(config_file: Path) -> None:
 
 	# write html output
 	try:
-		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		html_rendered: str = cfg.template_html.replace(
+			"//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items])
+		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
