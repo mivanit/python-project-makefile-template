@@ -35,7 +35,7 @@ DOCS_DIR := docs
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
-COVERAGE_REPORTS_DIR := docs/coverage
+COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 
 # where the tests are, for pytest
 TESTS_DIR := tests
@@ -464,14 +464,13 @@ export SCRIPT_CHECK_TORCH
 define SCRIPT_GET_TODOS
 from __future__ import annotations
 
-import functools
 import urllib.parse
 import argparse
 import fnmatch
 from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List, Union
 import warnings
 from jinja2 import Template
 
@@ -514,6 +513,7 @@ TEMPLATE_ISSUE: str = """\
 {context}
 ```
 """
+
 
 @dataclass
 class Config:
@@ -564,18 +564,15 @@ class Config:
 
 	@property
 	def template_code_url(self) -> str:
-		return (
-			self.template_code_url_
-			.replace("{repo_url}", self.repo_url)
-			.replace("{branch}", self.branch)
+		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
+			"{branch}", self.branch
 		)
-	
+
 	repo_url: str = "UNKNOWN"
 	# for the issue creation url
 
 	branch: str = "main"
 	# branch for links to files on github
-
 
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
@@ -621,12 +618,13 @@ class Config:
 			k: Path(v) if k in {"search_dir", "out_file"} else v
 			for k, v in data.items()
 		}
-		
+
 		return cls(**data)
 
 
 CFG: Config = Config()
 # this is messy, but we use a global config so we can get `TodoItem().issue_url` to work
+
 
 @dataclass
 class TodoItem:
@@ -646,7 +644,7 @@ class TodoItem:
 			"stripped_title": self.stripped_title,
 			"code_url": self.code_url,
 		}
-	
+
 	@property
 	def code_url(self) -> str:
 		"""Returns a URL to the code on GitHub"""
@@ -681,7 +679,7 @@ class TodoItem:
 		query: Dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
-	
+
 	@property
 	def file_lang(self) -> str:
 		"""Returns the language for the file extension"""
@@ -784,7 +782,9 @@ def main(config_file: Path) -> None:
 
 	# write html output
 	try:
-		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		html_rendered: str = cfg.template_html.replace(
+			"//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items])
+		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
@@ -819,58 +819,53 @@ from pdoc.markdown2 import Markdown, _safe_mode
 
 
 def convert_file(
-    input_path: Path, 
-    output_path: Path,
-    safe_mode: Optional[_safe_mode] = None,
-    encoding: str = "utf-8",
+	input_path: Path,
+	output_path: Path,
+	safe_mode: Optional[_safe_mode] = None,
+	encoding: str = "utf-8",
 ) -> None:
-    """Convert a markdown file to HTML"""
-    # Read markdown input
-    text: str = input_path.read_text(encoding=encoding)
-    
-    # Convert to HTML using markdown2
-    markdown: Markdown = Markdown(
-        extras=[
-            "fenced-code-blocks",
-            "header-ids",
-            "markdown-in-html", 
-            "tables"
-        ],
-        safe_mode=safe_mode
-    )
-    html: str = markdown.convert(text)
-    
-    # Write HTML output
-    output_path.write_text(str(html), encoding=encoding)
+	"""Convert a markdown file to HTML"""
+	# Read markdown input
+	text: str = input_path.read_text(encoding=encoding)
+
+	# Convert to HTML using markdown2
+	markdown: Markdown = Markdown(
+		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
+		safe_mode=safe_mode,
+	)
+	html: str = markdown.convert(text)
+
+	# Write HTML output
+	output_path.write_text(str(html), encoding=encoding)
 
 
 def main() -> None:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Convert markdown files to HTML using pdoc's markdown2")
-    parser.add_argument("input", type=Path, help="Input markdown file path")
-    parser.add_argument("output", type=Path, help="Output HTML file path") 
-    parser.add_argument(
-        "--safe-mode",
-        choices=["escape", "replace"],
-        help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]"
-    )
-    parser.add_argument(
-        "--encoding",
-        default="utf-8",
-        help="Character encoding for reading/writing files (default: utf-8)"
-    )
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
+		description="Convert markdown files to HTML using pdoc's markdown2"
+	)
+	parser.add_argument("input", type=Path, help="Input markdown file path")
+	parser.add_argument("output", type=Path, help="Output HTML file path")
+	parser.add_argument(
+		"--safe-mode",
+		choices=["escape", "replace"],
+		help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]",
+	)
+	parser.add_argument(
+		"--encoding",
+		default="utf-8",
+		help="Character encoding for reading/writing files (default: utf-8)",
+	)
 
-    args: argparse.Namespace = parser.parse_args()
-    
-    convert_file(
-        args.input,
-        args.output,
-        safe_mode=args.safe_mode,
-        encoding=args.encoding
-    )
+	args: argparse.Namespace = parser.parse_args()
+
+	convert_file(
+		args.input, args.output, safe_mode=args.safe_mode, encoding=args.encoding
+	)
 
 
 if __name__ == "__main__":
-    main()
+	main()
+
 endef
 
 export SCRIPT_PDOC_MARKDOWN2_CLI
@@ -1053,7 +1048,7 @@ check: clean format-check test typing
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
@@ -1062,7 +1057,7 @@ docs-html:
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html

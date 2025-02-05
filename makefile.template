@@ -35,7 +35,7 @@ DOCS_DIR := docs
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
-COVERAGE_REPORTS_DIR := docs/coverage
+COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 
 # where the tests are, for pytest
 TESTS_DIR := tests
@@ -374,7 +374,7 @@ check: clean format-check test typing
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) docs/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
@@ -383,7 +383,7 @@ docs-html:
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) docs/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
