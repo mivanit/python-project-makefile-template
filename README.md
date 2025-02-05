@@ -21,14 +21,15 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - I recommend using [gitforwindows.org](https://gitforwindows.org), or just using WSL
 - you will need [uv](https://docs.astral.sh/uv/) and some form of python installed.
 - run `uv init` or otherwise set up a `pyproject.toml` file
-  - the `pyproject.toml` of this repo has a lot of dev dependencies that you might need, you may want to copy those
+  - the `pyproject.toml` of this repo has dev dependencies that you might need, you may want to copy those
+  - it's also got some configuration that is worth looking at
 - copy `makefile` from this repo into the root of your repo
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
-- if you want automatic documentation generation, copy from this repo:
-  - `docs/.resources/make_docs.py`: script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
-  - `docs/templates/`: jinja2 templates for the docs
-  - `docs/.resources/`: some css and icons for the docs
+- if you want automatic documentation generation, copy `docs/.resources/`. it contains:
+  - `docs/.resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/.resources/templates/`: jinja2 templates for the docs, template for the todolist
+  - `docs/.resources/css/`, `docs/.resources/svg/`: some css and icons for the docs
 
 
 # Makefile
@@ -39,31 +40,39 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 $ make help
 # make targets:
     make build                build the package
-    make check                run format and lint checks, tests, and typing checks
+    make check                run format checks, tests, and typing checks
     make clean                clean up temporary files
+    make clean-all            clean up all temporary files, dep files, venv, and generated docs
     make cov                  generate coverage reports
-    make dep                  sync and export deps to $(REQ_BASE), $(REQ_EXTRAS), and $(REQ_DEV)
-    make dep-check            checking uv.lock is good, exported requirements up to date
+    make dep                  Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'
+    make dep-check            Checking that exported requirements are up to date
+    make dep-check-torch      see if torch is installed, and which CUDA version and devices it sees
+    make dep-clean            clean up lock files, .venv, and requirements files
     make docs                 generate all documentation and coverage reports
     make docs-clean           remove generated docs
     make docs-combined        generate combined (single-file) docs in markdown and convert to other formats
     make docs-html            generate html docs
     make docs-md              generate combined (single-file) docs in markdown
     make format               format the source code
-    make format-check         run format check
+    make format-check         check if the source code is formatted correctly
     make help
+    make info                 # makefile variables
+    make info-long            # other variables
+    make lmcat                write the lmcat full output to pyproject.toml:[tool.lmcat.output]
+    make lmcat-tree           show in console the lmcat tree view
     make publish              run all checks, build, and then publish
     make setup                install and update via uv
     make test                 running tests
+    make todo                 get all TODO's from the code
     make typing               running type checks
     make verify-git           checking git status
-    make version              Current version is $(VERSION), last auto-uploaded version is $(LAST_VERSION)
+    make version              Current version is $(PROJ_VERSION), last auto-uploaded version is $(LAST_VERSION)
 # makefile variables
     PYTHON = uv run python
     PYTHON_VERSION = 3.12.0 
     PACKAGE_NAME = myproject
-    VERSION = v0.0.2 
-    LAST_VERSION = v0.0.1 
+    PROJ_VERSION = v0.0.6 
+    LAST_VERSION = NULL # read from .meta/versions/.lastversion
     PYTEST_OPTIONS =  --cov=.
 ```
 
@@ -196,10 +205,10 @@ $ make help
 
 - `docs-html`: Generate html docs  
   Generates a whole tree of documentation in html format.  
-  See `docs/.resources/make_docs.py` and the templates in `docs/templates/html/` for more info  
+  See `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info  
 
 - `docs-md`: Generate combined (single-file) docs in markdown  
-  Instead of a whole website, generates a single markdown file with all docs using the templates in `docs/templates/markdown/`.  
+  Instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.  
   This is useful if you want to have a copy that you can grep/search, but those docs are much messier.  
   docs-combined will use pandoc to convert them to other formats.  
 
@@ -259,7 +268,7 @@ $ make help
 Provided files for pdoc usage are:
 
 - `docs/.resources/make_docs.py` which generates documentation with a slightly custom style, automatically adding metadata read from your `pyproject.toml` file
-- `docs/templates/` containing template files for both html and markdown docs
+- `docs/.resources/templates/` containing template files for both html and markdown docs
 - `docs/.resources/` containing some of the base `pdoc` resources as well as some custom icons for admonitions
 
 
