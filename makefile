@@ -457,12 +457,13 @@ TEMPLATE_MD: str = """\
 {% for tag, file_map in grouped|dictsort %}
 # {{ tag }}
 {% for filepath, item_list in file_map|dictsort %}
-## `{{ filepath }}`
+## [`{{ filepath }}`](/{{ filepath }})
 {% for itm in item_list %}
-- [ ] (line {{ itm.line_num }}) `{{ itm.content }}`
+- [ ] {{ itm.content }}  
+  [`/{{ filepath }}#{{ itm.line_num }}`](/{{ filepath }}#{{ itm.line_num }})
 {% if itm.context %}
 ```text
-{{ itm.context.rstrip() }}
+{{ itm.context.strip() }}
 ```
 {% endif %}
 {% endfor %}
