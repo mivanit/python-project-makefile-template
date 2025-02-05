@@ -712,7 +712,7 @@ def scrape_file(
 						file=file_path.as_posix(),
 						line_num=i + 1,
 						content=line.strip("\n"),
-						context=snippet,
+						context=snippet.strip("\n"),
 					)
 				)
 				break
@@ -780,8 +780,11 @@ def main(config_file: Path) -> None:
 	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
 
 	# write html output
-	html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
-	cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
+	try:
+		html_rendered: str = cfg.template_html.replace("//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items]))
+		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
+	except Exception as e:
+		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
 	print(cfg.out_file.with_suffix(".md").as_posix())
