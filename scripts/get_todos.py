@@ -63,7 +63,7 @@ class Config:
 	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	tag_label_map: dict[str, str] = field(
+	tag_label_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
 			"TODO": "enhancement",
@@ -72,7 +72,7 @@ class Config:
 			"HACK": "enhancement",
 		}
 	)
-	extension_lang_map: dict[str, str] = field(
+	extension_lang_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"py": "python",
 			"md": "markdown",

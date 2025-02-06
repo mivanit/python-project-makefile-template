@@ -1,5 +1,6 @@
 from pathlib import Path
 import tomllib
+from typing import Dict
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
@@ -11,8 +12,8 @@ with open("pyproject.toml", "rb") as f_pyproject:
 	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
 
 
-def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
-	scripts: dict[str, str] = {}
+def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
+	scripts: Dict[str, str] = {}
 	for script in scripts_dir.iterdir():
 		if script.is_file() and script.suffix == ".py":
 			scripts[script.stem] = script.read_text()
@@ -21,7 +22,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
 
 def main():
 	contents: str = TEMPLATE_PATH.read_text()
-	scripts: dict[str, str] = read_scripts()
+	scripts: Dict[str, str] = read_scripts()
 
 	# inline each script
 	for script_name, script_contents in scripts.items():

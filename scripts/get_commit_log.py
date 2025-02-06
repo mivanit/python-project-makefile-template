@@ -10,13 +10,13 @@ if last_version == "NULL":
 	sys.exit(1)
 
 try:
-	log_cmd: list[str] = [
+	log_cmd: List[str] = [
 		"git",
 		"log",
 		f"{last_version}..HEAD",
 		"--pretty=format:- %s (%h)",
 	]
-	commits: list[str] = (
+	commits: List[str] = (
 		subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
 	)
 	with open(commit_log_file, "w") as f:

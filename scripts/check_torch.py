@@ -2,7 +2,7 @@ import os
 import sys
 import re
 import subprocess
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 def print_info_dict(
@@ -30,7 +30,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		text=True,
 	)
 	output: str = result.stdout
-	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
+	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
 	assert len(lines) == 5, (
@@ -44,7 +44,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: Dict[str, Tuple[int, re.Pattern, int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -58,7 +58,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	info: Dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: re.Match | None = pattern.search(lines[line_index])
+		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
 			raise ValueError(
 				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
@@ -70,7 +70,7 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> tuple[List[Exception], Dict[str, str]]:
+def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
 	exceptions: List[Exception] = []
 	info: Dict[str, str] = {}
 
