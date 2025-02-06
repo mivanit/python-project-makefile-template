@@ -1,42 +1,73 @@
 # Stats
-- 22 files
-- 3637 (3.6K) lines
-- 121323 (121K) chars
-- 14690 (15K) `whitespace-split` tokens
+- 47 files
+- 6032 (6.0K) lines
+- 227019 (227K) chars
+- 23653 (24K) `whitespace-split` tokens
 
 # File Tree
 
 ```
-python-project-makefile-template     
-├── .meta                            
-│   ├── local                        
-│   ├── requirements                 
-│   │   ├── requirements-all.txt     [   63L  2,176C   202T]
-│   │   ├── requirements-base.txt    [   29L  1,596C   163T]
-│   │   ├── requirements-groups.txt  [   61L  2,134C   199T]
-│   │   ├── requirements-lint.txt    [   17L    373C    36T]
-│   │   └── requirements.txt         [   63L  2,195C   205T]
-│   └── versions                     
-│    └── .version                    [    1L      6C     1T]
-├── myproject                        
-│   ├── __init__.py                  [    3L     34C     5T]
-│   ├── helloworld.py                [   12L    359C    49T]
-│   └── other.py                     [    3L    128C    17T]
-├── scripts                          
-│   ├── assemble_make.py             [   55L  1,380C   136T]
-│   ├── check_torch.py               [  157L  4,424C   419T]
-│   ├── export_requirements.py       [   78L  2,049C   237T]
-│   ├── get_commit_log.py            [   27L    671C    65T]
-│   ├── get_todos.py                 [  342L  8,820C   986T]
-│   ├── get_version.py               [   17L    339C    37T]
-│   └── pdoc_markdown2_cli.py        [   54L  1,448C   144T]
-├── tests                            
-│   └── test_nothing.py              [    2L     42C     5T]
-├── LICENSE                          [  427L 20,133C 2,769T]
-├── README.md                        [   88L  5,059C   659T]
-├── makefile                         [1,282L 39,472C 4,780T]
-├── makefile.template                [  607L 21,839C 2,895T]
-├── pyproject.toml                   [  130L  2,893C   370T]
+python-project-makefile-template      
+├── .meta                             
+│   ├── local                         
+│   ├── requirements                  
+│   │   ├── requirements-all.txt      [   63L  2,176C   202T]
+│   │   ├── requirements-base.txt     [   29L  1,596C   163T]
+│   │   ├── requirements-groups.txt   [   61L  2,134C   199T]
+│   │   ├── requirements-lint.txt     [   17L    373C    36T]
+│   │   └── requirements.txt          [   63L  2,195C   205T]
+│   └── versions                      
+│    └── .version                     [    1L      6C     1T]
+├── _resources                        
+│   ├── css                           
+│   │   ├── bootstrap-reboot.min.css  [    7L  4,612C    74T]
+│   │   ├── content.css               [  467L  9,607C 1,125T]
+│   │   ├── custom.css                [   19L    382C    39T]
+│   │   ├── layout.css                [  230L  4,670C   586T]
+│   │   ├── syntax-highlighting.css   [   72L  4,545C   683T]
+│   │   └── theme.css                 [   21L    397C    43T]
+│   ├── svg                           
+│   │   ├── box-arrow-in-left.svg     [    4L    552C    85T]
+│   │   ├── caution.svg               [    1L    407C    41T]
+│   │   ├── important.svg             [    1L    351C    26T]
+│   │   ├── info.svg                  [    1L    342C    26T]
+│   │   ├── navtoggle.svg             [    1L    187C    14T]
+│   │   ├── pdoc-logo.svg             [    1L  6,989C   432T]
+│   │   ├── tip.svg                   [    4L    970C    75T]
+│   │   └── warning.svg               [    1L    419C    43T]
+│   ├── templates                     
+│   │   ├── html                      
+│   │   │   ├── error.html.jinja2     [   41L    992C   102T]
+│   │   │   ├── frame.html.jinja2     [   43L  1,866C   177T]
+│   │   │   ├── index.html.jinja2     [   74L  2,375C   268T]
+│   │   │   └── module.html.jinja2    [  333L 14,112C 1,509T]
+│   │   ├── markdown                  
+│   │   │   ├── error.html.jinja2     [    9L    232C    43T]
+│   │   │   ├── frame.html.jinja2     [    7L    218C    36T]
+│   │   │   ├── index.html.jinja2     [   73L  2,305C   261T]
+│   │   │   └── module.html.jinja2    [  211L  6,472C   923T]
+│   │   └── todo-template.html        [  388L 12,303C   823T]
+│   ├── elasticlunr.min.js            [    1L 17,929C   382T]
+│   └── make_docs.py                  [  262L  7,804C   772T]
+├── myproject                         
+│   ├── __init__.py                   [    3L     34C     5T]
+│   ├── helloworld.py                 [   12L    359C    49T]
+│   └── other.py                      [    3L    128C    17T]
+├── scripts                           
+│   ├── assemble_make.py              [   55L  1,380C   136T]
+│   ├── check_torch.py                [  157L  4,424C   419T]
+│   ├── export_requirements.py        [   78L  2,049C   237T]
+│   ├── get_commit_log.py             [   27L    671C    65T]
+│   ├── get_todos.py                  [  342L  8,820C   986T]
+│   ├── get_version.py                [   17L    339C    37T]
+│   └── pdoc_markdown2_cli.py         [   54L  1,448C   144T]
+├── tests                             
+│   └── test_nothing.py               [    2L     42C     5T]
+├── LICENSE                           [  427L 20,133C 2,769T]
+├── README.md                         [   88L  5,059C   659T]
+├── makefile                          [1,282L 39,472C 4,780T]
+├── makefile.template                 [  607L 21,839C 2,895T]
+├── pyproject.toml                    [  130L  2,893C   370T]
 ```
 
 # File Contents
@@ -297,6 +328,2370 @@ wcmatch==10.0
 ``````{ path=".meta/versions/.version"  }
 v0.1.1
 ``````{ end_of_file=".meta/versions/.version" }
+
+``````{ path="_resources/css/bootstrap-reboot.min.css"  }
+/*!
+* Bootstrap Reboot v5.0.0 (https://getbootstrap.com/)
+* Copyright 2011-2021 The Bootstrap Authors
+* Copyright 2011-2021 Twitter, Inc.
+* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+* Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md)
+*/*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}
+
+``````{ end_of_file="_resources/css/bootstrap-reboot.min.css" }
+
+``````{ path="_resources/css/content.css"  }
+/*
+This CSS file contains all style definitions for documentation content.
+
+All selectors are scoped with ".pdoc".
+This makes sure that the pdoc styling doesn't leak to the rest of the page when pdoc is embedded.
+*/
+
+.pdoc {
+    color: var(--text);
+    /* enforce some styling even if bootstrap reboot is not included */
+    box-sizing: border-box;
+    line-height: 1.5;
+    /* override background from pygments */
+    /*unnecessary since pdoc 10, only left here to keep old custom templates working. */
+    background: none;
+}
+
+.pdoc .pdoc-button {
+    cursor: pointer;
+    display: inline-block;
+    border: solid black 1px;
+    border-radius: 2px;
+    font-size: .75rem;
+    padding: calc(0.5em - 1px) 1em;
+    transition: 100ms all;
+    position: relative;
+}
+
+
+/* Admonitions */
+.pdoc .alert {
+    padding: 1rem 1rem 1rem calc(1.5rem + 24px);
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    background-repeat: no-repeat;
+    background-position: .75rem center;
+    margin-bottom: 1rem;
+}
+
+.pdoc .alert > em {
+    display: none;
+}
+
+.pdoc .alert > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Admonitions are currently not stylable via theme.css */
+/* NOTE|TIP|IMPORTANT|WARNING|CAUTION */
+/* admonition|attention|caution|danger|error|hint|important|note|tip|warning */
+
+.pdoc .alert.note  {
+    color: #084298;
+    background-color: #cfe2ff;
+    border-color: #b6d4fe;
+    background-image: url("../.resources/svg/info.svg");
+}
+
+.pdoc .alert.hint,
+.pdoc .alert.tip {
+    color: #208434;
+    background-color: #c8f7cf;
+    border-color: #c4f1cd;
+    background-image: url("../.resources/svg/tip.svg");
+}
+
+.pdoc .alert.important {
+    color: #752084;
+    background-color: #e5bef4;
+    border-color: #e3a9ee;
+    background-image: url("../.resources/svg/important.svg");
+}
+.pdoc .alert.warning {
+    color: #664d03;
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    background-image: url("../.resources/svg/warning.svg");
+}
+
+.pdoc .alert.admonition,
+.pdoc .alert.attention,
+.pdoc .alert.danger,
+.pdoc .alert.error,
+.pdoc .alert.caution {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    background-image: url("../.resources/svg/caution.svg");
+}
+
+
+/* other stuff */
+
+.pdoc .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.pdoc h1, .pdoc h2, .pdoc h3 {
+    font-weight: 300;
+    margin: .3em 0;
+    padding: .2em 0;
+}
+
+.pdoc > section:not(.module-info) h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+.pdoc > section:not(.module-info) h2 {
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+.pdoc > section:not(.module-info) h3 {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+.pdoc > section:not(.module-info) h4 {
+    font-size: 1.2rem;
+}
+.pdoc > section:not(.module-info) h5 {
+    font-size: 1.1rem;
+}
+
+.pdoc a {
+    text-decoration: none;
+    color: var(--link);
+}
+
+.pdoc a:hover {
+    color: var(--link-hover);
+}
+
+.pdoc blockquote {
+    margin-left: 2rem;
+}
+
+.pdoc pre {
+    border-top: 1px solid var(--accent2);
+    border-bottom: 1px solid var(--accent2);
+    margin-top: 0;
+    margin-bottom: 1em;
+    padding: .5rem 0 .5rem .5rem;
+    overflow-x: auto;
+    /*unnecessary since pdoc 10, only left here to keep old custom templates working. */
+    background-color: var(--code);
+}
+
+.pdoc code {
+    color: var(--text);
+    padding: .2em .4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: var(--accent);
+    border-radius: 6px;
+}
+
+.pdoc a > code {
+    color: inherit;
+}
+
+.pdoc pre > code {
+    display: inline-block;
+    font-size: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.pdoc > section:not(.module-info) {
+    /* this margin should collapse with docstring margin,
+       but not for the module docstr which is followed by view_source. */
+    margin-bottom: 1.5rem;
+}
+
+/* Page Heading */
+.pdoc .modulename {
+    margin-top: 0;
+    font-weight: bold;
+}
+
+.pdoc .modulename a {
+    color: var(--link);
+    transition: 100ms all;
+}
+
+/* GitHub Button */
+.pdoc .git-button {
+    float: right;
+    border: solid var(--link) 1px;
+}
+
+.pdoc .git-button:hover {
+    background-color: var(--link);
+    color: var(--pdoc-background);
+}
+
+.view-source-toggle-state,
+.view-source-toggle-state ~ .pdoc-code {
+    display: none;
+}
+.view-source-toggle-state:checked ~ .pdoc-code {
+    display: block;
+}
+
+.view-source-button {
+    display: inline-block;
+    float: right;
+    /* font-size: .75rem; */
+    /* line-height: 1.5rem; */
+    color: var(--muted);
+    /* padding: 0 .4rem 0 1.3rem; */
+    cursor: pointer;
+    /* odd hack to reduce space between "bullet" and text */
+    text-indent: -2px;
+}
+.view-source-button > span {
+    visibility: hidden;
+}
+/* .module-info .view-source-button {
+    float: none;
+    display: flex;
+    justify-content: flex-end;
+    margin: -1.2rem .4rem -.2rem 0;
+} */
+.view-source-button::before {
+    /* somewhat awkward recreation of a <summary> element. ideally we'd just use `display: inline list-item`, but
+     that does not work in Chrome (yet), see https://crbug.com/995106. */
+    position: absolute;
+    content: "View Source";
+    display: list-item;
+    list-style-type: disclosure-closed;
+}
+.view-source-toggle-state:checked ~ .attr .view-source-button::before,
+.view-source-toggle-state:checked ~ .view-source-button::before {
+    list-style-type: disclosure-open;
+}
+
+/* Docstrings */
+.pdoc .docstring {
+    margin-bottom: 1.5rem;
+}
+
+.pdoc section:not(.module-info) .docstring {
+    margin-left: clamp(0rem, 5vw - 2rem, 1rem);
+}
+
+.pdoc .docstring .pdoc-code {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+/* Highlight focused element */
+.pdoc h1:target,
+.pdoc h2:target,
+.pdoc h3:target,
+.pdoc h4:target,
+.pdoc h5:target,
+.pdoc h6:target,
+.pdoc .pdoc-code > pre > span:target {
+    background-color: var(--active);
+    box-shadow: -1rem 0 0 0 var(--active);
+}
+
+.pdoc .pdoc-code > pre > span:target {
+    /* make the highlighted line full width so that the background extends */
+    display: block;
+}
+
+.pdoc div:target > .attr,
+.pdoc section:target > .attr,
+.pdoc dd:target > a {
+    background-color: var(--active);
+}
+
+.pdoc * {
+    scroll-margin: 2rem;
+}
+
+.pdoc .pdoc-code .linenos {
+    user-select: none;
+}
+
+.pdoc .attr:hover {
+    filter: contrast(0.95);
+}
+
+/* Header link */
+.pdoc section, .pdoc .classattr {
+    position: relative;
+}
+
+.pdoc .headerlink {
+    --width: clamp(1rem, 3vw, 2rem);
+    position: absolute;
+    top: 0;
+    left: calc(0rem - var(--width));
+    transition: all 100ms ease-in-out;
+    opacity: 0;
+}
+.pdoc .headerlink::before {
+    content: "#";
+    display: block;
+    text-align: center;
+    width: var(--width);
+    height: 2.3rem;
+    line-height: 2.3rem;
+    font-size: 1.5rem;
+}
+
+.pdoc .attr:hover ~ .headerlink,
+.pdoc *:target > .headerlink,
+.pdoc .headerlink:hover {
+    opacity: 1;
+}
+
+/* Attributes */
+.pdoc .attr {
+    display: block;
+    margin: .5rem 0 .5rem;
+    padding: .4rem .4rem .4rem 1rem;
+    background-color: var(--accent);
+    overflow-x: auto;
+}
+
+.pdoc .classattr {
+    margin-left: 2rem;
+}
+
+.pdoc .name {
+    color: var(--name);
+    font-weight: bold;
+}
+
+.pdoc .def {
+    color: var(--def);
+    font-weight: bold;
+}
+
+.pdoc .signature {
+    /* override pygments background color */
+    background-color: transparent;
+}
+
+.pdoc .param, .pdoc .return-annotation {
+    white-space: pre;
+}
+.pdoc .signature.multiline .param {
+    display: block;
+}
+.pdoc .signature.condensed .param {
+    display:inline-block;
+}
+
+.pdoc .annotation {
+    color: var(--annotation);
+}
+
+/* Show/Hide buttons for long default values */
+.pdoc .view-value-toggle-state,
+.pdoc .view-value-toggle-state ~ .default_value {
+    display: none;
+}
+.pdoc .view-value-toggle-state:checked ~ .default_value {
+    display: inherit;
+}
+.pdoc .view-value-button {
+    font-size: .5rem;
+    vertical-align: middle;
+    border-style: dashed;
+    margin-top: -0.1rem;
+}
+.pdoc .view-value-button:hover {
+    background: white;
+}
+.pdoc .view-value-button::before {
+    content: "show";
+    text-align: center;
+    width: 2.2em;
+    display: inline-block;
+}
+.pdoc .view-value-toggle-state:checked ~ .view-value-button::before {
+    content: "hide";
+}
+
+/* Inherited Members */
+.pdoc .inherited {
+    margin-left: 2rem;
+}
+
+.pdoc .inherited dt {
+    font-weight: 700;
+}
+
+.pdoc .inherited dt, .pdoc .inherited dd {
+    display: inline;
+    margin-left: 0;
+    margin-bottom: .5rem;
+}
+
+.pdoc .inherited dd:not(:last-child):after {
+    content: ", ";
+}
+
+.pdoc .inherited .class:before {
+    content: "class ";
+}
+
+.pdoc .inherited .function a:after {
+    content: "()";
+}
+
+/* Search results */
+.pdoc .search-result .docstring {
+    overflow: auto;
+    max-height: 25vh;
+}
+
+.pdoc .search-result.focused > .attr {
+    background-color: var(--active);
+}
+
+/* "built with pdoc" attribution */
+.pdoc .attribution {
+    margin-top: 2rem;
+    display: block;
+    opacity: 0.5;
+    transition: all 200ms;
+    filter: grayscale(100%);
+}
+
+.pdoc .attribution:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+}
+
+.pdoc .attribution img {
+    margin-left: 5px;
+    height: 35px;
+    vertical-align: middle;
+    width: 70px;
+    transition: all 200ms;
+}
+
+/* Tables */
+.pdoc table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow: auto;
+    margin-bottom: 1rem;
+}
+
+.pdoc table th {
+    font-weight: 600;
+}
+
+.pdoc table th, .pdoc table td {
+    padding: 6px 13px;
+    border: 1px solid var(--accent2);
+}
+
+``````{ end_of_file="_resources/css/content.css" }
+
+``````{ path="_resources/css/custom.css"  }
+.github-link-button {
+    display: inline-block;
+    float: right;
+	margin-right: 1em;
+}
+
+.package-version {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1030;
+    background-color: #d0d2d3;
+    padding: 3px 3px;
+    text-align: right;
+    border-bottom: 1px solid #7c7c7c;
+    border-left: 1px solid #7c7c7c;
+    font-size: 1em;
+    border-bottom-left-radius: 5px;
+}
+``````{ end_of_file="_resources/css/custom.css" }
+
+``````{ path="_resources/css/layout.css"  }
+/*
+This CSS file contains all style definitions for the global page layout.
+
+When pdoc is embedded into other systems, it may be left out (or overwritten with an empty file) entirely.
+ */
+
+/* Responsive Layout */
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+html, main {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--pdoc-background);
+}
+
+@media (max-width: 769px) {
+    #navtoggle {
+        cursor: pointer;
+        position: absolute;
+        width: 50px;
+        height: 40px;
+        top: 1rem;
+        right: 1rem;
+        border-color: var(--text);
+        color: var(--text);
+        display: flex;
+        opacity: 0.8;
+        z-index: 999;
+    }
+
+    #navtoggle:hover {
+        opacity: 1;
+    }
+
+    #togglestate + div {
+        display: none;
+    }
+
+    #togglestate:checked + div {
+        display: inherit;
+    }
+
+    main, header {
+        padding: 2rem 3vw;
+    }
+
+    header + main {
+        margin-top: -3rem;
+    }
+
+    .git-button {
+        display: none !important;
+    }
+
+    nav input[type="search"] {
+        /* don't overflow into menu button */
+        max-width: 77%;
+    }
+
+    nav input[type="search"]:first-child {
+        /* align vertically with the hamburger menu */
+        margin-top: -6px;
+    }
+
+    nav input[type="search"]:valid ~ * {
+        /* hide rest of the menu when search has contents */
+        display: none !important;
+    }
+}
+
+@media (min-width: 770px) {
+    :root {
+        --sidebar-width: clamp(12.5rem, 28vw, 22rem);
+    }
+
+    nav {
+        position: fixed;
+        overflow: auto;
+        height: 100vh;
+        width: var(--sidebar-width);
+    }
+
+    main, header {
+        padding: 3rem 2rem 3rem calc(var(--sidebar-width) + 3rem);
+        width: calc(54rem + var(--sidebar-width));
+        max-width: 100%;
+    }
+
+    header + main {
+        margin-top: -4rem;
+    }
+
+    #navtoggle {
+        display: none;
+    }
+}
+
+#togglestate {
+    /*
+    Don't do `display: none` here.
+    When a mobile browser is not scrolled all the way to the top,
+    clicking the label would insert the menu above the scrolling position
+    and it would stay out of view. By making the checkbox technically
+    visible it jumps up first and we always get the menu into view when clicked.
+    */
+    position: absolute;
+    height: 0;
+    /* height:0 isn't enough in Firefox, so we hide it extra well */
+    opacity: 0;
+}
+
+/* Nav */
+nav.pdoc {
+    --pad: clamp(0.5rem, 2vw, 1.75rem);
+    --indent: 1.5rem;
+    background-color: var(--accent);
+    border-right: 1px solid var(--accent2);
+    box-shadow: 0 0 20px rgba(50, 50, 50, .2) inset;
+    padding: 0 0 0 var(--pad);
+    overflow-wrap: anywhere;
+    scrollbar-width: thin; /* Scrollbar width on Firefox */
+    scrollbar-color: var(--accent2) transparent; /* Scrollbar color on Firefox */
+    z-index: 1
+}
+
+nav.pdoc::-webkit-scrollbar {
+    width: .4rem; /* Scrollbar width on Chromium-based browsers */
+}
+
+nav.pdoc::-webkit-scrollbar-thumb {
+    background-color: var(--accent2); /* Scrollbar color on Chromium-based browsers */
+}
+
+nav.pdoc > div {
+    padding: var(--pad) 0;
+}
+
+nav.pdoc .module-list-button {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text);
+    border-color: var(--muted);
+    margin-bottom: 1rem;
+}
+
+nav.pdoc .module-list-button:hover {
+    border-color: var(--text);
+}
+
+nav.pdoc input[type=search] {
+    display: block;
+    outline-offset: 0;
+    width: calc(100% - var(--pad));
+}
+
+nav.pdoc .logo {
+    max-width: calc(100% - var(--pad));
+    max-height: 35vh;
+    display: block;
+    margin: 0 auto 1rem;
+    transform: translate(calc(-.5 * var(--pad)), 0);
+}
+
+nav.pdoc ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+nav.pdoc > div > ul {
+    /* undo padding here so that links span entire width */
+    margin-left: calc(0px - var(--pad));
+}
+
+nav.pdoc li a {
+    /* re-add padding (+indent) here */
+    padding: .2rem 0 .2rem calc(var(--pad) + var(--indent));
+}
+
+nav.pdoc > div > ul > li > a {
+    /* no padding for top-level */
+    padding-left: var(--pad);
+}
+
+nav.pdoc li {
+    transition: all 100ms;
+}
+
+nav.pdoc li:hover {
+    background-color: var(--nav-hover);
+}
+
+nav.pdoc a, nav.pdoc a:hover {
+    color: var(--text);
+}
+
+nav.pdoc a {
+    display: block;
+}
+
+nav.pdoc > h2:first-of-type {
+    margin-top: 1.5rem;
+}
+
+nav.pdoc .class:before {
+    content: "class ";
+    color: var(--muted);
+}
+
+nav.pdoc .function:after {
+    content: "()";
+    color: var(--muted);
+}
+
+nav.pdoc footer:before {
+    content: "";
+    display: block;
+    width: calc(100% - var(--pad));
+    border-top: solid var(--accent2) 1px;
+    margin-top: 1.5rem;
+    padding-top: .5rem;
+}
+
+nav.pdoc footer {
+    font-size: small;
+}
+
+``````{ end_of_file="_resources/css/layout.css" }
+
+``````{ path="_resources/css/syntax-highlighting.css"  }
+/* auto-generated, see templates/README.md */
+pre { line-height: 125%; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 20px; }
+.pdoc-code .hll { background-color: #ffffcc }
+.pdoc-code { background: #f8f8f8; }
+.pdoc-code .c { color: #3D7B7B; font-style: italic } /* Comment */
+.pdoc-code .err { border: 1px solid #FF0000 } /* Error */
+.pdoc-code .k { color: #008000; font-weight: bold } /* Keyword */
+.pdoc-code .o { color: #666666 } /* Operator */
+.pdoc-code .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.pdoc-code .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.pdoc-code .cp { color: #9C6500 } /* Comment.Preproc */
+.pdoc-code .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.pdoc-code .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.pdoc-code .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
+.pdoc-code .gd { color: #A00000 } /* Generic.Deleted */
+.pdoc-code .ge { font-style: italic } /* Generic.Emph */
+.pdoc-code .gr { color: #E40000 } /* Generic.Error */
+.pdoc-code .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.pdoc-code .gi { color: #008400 } /* Generic.Inserted */
+.pdoc-code .go { color: #717171 } /* Generic.Output */
+.pdoc-code .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.pdoc-code .gs { font-weight: bold } /* Generic.Strong */
+.pdoc-code .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.pdoc-code .gt { color: #0044DD } /* Generic.Traceback */
+.pdoc-code .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.pdoc-code .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.pdoc-code .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.pdoc-code .kp { color: #008000 } /* Keyword.Pseudo */
+.pdoc-code .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.pdoc-code .kt { color: #B00040 } /* Keyword.Type */
+.pdoc-code .m { color: #666666 } /* Literal.Number */
+.pdoc-code .s { color: #BA2121 } /* Literal.String */
+.pdoc-code .na { color: #687822 } /* Name.Attribute */
+.pdoc-code .nb { color: #008000 } /* Name.Builtin */
+.pdoc-code .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.pdoc-code .no { color: #880000 } /* Name.Constant */
+.pdoc-code .nd { color: #AA22FF } /* Name.Decorator */
+.pdoc-code .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.pdoc-code .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
+.pdoc-code .nf { color: #0000FF } /* Name.Function */
+.pdoc-code .nl { color: #767600 } /* Name.Label */
+.pdoc-code .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.pdoc-code .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.pdoc-code .nv { color: #19177C } /* Name.Variable */
+.pdoc-code .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.pdoc-code .w { color: #bbbbbb } /* Text.Whitespace */
+.pdoc-code .mb { color: #666666 } /* Literal.Number.Bin */
+.pdoc-code .mf { color: #666666 } /* Literal.Number.Float */
+.pdoc-code .mh { color: #666666 } /* Literal.Number.Hex */
+.pdoc-code .mi { color: #666666 } /* Literal.Number.Integer */
+.pdoc-code .mo { color: #666666 } /* Literal.Number.Oct */
+.pdoc-code .sa { color: #BA2121 } /* Literal.String.Affix */
+.pdoc-code .sb { color: #BA2121 } /* Literal.String.Backtick */
+.pdoc-code .sc { color: #BA2121 } /* Literal.String.Char */
+.pdoc-code .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.pdoc-code .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.pdoc-code .s2 { color: #BA2121 } /* Literal.String.Double */
+.pdoc-code .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
+.pdoc-code .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.pdoc-code .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
+.pdoc-code .sx { color: #008000 } /* Literal.String.Other */
+.pdoc-code .sr { color: #A45A77 } /* Literal.String.Regex */
+.pdoc-code .s1 { color: #BA2121 } /* Literal.String.Single */
+.pdoc-code .ss { color: #19177C } /* Literal.String.Symbol */
+.pdoc-code .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.pdoc-code .fm { color: #0000FF } /* Name.Function.Magic */
+.pdoc-code .vc { color: #19177C } /* Name.Variable.Class */
+.pdoc-code .vg { color: #19177C } /* Name.Variable.Global */
+.pdoc-code .vi { color: #19177C } /* Name.Variable.Instance */
+.pdoc-code .vm { color: #19177C } /* Name.Variable.Magic */
+.pdoc-code .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+``````{ end_of_file="_resources/css/syntax-highlighting.css" }
+
+``````{ path="_resources/css/theme.css"  }
+/* pdoc color scheme (see also: examples/dark-mode) */
+:root {
+    --pdoc-background: #fff;
+}
+
+.pdoc {
+    --text: #212529;
+    --muted: #6c757d;
+    --link: #3660a5;
+    --link-hover: #1659c5;
+    --code: #f8f8f8;
+    --active: #fff598;
+
+    --accent: #eee;
+    --accent2: #c1c1c1;
+
+    --nav-hover: rgba(255, 255, 255, 0.5);
+    --name: #0066BB;
+    --def: #008800;
+    --annotation: #007020;
+}
+
+``````{ end_of_file="_resources/css/theme.css" }
+
+``````{ path="_resources/svg/box-arrow-in-left.svg"  }
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
+  <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+</svg>
+``````{ end_of_file="_resources/svg/box-arrow-in-left.svg" }
+
+``````{ path="_resources/svg/caution.svg"  }
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+``````{ end_of_file="_resources/svg/caution.svg" }
+
+``````{ path="_resources/svg/important.svg"  }
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8050DF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+``````{ end_of_file="_resources/svg/important.svg" }
+
+``````{ path="_resources/svg/info.svg"  }
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D68DD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+``````{ end_of_file="_resources/svg/info.svg" }
+
+``````{ path="_resources/svg/navtoggle.svg"  }
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>
+
+``````{ end_of_file="_resources/svg/navtoggle.svg" }
+
+``````{ path="_resources/svg/pdoc-logo.svg"  }
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="pdoc logo" width="300" height="150" viewBox="-1 0 60 30"><title>pdoc</title><path d="M29.621 21.293c-.011-.273-.214-.475-.511-.481a.5.5 0 0 0-.489.503l-.044 1.393c-.097.551-.695 1.215-1.566 1.704-.577.428-1.306.486-2.193.182-1.426-.617-2.467-1.654-3.304-2.487l-.173-.172a3.43 3.43 0 0 0-.365-.306.49.49 0 0 0-.286-.196c-1.718-1.06-4.931-1.47-7.353.191l-.219.15c-1.707 1.187-3.413 2.131-4.328 1.03-.02-.027-.49-.685-.141-1.763.233-.721.546-2.408.772-4.076.042-.09.067-.187.046-.288.166-1.347.277-2.625.241-3.351 1.378-1.008 2.271-2.586 2.271-4.362 0-.976-.272-1.935-.788-2.774-.057-.094-.122-.18-.184-.268.033-.167.052-.339.052-.516 0-1.477-1.202-2.679-2.679-2.679-.791 0-1.496.352-1.987.9a6.3 6.3 0 0 0-1.001.029c-.492-.564-1.207-.929-2.012-.929-1.477 0-2.679 1.202-2.679 2.679A2.65 2.65 0 0 0 .97 6.554c-.383.747-.595 1.572-.595 2.41 0 2.311 1.507 4.29 3.635 5.107-.037.699-.147 2.27-.423 3.294l-.137.461c-.622 2.042-2.515 8.257 1.727 10.643 1.614.908 3.06 1.248 4.317 1.248 2.665 0 4.492-1.524 5.322-2.401 1.476-1.559 2.886-1.854 6.491.82 1.877 1.393 3.514 1.753 4.861 1.068 2.223-1.713 2.811-3.867 3.399-6.374.077-.846.056-1.469.054-1.537zm-4.835 4.313c-.054.305-.156.586-.242.629-.034-.007-.131-.022-.307-.157-.145-.111-.314-.478-.456-.908.221.121.432.25.675.355.115.039.219.051.33.081zm-2.251-1.238c-.05.33-.158.648-.252.694-.022.001-.125-.018-.307-.157-.217-.166-.488-.906-.639-1.573.358.344.754.693 1.198 1.036zm-3.887-2.337c-.006-.116-.018-.231-.041-.342.635.145 1.189.368 1.599.625.097.231.166.481.174.642-.03.049-.055.101-.067.158-.046.013-.128.026-.298.004-.278-.037-.901-.57-1.367-1.087zm-1.127-.497c.116.306.176.625.12.71-.019.014-.117.045-.345.016-.206-.027-.604-.332-.986-.695.41-.051.816-.056 1.211-.031zm-4.535 1.535c.209.22.379.47.358.598-.006.041-.088.138-.351.234-.144.055-.539-.063-.979-.259a11.66 11.66 0 0 0 .972-.573zm.983-.664c.359-.237.738-.418 1.126-.554.25.237.479.548.457.694-.006.042-.087.138-.351.235-.174.064-.694-.105-1.232-.375zm-3.381 1.794c-.022.145-.061.29-.149.401-.133.166-.358.248-.69.251h-.002c-.133 0-.306-.26-.45-.621.417.091.854.07 1.291-.031zm-2.066-8.077a4.78 4.78 0 0 1-.775-.584c.172-.115.505-.254.88-.378l-.105.962zm-.331 2.302a10.32 10.32 0 0 1-.828-.502c.202-.143.576-.328.984-.49l-.156.992zm-.45 2.157l-.701-.403c.214-.115.536-.249.891-.376a11.57 11.57 0 0 1-.19.779zm-.181 1.716c.064.398.194.702.298.893-.194-.051-.435-.162-.736-.398.061-.119.224-.3.438-.495zM8.87 4.141c0 .152-.123.276-.276.276s-.275-.124-.275-.276.123-.276.276-.276.275.124.275.276zm-.735-.389a1.15 1.15 0 0 0-.314.783 1.16 1.16 0 0 0 1.162 1.162c.457 0 .842-.27 1.032-.653.026.117.042.238.042.362a1.68 1.68 0 0 1-1.679 1.679 1.68 1.68 0 0 1-1.679-1.679c0-.843.626-1.535 1.436-1.654zM5.059 5.406A1.68 1.68 0 0 1 3.38 7.085a1.68 1.68 0 0 1-1.679-1.679c0-.037.009-.072.011-.109.21.3.541.508.935.508a1.16 1.16 0 0 0 1.162-1.162 1.14 1.14 0 0 0-.474-.912c.015 0 .03-.005.045-.005.926.001 1.679.754 1.679 1.68zM3.198 4.141c0 .152-.123.276-.276.276s-.275-.124-.275-.276.123-.276.276-.276.275.124.275.276zM1.375 8.964c0-.52.103-1.035.288-1.52.466.394 1.06.64 1.717.64 1.144 0 2.116-.725 2.499-1.738.383 1.012 1.355 1.738 2.499 1.738.867 0 1.631-.421 2.121-1.062.307.605.478 1.267.478 1.942 0 2.486-2.153 4.51-4.801 4.51s-4.801-2.023-4.801-4.51zm24.342 19.349c-.985.498-2.267.168-3.813-.979-3.073-2.281-5.453-3.199-7.813-.705-1.315 1.391-4.163 3.365-8.423.97-3.174-1.786-2.239-6.266-1.261-9.479l.146-.492c.276-1.02.395-2.457.444-3.268a6.11 6.11 0 0 0 1.18.115 6.01 6.01 0 0 0 2.536-.562l-.006.175c-.802.215-1.848.612-2.021 1.25-.079.295.021.601.274.837.219.203.415.364.598.501-.667.304-1.243.698-1.311 1.179-.02.144-.022.507.393.787.213.144.395.26.564.365-1.285.521-1.361.96-1.381 1.126-.018.142-.011.496.427.746l.854.489c-.473.389-.971.914-.999 1.429-.018.278.095.532.316.713.675.556 1.231.721 1.653.721.059 0 .104-.014.158-.02.207.707.641 1.64 1.513 1.64h.013c.8-.008 1.236-.345 1.462-.626.173-.216.268-.457.325-.692.424.195.93.374 1.372.374.151 0 .294-.021.423-.068.732-.27.944-.704.993-1.021.009-.061.003-.119.002-.179.266.086.538.147.789.147.15 0 .294-.021.423-.069.542-.2.797-.489.914-.754.237.147.478.258.704.288.106.014.205.021.296.021.356 0 .595-.101.767-.229.438.435 1.094.992 1.656 1.067.106.014.205.021.296.021a1.56 1.56 0 0 0 .323-.035c.17.575.453 1.289.866 1.605.358.273.665.362.914.362a.99.99 0 0 0 .421-.093 1.03 1.03 0 0 0 .245-.164c.168.428.39.846.68 1.068.358.273.665.362.913.362a.99.99 0 0 0 .421-.093c.317-.148.512-.448.639-.762.251.157.495.257.726.257.127 0 .25-.024.37-.071.427-.17.706-.617.841-1.314.022-.015.047-.022.068-.038.067-.051.133-.104.196-.159-.443 1.486-1.107 2.761-2.086 3.257zM8.66 9.925a.5.5 0 1 0-1 0c0 .653-.818 1.205-1.787 1.205s-1.787-.552-1.787-1.205a.5.5 0 1 0-1 0c0 1.216 1.25 2.205 2.787 2.205s2.787-.989 2.787-2.205zm4.4 15.965l-.208.097c-2.661 1.258-4.708 1.436-6.086.527-1.542-1.017-1.88-3.19-1.844-4.198a.4.4 0 0 0-.385-.414c-.242-.029-.406.164-.414.385-.046 1.249.367 3.686 2.202 4.896.708.467 1.547.7 2.51.7 1.248 0 2.706-.392 4.362-1.174l.185-.086a.4.4 0 0 0 .205-.527c-.089-.204-.326-.291-.527-.206zM9.547 2.292c.093.077.205.114.317.114a.5.5 0 0 0 .318-.886L8.817.397a.5.5 0 0 0-.703.068.5.5 0 0 0 .069.703l1.364 1.124zm-7.661-.065c.086 0 .173-.022.253-.068l1.523-.893a.5.5 0 0 0-.506-.863l-1.523.892a.5.5 0 0 0-.179.685c.094.158.261.247.432.247z" transform="matrix(-1 0 0 1 58 0)" fill="#3bb300"/><path d="M.3 21.86V10.18q0-.46.02-.68.04-.22.18-.5.28-.54 1.34-.54 1.06 0 1.42.28.38.26.44.78.76-1.04 2.38-1.04 1.64 0 3.1 1.54 1.46 1.54 1.46 3.58 0 2.04-1.46 3.58-1.44 1.54-3.08 1.54-1.64 0-2.38-.92v4.04q0 .46-.04.68-.02.22-.18.5-.14.3-.5.42-.36.12-.98.12-.62 0-1-.12-.36-.12-.52-.4-.14-.28-.18-.5-.02-.22-.02-.68zm3.96-9.42q-.46.54-.46 1.18 0 .64.46 1.18.48.52 1.2.52.74 0 1.24-.52.52-.52.52-1.18 0-.66-.48-1.18-.48-.54-1.26-.54-.76 0-1.22.54zm14.741-8.36q.16-.3.54-.42.38-.12 1-.12.64 0 1.02.12.38.12.52.42.16.3.18.54.04.22.04.68v11.94q0 .46-.04.7-.02.22-.18.5-.3.54-1.7.54-1.38 0-1.54-.98-.84.96-2.34.96-1.8 0-3.28-1.56-1.48-1.58-1.48-3.66 0-2.1 1.48-3.68 1.5-1.58 3.28-1.58 1.48 0 2.3 1v-4.2q0-.46.02-.68.04-.24.18-.52zm-3.24 10.86q.52.54 1.26.54.74 0 1.22-.54.5-.54.5-1.18 0-.66-.48-1.22-.46-.56-1.26-.56-.8 0-1.28.56-.48.54-.48 1.2 0 .66.52 1.2zm7.833-1.2q0-2.4 1.68-3.96 1.68-1.56 3.84-1.56 2.16 0 3.82 1.56 1.66 1.54 1.66 3.94 0 1.66-.86 2.96-.86 1.28-2.1 1.9-1.22.6-2.54.6-1.32 0-2.56-.64-1.24-.66-2.1-1.92-.84-1.28-.84-2.88zm4.18 1.44q.64.48 1.3.48.66 0 1.32-.5.66-.5.66-1.48 0-.98-.62-1.46-.62-.48-1.34-.48-.72 0-1.34.5-.62.5-.62 1.48 0 .96.64 1.46zm11.412-1.44q0 .84.56 1.32.56.46 1.18.46.64 0 1.18-.36.56-.38.9-.38.6 0 1.46 1.06.46.58.46 1.04 0 .76-1.1 1.42-1.14.8-2.8.8-1.86 0-3.58-1.34-.82-.64-1.34-1.7-.52-1.08-.52-2.36 0-1.3.52-2.34.52-1.06 1.34-1.7 1.66-1.32 3.54-1.32.76 0 1.48.22.72.2 1.06.4l.32.2q.36.24.56.38.52.4.52.92 0 .5-.42 1.14-.72 1.1-1.38 1.1-.38 0-1.08-.44-.36-.34-1.04-.34-.66 0-1.24.48-.58.48-.58 1.34z" fill="green"/></svg>
+
+``````{ end_of_file="_resources/svg/pdoc-logo.svg" }
+
+``````{ path="_resources/svg/tip.svg"  }
+<?xml version="1.0" encoding="utf-8"?>
+<svg fill="#1B7F35" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" stroke="#1B7F35" stroke-width="0.7" d="M12 2.5c-3.81 0-6.5 2.743-6.5 6.119 0 1.536.632 2.572 1.425 3.56.172.215.347.422.527.635l.096.112c.21.25.427.508.63.774.404.531.783 1.128.995 1.834a.75.75 0 01-1.436.432c-.138-.46-.397-.89-.753-1.357a18.354 18.354 0 00-.582-.714l-.092-.11c-.18-.212-.37-.436-.555-.667C4.87 12.016 4 10.651 4 8.618 4 4.363 7.415 1 12 1s8 3.362 8 7.619c0 2.032-.87 3.397-1.755 4.5-.185.23-.375.454-.555.667l-.092.109c-.21.248-.405.481-.582.714-.356.467-.615.898-.753 1.357a.75.75 0 01-1.437-.432c.213-.706.592-1.303.997-1.834.202-.266.419-.524.63-.774l.095-.112c.18-.213.355-.42.527-.634.793-.99 1.425-2.025 1.425-3.561C18.5 5.243 15.81 2.5 12 2.5zM9.5 21.75a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5a.75.75 0 01-.75-.75zM8.75 18a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"/>
+</svg>
+``````{ end_of_file="_resources/svg/tip.svg" }
+
+``````{ path="_resources/svg/warning.svg"  }
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9D6A04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-triangle"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+``````{ end_of_file="_resources/svg/warning.svg" }
+
+``````{ path="_resources/templates/html/error.html.jinja2"  }
+{# this template is used by pdoc's integrated web server to display runtime errors. #}
+{% extends "frame.html.jinja2" %}
+{% block title %}{{ error }}{% endblock %}
+{% block style %}
+    <link rel="stylesheet" href=".resources/css/bootstrap-reboot.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            max-width: 54rem;
+        }
+
+        footer {
+            text-align: right;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+        }
+
+        footer svg {
+            max-width: 70px;
+            max-height: 35px;
+            transition: all 200ms;
+            filter: grayscale(100%);
+        }
+
+        footer svg:hover {
+            filter: grayscale(0%);
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <h1>{{ error }}</h1>
+    <pre>{{ details }}</pre>
+    <hr>
+    <footer>
+        <a title="built with pdoc {{ __version__ }}" href="https://pdoc.dev">
+        <img src=".resources/svg/doc-logo.svg">
+        </a>
+    </footer>
+{% endblock %}
+
+``````{ end_of_file="_resources/templates/html/error.html.jinja2" }
+
+``````{ path="_resources/templates/html/frame.html.jinja2"  }
+<!doctype html>
+<html lang="en">
+{% set path_to_root = "../" * (module.modulename.count(".")) %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="pdoc {{ __version__ }}"/>
+    <title>{% block title %}{% endblock %}</title>
+    {% block favicon %}
+        {% if favicon %}
+            <link rel="icon" href="{{ favicon }}"/>
+        {% endif %}
+    {% endblock %}
+    {% block head %}{% endblock %}
+    {% filter minify_css | indent %}
+        {% block style %}
+            <link rel="stylesheet" href="{{ path_to_root }}.resources/css/bootstrap-reboot.min.css">
+            <link rel="stylesheet" href="{{ path_to_root }}.resources/css/syntax-highlighting.css">
+            <link rel="stylesheet" href="{{ path_to_root }}.resources/css/theme.css">
+            <link rel="stylesheet" href="{{ path_to_root }}.resources/css/layout.css">
+            <link rel="stylesheet" href="{{ path_to_root }}.resources/css/content.css">
+            <link rel="stylesheet" href="{{ path_to_root }}.resources/css/custom.css">
+        {% endblock %}
+    {% endfilter %}
+    {% if math %}{% include "math.html.jinja2" %}{% endif %}
+    {% if mermaid %}{% include "mermaid.html.jinja2" %}{% endif %}
+</head>
+<body>
+<div class="package-version">
+    docs for <a href="{{- package_repo_url -}}">{{- package_name -}}</a> v{{- package_version }}<br>
+</div>
+{% block body %}
+    <nav class="pdoc">
+        <label id="navtoggle" for="togglestate" class="pdoc-button">
+            <img src="{{ path_to_root }}.resources/svg/navtoggle.svg" alt="Toggle navigation"> 
+        </label>
+        <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
+        <div>{% block nav %}{% endblock %}</div>
+    </nav>
+    {% block content %}{% endblock %}
+{% endblock body %}
+</body>
+</html>
+
+``````{ end_of_file="_resources/templates/html/frame.html.jinja2" }
+
+``````{ path="_resources/templates/html/index.html.jinja2"  }
+{# this template is used to render the top-level index.html. #}
+{% if root_module_name %}
+{#
+If there is one common parent module for all documented modules, redirect there immediately.
+This makes a package's `__init__.py` the main entrypoint by default.
+A custom template could override this by setting root_module_name to false before `{% extend ... %}`.
+#}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=./{{ root_module_name.replace(".","/") }}.html"/>
+</head>
+</html>
+{% else %}
+{% extends "frame.html.jinja2" %}
+{% block title %}Module List &ndash; pdoc {{ __version__ }}{% endblock %}
+{% block style %}
+    {{ super() | safe }}
+    <style>
+        header.pdoc {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header.pdoc img {
+            max-width: 200px;
+            max-height: 75px;
+            padding-right: 2rem;
+        }
+
+        header.pdoc input[type=search] {
+            outline-offset: 0;
+            font-size: 1.5rem;
+            min-width: 60%;
+            flex-grow: 1;
+            padding-left: .5rem;
+            margin: 1.75rem 0;
+        }
+    </style>
+{% endblock %}
+{% block nav %}
+    <h2>Available Modules</h2>
+    <ul>
+        {% for submodule in all_modules if "._" not in submodule and not submodule.startswith("_") %}
+            <li><a href="{{ submodule.replace(".","/") }}.html">{{ submodule }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block content %}
+    {% set path_to_root = "../" * (module.modulename.count(".")) %}
+    <header class="pdoc">
+        {% block logo %}
+            {% if logo %}
+                {% if logo_link %}<a href="{{ logo_link }}">{% endif %}
+                <img src="{{ logo }}" alt="project logo"/>
+                {% if logo_link %}</a>{% endif %}
+            {% else %}
+                <a href="https://pdoc.dev">
+                    <img src="{{ path_to_root }}.resources/svg/pdoc-logo.svg" alt="pdoc"/>
+                </a>
+            {% endif %}
+        {% endblock %}
+        {% if search %}
+            <input type="search" placeholder="Search API Documentation..." aria-label="search box">
+        {% endif %}
+    </header>
+    <main class="pdoc"></main>
+    {% if search %}
+        {% include "search.html.jinja2" %}
+    {% endif %}
+{% endblock %}
+{% endif %}
+
+``````{ end_of_file="_resources/templates/html/index.html.jinja2" }
+
+``````{ path="_resources/templates/html/module.html.jinja2"  }
+{% extends "frame.html.jinja2" %}
+{% set path_to_root = "../" * (module.modulename.count(".")) %}
+{% block title %}{{ module.modulename }} API documentation{% endblock %}
+{% block nav %}
+    {% block module_list_link %}
+        {% set parentmodule = ".".join(module.modulename.split(".")[:-1]) %}
+        {% if parentmodule and parentmodule in all_modules %}
+            <a class="pdoc-button module-list-button" href="../{{ parentmodule.split(".")[-1] }}.html">
+                <img src="{{ path_to_root }}.resources/svg/box-arrow-in-left.svg" alt="Back to parent module"/>
+                &nbsp;
+                {{- parentmodule -}}
+            </a>
+        {% elif not root_module_name %}
+            <a class="pdoc-button module-list-button" href="{{ "../" * module.modulename.count(".") }}index.html">
+                <img src="{{ path_to_root }}.resources/svg/box-arrow-in-left.svg" alt="Back to module index"/>
+                &nbsp;
+                Module Index
+            </a>
+        {% endif %}
+    {% endblock %}
+
+    {% block nav_title %}
+        {% if logo %}
+            {% if logo_link %}<a href="{{ logo_link }}">{% endif %}
+            <img src="{{ logo }}" class="logo" alt="project logo"/>
+            {% if logo_link %}</a>{% endif %}
+        {% endif %}
+    {% endblock %}
+
+    {% block search_box %}
+        {% if search and all_modules|length > 1 %}
+            {# we set a pattern here so that we can use the :valid CSS selector #}
+            <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
+                   pattern=".+" required>
+        {% endif %}
+    {% endblock %}
+
+    {% block nav_index %}
+        {% set index = module.docstring | to_markdown | to_html | attr("toc_html") %}
+        {% if index %}
+            <h2>Contents</h2>
+            {{ index | safe }}
+        {% endif %}
+    {% endblock %}
+
+    {% block nav_submodules %}
+        {% if module.submodules %}
+            <h2>Submodules</h2>
+            <ul>
+                {% for submodule in module.submodules if is_public(submodule) | trim %}
+                    <li>{{ submodule.taken_from | link(text=submodule.name) }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endblock %}
+
+    {% block nav_members %}
+        {% if module.members %}
+            <h2>API Documentation</h2>
+            {{ nav_members(module.members.values()) }}
+        {% endif %}
+    {% endblock %}
+
+    <hr/>
+    
+    <div>
+        <a href="{{ path_to_root }}coverage/html/index.html" class="pdoc-button" title="View test coverage report">
+            Coverage
+        </a>
+        <a href="{{ path_to_root }}other/todo-inline.html" class="pdoc-button" title="Table of TODOs scraped from source code, with links to create issues from them">
+            TODOs
+        </a>
+        <a href="{{ path_to_root }}other/lmcat.txt" class="pdoc-button" title="a view of the repo contents made for LLMs, using https://miv.name/lmcat">
+            lmcat
+        </a>
+    </div>
+
+    {% block nav_footer %}
+        {% if footer_text %}
+            <footer>{{ footer_text }}</footer>
+        {% endif %}
+    {% endblock %}
+
+    {% block attribution %}
+        <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev" target="_blank">
+            built with <span class="visually-hidden">pdoc</span>
+            <img src="{{ path_to_root }}.resources/svg/pdoc-logo.svg" alt="pdoc logo"/>
+        </a>
+    {% endblock %}
+{% endblock nav %}
+{% block content %}
+    <main class="pdoc">
+        {% block module_info %}
+            <section class="module-info">
+                {% block edit_button %}
+                    {% if edit_url %}
+                        <a class="pdoc-button git-button" href="{{ edit_url }}">View Source on GitHub</a>
+                    {% endif %}
+                {% endblock %}
+                {{ module_name() }}
+                {{ docstring(module) }}
+                {{ view_source_state(module) }}
+                {{ view_source_button(module) }}
+                <br/>
+                {{ view_source_code(module) }}
+                <br/>
+            </section>
+        {% endblock %}
+        {% block module_contents %}
+            {% for m in module.flattened_own_members if is_public(m) | trim %}
+                <section id="{{ m.qualname or m.name }}">
+                    {{ member(m) }}
+                    {% if m.kind == "class" %}
+                        {% for m in m.own_members if m.kind != "class" and is_public(m) | trim %}
+                            <div id="{{ m.qualname }}" class="classattr">
+                                {{ member(m) }}
+                            </div>
+                        {% endfor %}
+                        {% set inherited_members = inherited(m) | trim %}
+                        {% if inherited_members %}
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    {{ inherited_members }}
+                                </dl>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </section>
+            {% endfor %}
+        {% endblock %}
+    </main>
+    {% if mtime %}
+        {% include "livereload.html.jinja2" %}
+    {% endif %}
+    {% block search_js %}
+        {% if search and all_modules|length > 1 %}
+            {% include "search.html.jinja2" %}
+        {% endif %}
+    {% endblock %}
+{% endblock content %}
+{#
+End of content, beginning of helper macros.
+See https://pdoc.dev/docs/pdoc/render_helpers.html#DefaultMacroExtension for an explanation of defaultmacro.
+#}
+{% defaultmacro bases(cls) %}
+    {%- if cls.bases -%}
+        <wbr>(
+        {%- for base in cls.bases -%}
+            <span class="base">{{ base[:2] | link(text=base[2]) }}</span>
+            {%- if loop.nextitem %}, {% endif %}
+        {%- endfor -%}
+        )
+    {%- endif -%}
+{% enddefaultmacro %}
+{% defaultmacro default_value(var) -%}
+    {%- if var.default_value_str %}
+        =
+        {% if var.default_value_str | length > 100 -%}
+            <input id="{{ var.qualname }}-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="{{ var.qualname }}-view-value"></label>
+        {%- endif -%}
+        <span class="default_value">{{ var.default_value_str | escape | linkify }}</span>
+    {%- endif -%}
+{% enddefaultmacro %}
+{% defaultmacro annotation(var) %}
+    {%- if var.annotation_str -%}
+        <span class="annotation">{{ var.annotation_str | escape | linkify }}</span>
+    {%- endif -%}
+{% enddefaultmacro %}
+{% defaultmacro decorators(doc) %}
+    {% for d in doc.decorators if not d.startswith("@_") %}
+        <div class="decorator">{{ d }}</div>
+    {% endfor %}
+{% enddefaultmacro %}
+{% defaultmacro function(fn) -%}
+    {{ decorators(fn) }}
+    {% if fn.name == "__init__" %}
+        <span class="name">{{ ".".join(fn.qualname.split(".")[:-1]) }}</span>
+        {{- fn.signature_without_self | format_signature(colon=False) | linkify }}
+    {% else %}
+        <span class="def">{{ fn.funcdef }}</span>
+        <span class="name">{{ fn.name }}</span>
+        {{- fn.signature | format_signature(colon=True) | linkify }}
+    {% endif %}
+{% enddefaultmacro %}
+{% defaultmacro variable(var) -%}
+    {%- if var.is_type_alias_type %}<span class="def">type</span> {% endif -%}
+    <span class="name">{{ var.name }}</span>{{ annotation(var) }}{{ default_value(var) }}
+{% enddefaultmacro %}
+{% defaultmacro submodule(mod) -%}
+    <span class="name">{{ mod.taken_from | link }}</span>
+{% enddefaultmacro %}
+{% defaultmacro class(cls) -%}
+    {{ decorators(cls) }}
+    <span class="def">class</span>
+    <span class="name">{{ cls.qualname }}</span>
+    {{- bases(cls) -}}:
+{% enddefaultmacro %}
+{% defaultmacro member(doc) %}
+    {{- view_source_state(doc) -}}
+    <div class="attr {{ doc.kind }}">
+        {% if doc.kind == "class" %}
+            {{ class(doc) }}
+        {% elif doc.kind == "function" %}
+            {{ function(doc) }}
+        {% elif doc.kind == "module" %}
+            {{ submodule(doc) }}
+        {% else %}
+            {{ variable(doc) }}
+        {% endif %}
+        {{ view_source_button(doc) }}
+    </div>
+    <a class="headerlink" href="#{{ doc.qualname or doc.name }}"></a>
+    {{ view_source_code(doc) }}
+    {{ docstring(doc) }}
+{% enddefaultmacro %}
+{% defaultmacro docstring(var) %}
+    {% if var.docstring %}
+        <div class="docstring">{{ var.docstring | replace("@public", "") | to_markdown | to_html | linkify(namespace=var.qualname) }}</div>
+    {% endif %}
+{% enddefaultmacro %}
+{% defaultmacro nav_members(members) %}
+    <ul class="memberlist">
+        {% for m in members if is_public(m) | trim %}
+            <li>
+                {% if m.kind == "class" %}
+                    <a class="class" href="#{{ m.qualname }}">{{ m.qualname }}</a>
+                    {% if m.own_members %}
+                        {{ nav_members(m.own_members) | indent(12) }}
+                    {% endif %}
+                {% elif m.kind == "module" %}
+                    <a class="module" href="#{{ m.name }}">{{ m.name }}</a>
+                {% elif m.name == "__init__" %}
+                    <a class="function" href="#{{ m.qualname }}">{{ m.qualname.split(".")[-2] }}</a>
+                {% else %}
+                    <a class="{{ m.kind }}" href="#{{ m.qualname }}">{{ m.name }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% enddefaultmacro %}
+{% defaultmacro is_public(doc) %}
+    {#
+    This macro is a bit unconventional in that its output is not rendered, but treated as a boolean:
+    Returning no text is interpreted as false, returning any other text is iterpreted as true.
+    Implementing this as a macro makes it very easy to override with a custom template, see
+    https://github.com/mitmproxy/pdoc/tree/main/examples/custom-template.
+    #}
+    {% if "@private" in doc.docstring %}
+        {# hide members explicitly marked as @private #}
+    {% elif "@public" in doc.docstring %}
+        {# show members explicitly marked as @public #}
+        true
+    {% elif not include_undocumented and not doc.docstring and doc.kind != "module" %}
+        {# hide members that are undocumented if include_undocumented has been toggled off. #}
+    {% elif doc.name == "__init__" and (doc.docstring or (doc.kind == "function" and doc.signature_without_self.parameters)) %}
+        {# show constructors that have a docstring or at least one extra argument #}
+        true
+    {% elif doc.name == "__doc__" %}
+        {# We don't want to document __doc__ itself, https://github.com/mitmproxy/pdoc/issues/235 #}
+    {% elif doc.kind == "variable" and doc.is_typevar and not doc.docstring %}
+        {# do not document TypeVars, that only clutters the docs. #}
+    {% elif doc.kind == "module" and doc.fullname not in all_modules %}
+        {# Skip modules that were manually excluded, https://github.com/mitmproxy/pdoc/issues/334 #}
+    {% elif (doc.qualname or doc.name) is in(module.obj.__all__ or []) %}
+        {# members starting with an underscore are still public if mentioned in __all__ #}
+        true
+    {% elif not doc.name.startswith("_") %}
+        {# members not starting with an underscore are considered public by default #}
+        true
+    {% endif %}
+{% enddefaultmacro %}
+{# fmt: off #}
+{% defaultmacro inherited(cls) %}
+    {% for base, members in cls.inherited_members.items() %}
+        {% set m = None %}{# workaround for https://github.com/pallets/jinja/issues/1427 #}
+        {% set member_html %}
+            {% for m in members if is_public(m) | trim %}
+                <dd id="{{ m.qualname }}" class="{{ m.kind }}">
+                    {{- m.taken_from | link(text=m.name.replace("__init__",base[1])) -}}
+                </dd>
+            {% endfor %}
+        {% endset %}
+        {# we may not have any public members, in which case we don't want to print anything. #}
+        {% if member_html %}
+            <div><dt>{{ base | link }}</dt>
+                {{ member_html }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% enddefaultmacro %}
+{# fmt: on #}
+{% defaultmacro view_source_state(doc) %}
+    {% if show_source and doc.source %}
+        <input id="{{ doc.qualname or "mod-" + doc.name }}-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+    {% endif %}
+{% enddefaultmacro %}
+{% defaultmacro view_source_button(doc) %}
+    {% if show_source and doc.source %}
+        {% set github_line_url = edit_url.replace(module.source_file|string, doc.source_file|string) %}
+        {% set github_line_url = github_line_url + "#L" + doc.source_lines[0]|string + "-L" + doc.source_lines[1]|string %}
+        <div class="source-button-container">
+            <label class="pdoc-button view-source-button" for="{{ doc.qualname or "mod-" + doc.name }}-view-source"><span>View Source</span></label>
+            <div class="github-button-wrapper">
+                <a class="pdoc-button github-link-button" href="{{ github_line_url }}" target="_blank">
+                    <span>View on GitHub</span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+{% enddefaultmacro %}
+{% defaultmacro view_source_code(doc) %}
+    {% if show_source and doc.source %}
+        {{ doc | highlight }}
+    {% endif %}
+{% enddefaultmacro %}
+{% defaultmacro module_name() %}
+    <h1 class="modulename">
+        {% set parts = module.modulename.split(".") %}
+        {% for part in parts %}
+            {%- set fullname = ".".join(parts[:loop.index]) -%}
+            {%- if fullname in all_modules and fullname != module.modulename -%}
+                <a href="./{{ "../" * loop.revindex0 }}{{ part }}.html">{{ part }}</a>
+            {%- else -%}
+                {{ part }}
+            {%- endif -%}
+            {%- if loop.nextitem -%}
+                <wbr>.
+            {%- endif -%}
+        {% endfor %}
+    </h1>
+{% enddefaultmacro %}
+
+``````{ end_of_file="_resources/templates/html/module.html.jinja2" }
+
+``````{ path="_resources/templates/markdown/error.html.jinja2"  }
+{# this template is used by pdoc's integrated web server to display runtime errors. #}
+{% extends "frame.html.jinja2" %}
+{% block title %}{{ error }}{% endblock %}
+{% block body %}
+# {{ error }}
+```
+{{ details }}
+```
+{% endblock %}
+
+``````{ end_of_file="_resources/templates/markdown/error.html.jinja2" }
+
+``````{ path="_resources/templates/markdown/frame.html.jinja2"  }
+> docs for [`{{- package_name -}}`]({{- package_repo_url -}}) v{{- package_version}}
+
+{% block head %}{% endblock %}
+{% block body %}
+{% block nav %}{% endblock %}
+{% block content %}{% endblock %}
+{% endblock body %}
+
+``````{ end_of_file="_resources/templates/markdown/frame.html.jinja2" }
+
+``````{ path="_resources/templates/markdown/index.html.jinja2"  }
+{# this template is used to render the top-level index.html. #}
+{% if root_module_name %}
+{#
+If there is one common parent module for all documented modules, redirect there immediately.
+This makes a package's `__init__.py` the main entrypoint by default.
+A custom template could override this by setting root_module_name to false before `{% extend ... %}`.
+#}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=./{{ root_module_name.replace(".","/") }}.html"/>
+</head>
+</html>
+{% else %}
+{% extends "frame.html.jinja2" %}
+{% block title %}Module List &ndash; pdoc {{ __version__ }}{% endblock %}
+{% block style %}
+    {{ super() | safe }}
+    <style>
+        header.pdoc {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header.pdoc img {
+            max-width: 200px;
+            max-height: 75px;
+            padding-right: 2rem;
+        }
+
+        header.pdoc input[type=search] {
+            outline-offset: 0;
+            font-size: 1.5rem;
+            min-width: 60%;
+            flex-grow: 1;
+            padding-left: .5rem;
+            margin: 1.75rem 0;
+        }
+    </style>
+{% endblock %}
+{% block nav %}
+    <h2>Available Modules</h2>
+    <ul>
+        {% for submodule in all_modules if "._" not in submodule and not submodule.startswith("_") %}
+            <li><a href="{{ submodule.replace(".","/") }}.html">{{ submodule }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block content %}
+    <header class="pdoc">
+        {% block logo %}
+            {% if logo %}
+                {% if logo_link %}<a href="{{ logo_link }}">{% endif %}
+                <img src="{{ logo }}" alt="project logo"/>
+                {% if logo_link %}</a>{% endif %}
+            {% else %}
+                <a href="https://pdoc.dev">
+                    <img src="{% include ".resources/svg/pdoc-logo.svg" %}" alt="pdoc"/>
+                </a>
+            {% endif %}
+        {% endblock %}
+        {% if search %}
+            <input type="search" placeholder="Search API Documentation..." aria-label="search box">
+        {% endif %}
+    </header>
+    <main class="pdoc"></main>
+    {% if search %}
+        {% include "search.html.jinja2" %}
+    {% endif %}
+{% endblock %}
+{% endif %}
+
+``````{ end_of_file="_resources/templates/markdown/index.html.jinja2" }
+
+``````{ path="_resources/templates/markdown/module.html.jinja2"  }
+{% extends "frame.html.jinja2" %}
+{% block title %}{{ module.modulename }} API documentation{% endblock %}
+{% block nav %}
+
+{% block nav_index %}
+{% set index = module.docstring | to_markdown %}
+{% if index %}
+## Contents
+{{ index | safe }}
+{% endif %}
+{% endblock %}
+
+{% block nav_submodules %}
+{% if module.submodules %}
+## Submodules
+
+{% for submodule in module.submodules if is_public(submodule) | trim %}
+- [`{{ submodule.name }}`](#{{ submodule.name }})
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block nav_members %}
+{% if module.members %}
+## API Documentation
+
+{{ nav_members(module.members.values()) }}
+{% endif %}
+{% endblock %}
+
+{% endblock nav %}
+{% block content %}
+
+{% block module_info %}
+
+{% block edit_button %}
+{% if edit_url %}
+[View Source on GitHub]({{ edit_url }})
+{% endif %}
+{% endblock %}
+
+{{ module_name() }}
+{{ docstring(module) }}
+{{ view_source_button(module) }}
+{% endblock %}
+
+{% block module_contents %}
+{% for m in module.flattened_own_members if is_public(m) | trim %}
+{{ member(m) }}
+{% if m.kind == "class" %}
+{% for m in m.own_members if m.kind != "class" and is_public(m) | trim %}
+{{ member(m) }}
+{% endfor %}
+{% set inherited_members = inherited(m) %}
+{% if inherited_members %}
+### Inherited Members                                
+
+{{ inherited_members }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% endblock content %}
+
+
+
+{#
+End of content, beginning of helper macros.
+See https://pdoc.dev/docs/pdoc/render_helpers.html#DefaultMacroExtension for an explanation of defaultmacro.
+#}
+{% defaultmacro bases(cls) %}
+{%- if cls.bases -%}
+({%- for base in cls.bases -%}{{base[2]}}{%- if loop.nextitem %}, {% endif %}{%- endfor -%})
+{%- endif -%}
+{% enddefaultmacro %}
+
+{% defaultmacro default_value(var) -%}
+{%- if var.default_value_str %}
+= {{ var.default_value_str | markup_safe }}
+{%- endif -%}
+{% enddefaultmacro %}
+
+{% defaultmacro annotation(var) %}
+{%- if var.annotation_str -%}
+{{ var.annotation_str | markup_safe }}
+{%- endif -%}
+{% enddefaultmacro %}
+
+
+{% defaultmacro function(fn) -%}
+{% if fn.name == "__init__" %}
+## `{{ ".".join(fn.qualname.split(".")[:-1]) }}` { #{{ fn.qualname }} }
+```python
+{{ fn.signature_without_self | markup_safe }}
+```
+{% else %}
+## `{{ fn.funcdef }} {{ fn.name }}` { #{{ fn.qualname }} }
+```python
+{{ fn.signature | markup_safe }}
+```
+
+{% endif %}
+{% enddefaultmacro %}
+
+{% defaultmacro variable(var) -%}
+- {% if var.is_type_alias_type %}type {% endif %}`{{ var.name }}{{ annotation(var) | markup_safe }} {{ default_value(var) | markup_safe }}`
+{% enddefaultmacro %}
+
+{% defaultmacro submodule(mod) -%}
+{{ mod.taken_from | link }}
+{% enddefaultmacro %}
+
+{% defaultmacro class(cls) -%}
+## `class {{ cls.qualname }}{{- bases(cls) -}}:` { #{{ cls.qualname }} }
+{% enddefaultmacro %}
+
+{% defaultmacro member(doc) %}
+{% if doc.kind == "class" %}
+#{{- class(doc) }}
+{% elif doc.kind == "function" %}
+#{{- function(doc) }}
+{% elif doc.kind == "module" %}
+{{ submodule(doc) }}
+{% else %}
+{{ variable(doc) }}
+{% endif %}
+{{ view_source_button(doc) }}
+{{ docstring(doc) }}
+{% enddefaultmacro %}
+
+{% defaultmacro docstring(var) %}
+{% if var.docstring %}
+{{ var.docstring | replace("@public", "") | to_markdown | increment_markdown_headings | linkify(namespace=var.qualname) }}
+{% endif %}
+{% enddefaultmacro %}
+
+{% defaultmacro nav_members(members) %}
+{% for m in members if is_public(m) | trim %}
+ - [`{{m.qualname}}`](#{{ m.qualname }})
+{% endfor %}
+{% enddefaultmacro %}
+
+{% defaultmacro is_public(doc) %}
+    {#
+    This macro is a bit unconventional in that its output is not rendered, but treated as a boolean:
+    Returning no text is interpreted as false, returning any other text is iterpreted as true.
+    Implementing this as a macro makes it very easy to override with a custom template, see
+    https://github.com/mitmproxy/pdoc/tree/main/examples/custom-template.
+    #}
+    {% if "@private" in doc.docstring %}
+        {# hide members explicitly marked as @private #}
+    {% elif "@public" in doc.docstring %}
+        {# show members explicitly marked as @public #}
+        true
+    {% elif not include_undocumented and not doc.docstring and doc.kind != "module" %}
+        {# hide members that are undocumented if include_undocumented has been toggled off. #}
+    {% elif doc.name == "__init__" and (doc.docstring or (doc.kind == "function" and doc.signature_without_self.parameters)) %}
+        {# show constructors that have a docstring or at least one extra argument #}
+        true
+    {% elif doc.name == "__doc__" %}
+        {# We don't want to document __doc__ itself, https://github.com/mitmproxy/pdoc/issues/235 #}
+    {% elif doc.kind == "variable" and doc.is_typevar and not doc.docstring %}
+        {# do not document TypeVars, that only clutters the docs. #}
+    {% elif doc.kind == "module" and doc.fullname not in all_modules %}
+        {# Skip modules that were manually excluded, https://github.com/mitmproxy/pdoc/issues/334 #}
+    {% elif (doc.qualname or doc.name) is in(module.obj.__all__ or []) %}
+        {# members starting with an underscore are still public if mentioned in __all__ #}
+        true
+    {% elif not doc.name.startswith("_") %}
+        {# members not starting with an underscore are considered public by default #}
+        true
+    {% endif %}
+{% enddefaultmacro %}
+
+{# fmt: off #}
+{% defaultmacro inherited(cls) %}
+{% for base, members in cls.inherited_members.items() %}
+{% set m = None %}{# workaround for https://github.com/pallets/jinja/issues/1427 #}
+{% set member_html %}
+{% for m in members if is_public(m) | trim %}
+- [`{{m.name.replace("__init__",base[1]) | markup_safe }}`](#{{ m.qualname }})
+{% endfor %}
+{% endset %}
+{# we may not have any public members, in which case we don't want to print anything. #}
+{% if member_html %}
+{{ member_html }}
+{% endif %}
+{% endfor %}
+{% enddefaultmacro %}
+
+
+{% defaultmacro view_source_button(doc) %}
+{% if show_source and doc.source %}
+{% set github_line_url = edit_url.replace(module.source_file|string, doc.source_file|string) %}
+{% set github_line_url = github_line_url + "#L" + doc.source_lines[0]|string + "-L" + doc.source_lines[1]|string %}
+[View Source on GitHub]({{ github_line_url }})
+
+{# ```python
+{{ doc.source}}
+``` #}
+{# <details>
+<summary>View Source</summary>
+<pre><code>{{ doc.source | escape }}</code></pre>
+</details> #}
+{% endif %}
+{% enddefaultmacro %}
+
+{% defaultmacro module_name() %}
+# `{{ module.modulename }}` { #{{ module.modulename }} }
+{% enddefaultmacro %}
+
+``````{ end_of_file="_resources/templates/markdown/module.html.jinja2" }
+
+``````{ path="_resources/templates/todo-template.html"  }
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List Viewer</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f9fa;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background: #e9ecef;
+        }
+
+        th.sorted::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+        }
+
+        th.sorted.asc::after {
+            border-bottom: 6px solid #666;
+        }
+
+        th.sorted.desc::after {
+            border-top: 6px solid #666;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .code-context {
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-size: 14px;
+            display: none;
+        }
+
+        .code-context.expanded {
+            display: block;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #666;
+            transition: transform 0.2s;
+        }
+
+        .content-cell {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .chevron {
+            width: 8px;
+            height: 8px;
+            border: solid #666;
+            border-width: 0 2px 2px 0;
+            padding: 2px;
+            transform: rotate(45deg);
+            /* point down */
+            transition: transform 0.2s;
+            margin-top: 6px;
+        }
+
+        .expanded .chevron {
+            transform: rotate(225deg);
+            /* point up */
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .control-button:hover {
+            background: #f8f9fa;
+        }
+
+        .highlight-line {
+            background: #fff3cd;
+        }
+
+        .file-path {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e9ecef;
+        }
+
+        .github-link {
+            color: #0366d6;
+            text-decoration: none;
+        }
+
+        .github-link:hover {
+            text-decoration: underline;
+        }
+
+        th .resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search..." style="flex: 1">
+        <select id="tagFilter">
+            <option value="">All tags</option>
+        </select>
+        <select id="langFilter">
+            <option value="">All languages</option>
+        </select>
+        <div class="controls-group">
+            <button class="control-button" onclick="toggleAll(true)">Expand All</button>
+            <button class="control-button" onclick="toggleAll(false)">Collapse All</button>
+        </div>
+    </div>
+    <table id="todoTable">
+        <thead>
+            <tr>
+                <th data-sort="tag">Tag</th>
+                <th data-sort="file">File</th>
+                <th data-sort="content">Content</th>
+                <th data-sort="file_lang">Language</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        function toggleAll(expand) {
+            const buttons = document.querySelectorAll('.expand-btn');
+            const contexts = document.querySelectorAll('.code-context');
+            buttons.forEach(btn => {
+                if (expand) {
+                    btn.classList.add('expanded');
+                } else {
+                    btn.classList.remove('expanded');
+                }
+            });
+            contexts.forEach(ctx => {
+                if (expand) {
+                    ctx.classList.add('expanded');
+                } else {
+                    ctx.classList.remove('expanded');
+                }
+            });
+        }
+
+        function toggleCode(button) {
+            button.classList.toggle('expanded');
+            const codeContext = button.parentElement.querySelector('.code-context');
+            codeContext.classList.toggle('expanded');
+        }
+
+        let todos = [];
+        let currentSort = { column: null, direction: 'asc' };
+
+        function formatContext(context) {
+            const lines = context.split('\\n');
+            return lines.map((line, i) => {
+                const isHighlight = line.includes('TODO:');
+                return `<div class="${isHighlight ? 'highlight-line' : ''}">${line}</div>`;
+            }).join('\\n');
+        }
+
+
+        function updateSortIndicators() {
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sorted', 'asc', 'desc');
+                if (th.dataset.sort === currentSort.column) {
+                    th.classList.add('sorted', currentSort.direction);
+                }
+            });
+        }
+
+        function renderTable() {
+            updateSortIndicators();
+            const tbody = document.querySelector('tbody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const tagFilter = document.getElementById('tagFilter').value;
+            const langFilter = document.getElementById('langFilter').value;
+
+            let filteredTodos = todos.filter(todo => {
+                const matchesSearch = todo.content.toLowerCase().includes(searchTerm) ||
+                    todo.file.toLowerCase().includes(searchTerm);
+                const matchesTag = !tagFilter || todo.tag === tagFilter;
+                const matchesLang = !langFilter || todo.file_lang === langFilter;
+                return matchesSearch && matchesTag && matchesLang;
+            });
+
+            if (currentSort.column) {
+                filteredTodos.sort((a, b) => {
+                    const aVal = a[currentSort.column];
+                    const bVal = b[currentSort.column];
+                    const modifier = currentSort.direction === 'asc' ? 1 : -1;
+                    return aVal > bVal ? modifier : -modifier;
+                });
+            }
+
+            tbody.innerHTML = filteredTodos.map(todo => `
+                <tr>
+                    <td><span class="tag">${todo.tag}</span></td>
+                    <td>
+                        <div class="file-path">
+                            <a href="${todo.code_url}" target="_blank" class="github-link">${todo.file}:${todo.line_num}</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="content-cell">
+                            <button class="expand-btn" onclick="toggleCode(this)">
+                                <div class="chevron"></div>
+                            </button>
+                            <div>
+                                <div><strong>${todo.stripped_title || todo.content}</strong></div>
+                                <div class="code-context">${formatContext(todo.context)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${todo.file_lang}</td>
+                    <td>
+                        <a href="${todo.issue_url}" target="_blank" class="github-link">Create Issue</a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateFilters() {
+            const tagSet = new Set(todos.map(t => t.tag));
+            const langSet = new Set(todos.map(t => t.file_lang));
+
+            const tagFilter = document.getElementById('tagFilter');
+            const langFilter = document.getElementById('langFilter');
+
+            tagFilter.innerHTML = '<option value="">All tags</option>' +
+                Array.from(tagSet).map(tag => `<option value="${tag}">${tag}</option>`).join('');
+
+            langFilter.innerHTML = '<option value="">All languages</option>' +
+                Array.from(langSet).map(lang => `<option value="${lang}">${lang}</option>`).join('');
+        }
+
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.getElementById('tagFilter').addEventListener('change', renderTable);
+        document.getElementById('langFilter').addEventListener('change', renderTable);
+
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const column = th.dataset.sort;
+                if (currentSort.column === column) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort = { column, direction: 'asc' };
+                }
+                renderTable();
+            });
+        });
+        function initResizableColumns() {
+            const table = document.getElementById('todoTable');
+            const thElements = table.querySelectorAll('th');
+            thElements.forEach((th) => {
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                th.appendChild(resizer);
+
+                resizer.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const startX = e.pageX;
+                    const startWidth = th.offsetWidth;
+
+                    function onMouseMove(e) {
+                        // Enforce a minimum width of 40px
+                        const newWidth = Math.max(startWidth + (e.pageX - startX), 40);
+                        th.style.width = newWidth + 'px';
+                    }
+
+                    function onMouseUp() {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+            });
+        }
+
+
+
+        // Initialize with data
+        todos = //{{DATA}}//;
+            updateFilters();
+        renderTable();
+        initResizableColumns();
+    </script>
+</body>
+
+</html>
+``````{ end_of_file="_resources/templates/todo-template.html" }
+
+``````{ path="_resources/elasticlunr.min.js"  }
+/** elasticlunr - http://weixsong.github.io * Copyright (C) 2017 Oliver Nightingale * Copyright (C) 2017 Wei Song * MIT Licensed */!function(){function e(e){if(null===e||"object"!=typeof e)return e;var t=e.constructor();for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t}var t=function(e){var n=new t.Index;return n.pipeline.add(t.trimmer,t.stopWordFilter,t.stemmer),e&&e.call(n,n),n};t.version="0.9.5",lunr=t,t.utils={},t.utils.warn=function(e){return function(t){e.console&&console.warn&&console.warn(t)}}(this),t.utils.toString=function(e){return void 0===e||null===e?"":e.toString()},t.EventEmitter=function(){this.events={}},t.EventEmitter.prototype.addListener=function(){var e=Array.prototype.slice.call(arguments),t=e.pop(),n=e;if("function"!=typeof t)throw new TypeError("last argument must be a function");n.forEach(function(e){this.hasHandler(e)||(this.events[e]=[]),this.events[e].push(t)},this)},t.EventEmitter.prototype.removeListener=function(e,t){if(this.hasHandler(e)){var n=this.events[e].indexOf(t);-1!==n&&(this.events[e].splice(n,1),0==this.events[e].length&&delete this.events[e])}},t.EventEmitter.prototype.emit=function(e){if(this.hasHandler(e)){var t=Array.prototype.slice.call(arguments,1);this.events[e].forEach(function(e){e.apply(void 0,t)},this)}},t.EventEmitter.prototype.hasHandler=function(e){return e in this.events},t.tokenizer=function(e){if(!arguments.length||null===e||void 0===e)return[];if(Array.isArray(e)){var n=e.filter(function(e){return null===e||void 0===e?!1:!0});n=n.map(function(e){return t.utils.toString(e).toLowerCase()});var i=[];return n.forEach(function(e){var n=e.split(t.tokenizer.seperator);i=i.concat(n)},this),i}return e.toString().trim().toLowerCase().split(t.tokenizer.seperator)},t.tokenizer.defaultSeperator=/[\s\-]+/,t.tokenizer.seperator=t.tokenizer.defaultSeperator,t.tokenizer.setSeperator=function(e){null!==e&&void 0!==e&&"object"==typeof e&&(t.tokenizer.seperator=e)},t.tokenizer.resetSeperator=function(){t.tokenizer.seperator=t.tokenizer.defaultSeperator},t.tokenizer.getSeperator=function(){return t.tokenizer.seperator},t.Pipeline=function(){this._queue=[]},t.Pipeline.registeredFunctions={},t.Pipeline.registerFunction=function(e,n){n in t.Pipeline.registeredFunctions&&t.utils.warn("Overwriting existing registered function: "+n),e.label=n,t.Pipeline.registeredFunctions[n]=e},t.Pipeline.getRegisteredFunction=function(e){return e in t.Pipeline.registeredFunctions!=!0?null:t.Pipeline.registeredFunctions[e]},t.Pipeline.warnIfFunctionNotRegistered=function(e){var n=e.label&&e.label in this.registeredFunctions;n||t.utils.warn("Function is not registered with pipeline. This may cause problems when serialising the index.\n",e)},t.Pipeline.load=function(e){var n=new t.Pipeline;return e.forEach(function(e){var i=t.Pipeline.getRegisteredFunction(e);if(!i)throw new Error("Cannot load un-registered function: "+e);n.add(i)}),n},t.Pipeline.prototype.add=function(){var e=Array.prototype.slice.call(arguments);e.forEach(function(e){t.Pipeline.warnIfFunctionNotRegistered(e),this._queue.push(e)},this)},t.Pipeline.prototype.after=function(e,n){t.Pipeline.warnIfFunctionNotRegistered(n);var i=this._queue.indexOf(e);if(-1===i)throw new Error("Cannot find existingFn");this._queue.splice(i+1,0,n)},t.Pipeline.prototype.before=function(e,n){t.Pipeline.warnIfFunctionNotRegistered(n);var i=this._queue.indexOf(e);if(-1===i)throw new Error("Cannot find existingFn");this._queue.splice(i,0,n)},t.Pipeline.prototype.remove=function(e){var t=this._queue.indexOf(e);-1!==t&&this._queue.splice(t,1)},t.Pipeline.prototype.run=function(e){for(var t=[],n=e.length,i=this._queue.length,o=0;n>o;o++){for(var r=e[o],s=0;i>s&&(r=this._queue[s](r,o,e),void 0!==r&&null!==r);s++);void 0!==r&&null!==r&&t.push(r)}return t},t.Pipeline.prototype.reset=function(){this._queue=[]},t.Pipeline.prototype.get=function(){return this._queue},t.Pipeline.prototype.toJSON=function(){return this._queue.map(function(e){return t.Pipeline.warnIfFunctionNotRegistered(e),e.label})},t.Index=function(){this._fields=[],this._ref="id",this.pipeline=new t.Pipeline,this.documentStore=new t.DocumentStore,this.index={},this.eventEmitter=new t.EventEmitter,this._idfCache={},this.on("add","remove","update",function(){this._idfCache={}}.bind(this))},t.Index.prototype.on=function(){var e=Array.prototype.slice.call(arguments);return this.eventEmitter.addListener.apply(this.eventEmitter,e)},t.Index.prototype.off=function(e,t){return this.eventEmitter.removeListener(e,t)},t.Index.load=function(e){e.version!==t.version&&t.utils.warn("version mismatch: current "+t.version+" importing "+e.version);var n=new this;n._fields=e.fields,n._ref=e.ref,n.documentStore=t.DocumentStore.load(e.documentStore),n.pipeline=t.Pipeline.load(e.pipeline),n.index={};for(var i in e.index)n.index[i]=t.InvertedIndex.load(e.index[i]);return n},t.Index.prototype.addField=function(e){return this._fields.push(e),this.index[e]=new t.InvertedIndex,this},t.Index.prototype.setRef=function(e){return this._ref=e,this},t.Index.prototype.saveDocument=function(e){return this.documentStore=new t.DocumentStore(e),this},t.Index.prototype.addDoc=function(e,n){if(e){var n=void 0===n?!0:n,i=e[this._ref];this.documentStore.addDoc(i,e),this._fields.forEach(function(n){var o=this.pipeline.run(t.tokenizer(e[n]));this.documentStore.addFieldLength(i,n,o.length);var r={};o.forEach(function(e){e in r?r[e]+=1:r[e]=1},this);for(var s in r){var u=r[s];u=Math.sqrt(u),this.index[n].addToken(s,{ref:i,tf:u})}},this),n&&this.eventEmitter.emit("add",e,this)}},t.Index.prototype.removeDocByRef=function(e){if(e&&this.documentStore.isDocStored()!==!1&&this.documentStore.hasDoc(e)){var t=this.documentStore.getDoc(e);this.removeDoc(t,!1)}},t.Index.prototype.removeDoc=function(e,n){if(e){var n=void 0===n?!0:n,i=e[this._ref];this.documentStore.hasDoc(i)&&(this.documentStore.removeDoc(i),this._fields.forEach(function(n){var o=this.pipeline.run(t.tokenizer(e[n]));o.forEach(function(e){this.index[n].removeToken(e,i)},this)},this),n&&this.eventEmitter.emit("remove",e,this))}},t.Index.prototype.updateDoc=function(e,t){var t=void 0===t?!0:t;this.removeDocByRef(e[this._ref],!1),this.addDoc(e,!1),t&&this.eventEmitter.emit("update",e,this)},t.Index.prototype.idf=function(e,t){var n="@"+t+"/"+e;if(Object.prototype.hasOwnProperty.call(this._idfCache,n))return this._idfCache[n];var i=this.index[t].getDocFreq(e),o=1+Math.log(this.documentStore.length/(i+1));return this._idfCache[n]=o,o},t.Index.prototype.getFields=function(){return this._fields.slice()},t.Index.prototype.search=function(e,n){if(!e)return[];e="string"==typeof e?{any:e}:JSON.parse(JSON.stringify(e));var i=null;null!=n&&(i=JSON.stringify(n));for(var o=new t.Configuration(i,this.getFields()).get(),r={},s=Object.keys(e),u=0;u<s.length;u++){var a=s[u];r[a]=this.pipeline.run(t.tokenizer(e[a]))}var l={};for(var c in o){var d=r[c]||r.any;if(d){var f=this.fieldSearch(d,c,o),h=o[c].boost;for(var p in f)f[p]=f[p]*h;for(var p in f)p in l?l[p]+=f[p]:l[p]=f[p]}}var v,g=[];for(var p in l)v={ref:p,score:l[p]},this.documentStore.hasDoc(p)&&(v.doc=this.documentStore.getDoc(p)),g.push(v);return g.sort(function(e,t){return t.score-e.score}),g},t.Index.prototype.fieldSearch=function(e,t,n){var i=n[t].bool,o=n[t].expand,r=n[t].boost,s=null,u={};return 0!==r?(e.forEach(function(e){var n=[e];1==o&&(n=this.index[t].expandToken(e));var r={};n.forEach(function(n){var o=this.index[t].getDocs(n),a=this.idf(n,t);if(s&&"AND"==i){var l={};for(var c in s)c in o&&(l[c]=o[c]);o=l}n==e&&this.fieldSearchStats(u,n,o);for(var c in o){var d=this.index[t].getTermFrequency(n,c),f=this.documentStore.getFieldLength(c,t),h=1;0!=f&&(h=1/Math.sqrt(f));var p=1;n!=e&&(p=.15*(1-(n.length-e.length)/n.length));var v=d*a*h*p;c in r?r[c]+=v:r[c]=v}},this),s=this.mergeScores(s,r,i)},this),s=this.coordNorm(s,u,e.length)):void 0},t.Index.prototype.mergeScores=function(e,t,n){if(!e)return t;if("AND"==n){var i={};for(var o in t)o in e&&(i[o]=e[o]+t[o]);return i}for(var o in t)o in e?e[o]+=t[o]:e[o]=t[o];return e},t.Index.prototype.fieldSearchStats=function(e,t,n){for(var i in n)i in e?e[i].push(t):e[i]=[t]},t.Index.prototype.coordNorm=function(e,t,n){for(var i in e)if(i in t){var o=t[i].length;e[i]=e[i]*o/n}return e},t.Index.prototype.toJSON=function(){var e={};return this._fields.forEach(function(t){e[t]=this.index[t].toJSON()},this),{version:t.version,fields:this._fields,ref:this._ref,documentStore:this.documentStore.toJSON(),index:e,pipeline:this.pipeline.toJSON()}},t.Index.prototype.use=function(e){var t=Array.prototype.slice.call(arguments,1);t.unshift(this),e.apply(this,t)},t.DocumentStore=function(e){this._save=null===e||void 0===e?!0:e,this.docs={},this.docInfo={},this.length=0},t.DocumentStore.load=function(e){var t=new this;return t.length=e.length,t.docs=e.docs,t.docInfo=e.docInfo,t._save=e.save,t},t.DocumentStore.prototype.isDocStored=function(){return this._save},t.DocumentStore.prototype.addDoc=function(t,n){this.hasDoc(t)||this.length++,this.docs[t]=this._save===!0?e(n):null},t.DocumentStore.prototype.getDoc=function(e){return this.hasDoc(e)===!1?null:this.docs[e]},t.DocumentStore.prototype.hasDoc=function(e){return e in this.docs},t.DocumentStore.prototype.removeDoc=function(e){this.hasDoc(e)&&(delete this.docs[e],delete this.docInfo[e],this.length--)},t.DocumentStore.prototype.addFieldLength=function(e,t,n){null!==e&&void 0!==e&&0!=this.hasDoc(e)&&(this.docInfo[e]||(this.docInfo[e]={}),this.docInfo[e][t]=n)},t.DocumentStore.prototype.updateFieldLength=function(e,t,n){null!==e&&void 0!==e&&0!=this.hasDoc(e)&&this.addFieldLength(e,t,n)},t.DocumentStore.prototype.getFieldLength=function(e,t){return null===e||void 0===e?0:e in this.docs&&t in this.docInfo[e]?this.docInfo[e][t]:0},t.DocumentStore.prototype.toJSON=function(){return{docs:this.docs,docInfo:this.docInfo,length:this.length,save:this._save}},t.stemmer=function(){var e={ational:"ate",tional:"tion",enci:"ence",anci:"ance",izer:"ize",bli:"ble",alli:"al",entli:"ent",eli:"e",ousli:"ous",ization:"ize",ation:"ate",ator:"ate",alism:"al",iveness:"ive",fulness:"ful",ousness:"ous",aliti:"al",iviti:"ive",biliti:"ble",logi:"log"},t={icate:"ic",ative:"",alize:"al",iciti:"ic",ical:"ic",ful:"",ness:""},n="[^aeiou]",i="[aeiouy]",o=n+"[^aeiouy]*",r=i+"[aeiou]*",s="^("+o+")?"+r+o,u="^("+o+")?"+r+o+"("+r+")?$",a="^("+o+")?"+r+o+r+o,l="^("+o+")?"+i,c=new RegExp(s),d=new RegExp(a),f=new RegExp(u),h=new RegExp(l),p=/^(.+?)(ss|i)es$/,v=/^(.+?)([^s])s$/,g=/^(.+?)eed$/,m=/^(.+?)(ed|ing)$/,y=/.$/,S=/(at|bl|iz)$/,x=new RegExp("([^aeiouylsz])\\1$"),w=new RegExp("^"+o+i+"[^aeiouwxy]$"),I=/^(.+?[^aeiou])y$/,b=/^(.+?)(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti|logi)$/,E=/^(.+?)(icate|ative|alize|iciti|ical|ful|ness)$/,D=/^(.+?)(al|ance|ence|er|ic|able|ible|ant|ement|ment|ent|ou|ism|ate|iti|ous|ive|ize)$/,F=/^(.+?)(s|t)(ion)$/,_=/^(.+?)e$/,P=/ll$/,k=new RegExp("^"+o+i+"[^aeiouwxy]$"),z=function(n){var i,o,r,s,u,a,l;if(n.length<3)return n;if(r=n.substr(0,1),"y"==r&&(n=r.toUpperCase()+n.substr(1)),s=p,u=v,s.test(n)?n=n.replace(s,"$1$2"):u.test(n)&&(n=n.replace(u,"$1$2")),s=g,u=m,s.test(n)){var z=s.exec(n);s=c,s.test(z[1])&&(s=y,n=n.replace(s,""))}else if(u.test(n)){var z=u.exec(n);i=z[1],u=h,u.test(i)&&(n=i,u=S,a=x,l=w,u.test(n)?n+="e":a.test(n)?(s=y,n=n.replace(s,"")):l.test(n)&&(n+="e"))}if(s=I,s.test(n)){var z=s.exec(n);i=z[1],n=i+"i"}if(s=b,s.test(n)){var z=s.exec(n);i=z[1],o=z[2],s=c,s.test(i)&&(n=i+e[o])}if(s=E,s.test(n)){var z=s.exec(n);i=z[1],o=z[2],s=c,s.test(i)&&(n=i+t[o])}if(s=D,u=F,s.test(n)){var z=s.exec(n);i=z[1],s=d,s.test(i)&&(n=i)}else if(u.test(n)){var z=u.exec(n);i=z[1]+z[2],u=d,u.test(i)&&(n=i)}if(s=_,s.test(n)){var z=s.exec(n);i=z[1],s=d,u=f,a=k,(s.test(i)||u.test(i)&&!a.test(i))&&(n=i)}return s=P,u=d,s.test(n)&&u.test(n)&&(s=y,n=n.replace(s,"")),"y"==r&&(n=r.toLowerCase()+n.substr(1)),n};return z}(),t.Pipeline.registerFunction(t.stemmer,"stemmer"),t.stopWordFilter=function(e){return e&&t.stopWordFilter.stopWords[e]!==!0?e:void 0},t.clearStopWords=function(){t.stopWordFilter.stopWords={}},t.addStopWords=function(e){null!=e&&Array.isArray(e)!==!1&&e.forEach(function(e){t.stopWordFilter.stopWords[e]=!0},this)},t.resetStopWords=function(){t.stopWordFilter.stopWords=t.defaultStopWords},t.defaultStopWords={"":!0,a:!0,able:!0,about:!0,across:!0,after:!0,all:!0,almost:!0,also:!0,am:!0,among:!0,an:!0,and:!0,any:!0,are:!0,as:!0,at:!0,be:!0,because:!0,been:!0,but:!0,by:!0,can:!0,cannot:!0,could:!0,dear:!0,did:!0,"do":!0,does:!0,either:!0,"else":!0,ever:!0,every:!0,"for":!0,from:!0,get:!0,got:!0,had:!0,has:!0,have:!0,he:!0,her:!0,hers:!0,him:!0,his:!0,how:!0,however:!0,i:!0,"if":!0,"in":!0,into:!0,is:!0,it:!0,its:!0,just:!0,least:!0,let:!0,like:!0,likely:!0,may:!0,me:!0,might:!0,most:!0,must:!0,my:!0,neither:!0,no:!0,nor:!0,not:!0,of:!0,off:!0,often:!0,on:!0,only:!0,or:!0,other:!0,our:!0,own:!0,rather:!0,said:!0,say:!0,says:!0,she:!0,should:!0,since:!0,so:!0,some:!0,than:!0,that:!0,the:!0,their:!0,them:!0,then:!0,there:!0,these:!0,they:!0,"this":!0,tis:!0,to:!0,too:!0,twas:!0,us:!0,wants:!0,was:!0,we:!0,were:!0,what:!0,when:!0,where:!0,which:!0,"while":!0,who:!0,whom:!0,why:!0,will:!0,"with":!0,would:!0,yet:!0,you:!0,your:!0},t.stopWordFilter.stopWords=t.defaultStopWords,t.Pipeline.registerFunction(t.stopWordFilter,"stopWordFilter"),t.trimmer=function(e){if(null===e||void 0===e)throw new Error("token should not be undefined");return e.replace(/^\W+/,"").replace(/\W+$/,"")},t.Pipeline.registerFunction(t.trimmer,"trimmer"),t.InvertedIndex=function(){this.root={docs:{},df:0}},t.InvertedIndex.load=function(e){var t=new this;return t.root=e.root,t},t.InvertedIndex.prototype.addToken=function(e,t,n){for(var n=n||this.root,i=0;i<=e.length-1;){var o=e[i];o in n||(n[o]={docs:{},df:0}),i+=1,n=n[o]}var r=t.ref;n.docs[r]?n.docs[r]={tf:t.tf}:(n.docs[r]={tf:t.tf},n.df+=1)},t.InvertedIndex.prototype.hasToken=function(e){if(!e)return!1;for(var t=this.root,n=0;n<e.length;n++){if(!t[e[n]])return!1;t=t[e[n]]}return!0},t.InvertedIndex.prototype.getNode=function(e){if(!e)return null;for(var t=this.root,n=0;n<e.length;n++){if(!t[e[n]])return null;t=t[e[n]]}return t},t.InvertedIndex.prototype.getDocs=function(e){var t=this.getNode(e);return null==t?{}:t.docs},t.InvertedIndex.prototype.getTermFrequency=function(e,t){var n=this.getNode(e);return null==n?0:t in n.docs?n.docs[t].tf:0},t.InvertedIndex.prototype.getDocFreq=function(e){var t=this.getNode(e);return null==t?0:t.df},t.InvertedIndex.prototype.removeToken=function(e,t){if(e){var n=this.getNode(e);null!=n&&t in n.docs&&(delete n.docs[t],n.df-=1)}},t.InvertedIndex.prototype.expandToken=function(e,t,n){if(null==e||""==e)return[];var t=t||[];if(void 0==n&&(n=this.getNode(e),null==n))return t;n.df>0&&t.push(e);for(var i in n)"docs"!==i&&"df"!==i&&this.expandToken(e+i,t,n[i]);return t},t.InvertedIndex.prototype.toJSON=function(){return{root:this.root}},t.Configuration=function(e,n){var e=e||"";if(void 0==n||null==n)throw new Error("fields should not be null");this.config={};var i;try{i=JSON.parse(e),this.buildUserConfig(i,n)}catch(o){t.utils.warn("user configuration parse failed, will use default configuration"),this.buildDefaultConfig(n)}},t.Configuration.prototype.buildDefaultConfig=function(e){this.reset(),e.forEach(function(e){this.config[e]={boost:1,bool:"OR",expand:!1}},this)},t.Configuration.prototype.buildUserConfig=function(e,n){var i="OR",o=!1;if(this.reset(),"bool"in e&&(i=e.bool||i),"expand"in e&&(o=e.expand||o),"fields"in e)for(var r in e.fields)if(n.indexOf(r)>-1){var s=e.fields[r],u=o;void 0!=s.expand&&(u=s.expand),this.config[r]={boost:s.boost||0===s.boost?s.boost:1,bool:s.bool||i,expand:u}}else t.utils.warn("field name in user configuration not found in index instance fields");else this.addAllFields2UserConfig(i,o,n)},t.Configuration.prototype.addAllFields2UserConfig=function(e,t,n){n.forEach(function(n){this.config[n]={boost:1,bool:e,expand:t}},this)},t.Configuration.prototype.get=function(){return this.config},t.Configuration.prototype.reset=function(){this.config={}},lunr.SortedSet=function(){this.length=0,this.elements=[]},lunr.SortedSet.load=function(e){var t=new this;return t.elements=e,t.length=e.length,t},lunr.SortedSet.prototype.add=function(){var e,t;for(e=0;e<arguments.length;e++)t=arguments[e],~this.indexOf(t)||this.elements.splice(this.locationFor(t),0,t);this.length=this.elements.length},lunr.SortedSet.prototype.toArray=function(){return this.elements.slice()},lunr.SortedSet.prototype.map=function(e,t){return this.elements.map(e,t)},lunr.SortedSet.prototype.forEach=function(e,t){return this.elements.forEach(e,t)},lunr.SortedSet.prototype.indexOf=function(e){for(var t=0,n=this.elements.length,i=n-t,o=t+Math.floor(i/2),r=this.elements[o];i>1;){if(r===e)return o;e>r&&(t=o),r>e&&(n=o),i=n-t,o=t+Math.floor(i/2),r=this.elements[o]}return r===e?o:-1},lunr.SortedSet.prototype.locationFor=function(e){for(var t=0,n=this.elements.length,i=n-t,o=t+Math.floor(i/2),r=this.elements[o];i>1;)e>r&&(t=o),r>e&&(n=o),i=n-t,o=t+Math.floor(i/2),r=this.elements[o];return r>e?o:e>r?o+1:void 0},lunr.SortedSet.prototype.intersect=function(e){for(var t=new lunr.SortedSet,n=0,i=0,o=this.length,r=e.length,s=this.elements,u=e.elements;;){if(n>o-1||i>r-1)break;s[n]!==u[i]?s[n]<u[i]?n++:s[n]>u[i]&&i++:(t.add(s[n]),n++,i++)}return t},lunr.SortedSet.prototype.clone=function(){var e=new lunr.SortedSet;return e.elements=this.toArray(),e.length=e.elements.length,e},lunr.SortedSet.prototype.union=function(e){var t,n,i;this.length>=e.length?(t=this,n=e):(t=e,n=this),i=t.clone();for(var o=0,r=n.toArray();o<r.length;o++)i.add(r[o]);return i},lunr.SortedSet.prototype.toJSON=function(){return this.toArray()},function(e,t){"function"==typeof define&&define.amd?define(t):"object"==typeof exports?module.exports=t():e.elasticlunr=t()}(this,function(){return t})}();
+
+``````{ end_of_file="_resources/elasticlunr.min.js" }
+
+``````{ path="_resources/make_docs.py"  }
+import argparse
+import inspect
+import re
+import tomllib
+from typing import Dict, List, Union
+import warnings
+from pathlib import Path
+
+import pdoc  # type: ignore[import-not-found]
+import pdoc.doc  # type: ignore[import-not-found]
+import pdoc.extract  # type: ignore[import-not-found]
+import pdoc.render  # type: ignore[import-not-found]
+import pdoc.render_helpers  # type: ignore[import-not-found]
+from markupsafe import Markup
+
+# ====================================================================================================
+# CONFIGURATION
+PACKAGE_NAME: str
+PACKAGE_REPO_URL: str
+PACKAGE_CODE_URL: str
+PACKAGE_VERSION: str
+# ====================================================================================================
+
+pdoc.render_helpers.markdown_extensions["alerts"] = True
+pdoc.render_helpers.markdown_extensions["admonitions"] = True
+
+
+def get_package_meta_global(config_path: Union[str, Path] = Path("pyproject.toml")):
+	"""set global vars from pyproject.toml
+
+	sets the global vars:
+
+	- `PACKAGE_NAME`
+	- `PACKAGE_REPO_URL`
+	- `PACKAGE_CODE_URL`
+	- `PACKAGE_VERSION`
+	"""
+	global PACKAGE_NAME, PACKAGE_REPO_URL, PACKAGE_CODE_URL, PACKAGE_VERSION
+	config_path = Path(config_path)
+	with config_path.open("rb") as f:
+		pyproject_data = tomllib.load(f)
+	PACKAGE_VERSION = pyproject_data["project"]["version"]
+	PACKAGE_NAME = pyproject_data["project"]["name"]
+	PACKAGE_REPO_URL = pyproject_data["project"]["urls"]["Repository"]
+	PACKAGE_CODE_URL = f"{PACKAGE_REPO_URL}/blob/{PACKAGE_VERSION}/"
+
+
+def add_package_meta_pdoc_globals(
+	config_path: Union[str, Path] = Path("pyproject.toml"),
+):
+	"adds the package meta to the pdoc globals"
+	get_package_meta_global(config_path)
+	pdoc.render.env.globals["package_version"] = PACKAGE_VERSION
+	pdoc.render.env.globals["package_name"] = PACKAGE_NAME
+	pdoc.render.env.globals["package_repo_url"] = PACKAGE_REPO_URL
+	pdoc.render.env.globals["package_code_url"] = PACKAGE_CODE_URL
+
+
+def increment_markdown_headings(markdown_text: str, increment: int = 2) -> str:
+	"""
+	Increment all Markdown headings in the given text by the specified amount.
+
+	Args:
+	    markdown_text (str): The input Markdown text.
+	    increment (int): The number of levels to increment the headings by. Default is 2.
+
+	Returns:
+	    str: The Markdown text with incremented heading levels.
+	"""
+
+	def replace_heading(match):
+		current_level = len(match.group(1))
+		new_level = min(current_level + increment, 6)  # Cap at h6
+		return "#" * new_level + match.group(2)
+
+	# Regular expression to match Markdown headings
+	heading_pattern = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
+
+	# Replace all headings with incremented versions
+	return heading_pattern.sub(replace_heading, markdown_text)
+
+
+OUTPUT_DIR: Path = Path("docs")
+
+
+def format_signature(sig: inspect.Signature, colon: bool) -> str:
+	"""Format a function signature for Markdown. Returns a single-line Markdown string."""
+	# First get a list with all params as strings.
+	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore
+	return_annot = pdoc.doc._PrettySignature._return_annotation_str(sig)  # type: ignore
+
+	def _format_param(param: str) -> str:
+		"""Format a parameter for Markdown, including potential links."""
+		# This is a simplified version. You might need to adjust this
+		# to properly handle links in your specific use case.
+		return f"`{param}`"
+
+	# Format each parameter
+	pretty_result = [_format_param(param) for param in result]
+
+	# Join parameters
+	params_str = ", ".join(pretty_result)
+
+	# Add return annotation
+	anno = ")"
+	if return_annot:
+		anno += f" -> `{return_annot}`"
+	if colon:
+		anno += ":"
+
+	# Construct the full signature
+	rendered = f"`(`{params_str}`{anno}`"
+
+	return rendered
+
+
+HTML_TO_MD_MAP: Dict[str, str] = {
+	"&gt;": ">",
+	"&lt;": "<",
+	"&amp;": "&",
+	"&quot;": '"',
+	"&#39": "'",
+	"&apos;": "'",
+}
+
+
+def markup_safe(sig: inspect.Signature) -> str:
+	"mark some text as safe, no escaping needed"
+	output: str = str(sig)
+	return Markup(output)
+
+
+def use_markdown_format():
+	"set some functions to output markdown format"
+	pdoc.render_helpers.format_signature = format_signature
+	pdoc.render.env.filters["markup_safe"] = markup_safe
+	pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
+
+
+def pdoc_combined(*modules, output_file: Path) -> None:
+	"""Render the documentation for a list of modules into a single HTML file.
+
+	Args:
+	    *modules: Paths or names of the modules to document.
+	    output_file: Path to the output HTML file.
+
+	This function will:
+	1. Extract all modules and submodules.
+	2. Generate documentation for each module.
+	3. Combine all module documentation into a single HTML file.
+	4. Write the combined documentation to the specified output file.
+
+	Rendering options can be configured by calling `pdoc.render.configure` in advance.
+	"""
+	# Extract all modules and submodules
+	all_modules: Dict[str, pdoc.doc.Module] = {}
+	for module_name in pdoc.extract.walk_specs(modules):
+		all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
+
+	# Generate HTML content for each module
+	module_contents: List[str] = []
+	for module in all_modules.values():
+		module_html = pdoc.render.html_module(module, all_modules)
+		module_contents.append(module_html)
+
+	# Combine all module contents
+	combined_content = "\n".join(module_contents)
+
+	# Write the combined content to the output file
+	with output_file.open("w", encoding="utf-8") as f:
+		f.write(combined_content)
+
+
+def ignore_warnings(config_path: Union[str, Path] = Path("pyproject.toml")):
+	# Read the pyproject.toml file
+	config_path = Path(config_path)
+	with config_path.open("rb") as f:
+		pyproject_data = tomllib.load(f)
+
+	# Extract the warning messages from the tool.pdoc.ignore section
+	warning_messages: List[str] = (
+		pyproject_data.get("tool", {}).get("pdoc", {}).get("warnings_ignore", [])
+	)
+
+	# Process and apply the warning filters
+	for message in warning_messages:
+		warnings.filterwarnings("ignore", message=message)
+
+
+if __name__ == "__main__":
+	# parse args
+	# --------------------------------------------------
+	argparser: argparse.ArgumentParser = argparse.ArgumentParser()
+	argparser.add_argument(
+		"--serve",
+		"-s",
+		action="store_true",
+		help="Whether to start an HTTP server to serve the documentation",
+	)
+	argparser.add_argument(
+		"--warn-all",
+		"-w",
+		action="store_true",
+		help="Whether to show all warnings, instead of ignoring the ones specified in pyproject.toml:tool.pdoc.ignore",
+	)
+	argparser.add_argument(
+		"--combined",
+		"-c",
+		action="store_true",
+		help="Whether to combine the documentation for multiple modules into a single markdown file",
+	)
+	parsed_args = argparser.parse_args()
+
+	# configure pdoc
+	# --------------------------------------------------
+	add_package_meta_pdoc_globals()
+
+	if not parsed_args.warn_all:
+		ignore_warnings()
+
+	pdoc.render.configure(
+		edit_url_map={
+			PACKAGE_NAME: PACKAGE_CODE_URL,
+		},
+		template_directory=(
+			Path("docs/.resources/templates/html/")
+			if not parsed_args.combined
+			else Path("docs/.resources/templates/markdown/")
+		),
+		show_source=True,
+		math=True,
+		mermaid=True,
+		search=True,
+	)
+
+	# do the rendering
+	# --------------------------------------------------
+	if not parsed_args.combined:
+		pdoc.pdoc(
+			PACKAGE_NAME,
+			output_directory=OUTPUT_DIR,
+		)
+	else:
+		use_markdown_format()
+		pdoc_combined(
+			PACKAGE_NAME, output_file=OUTPUT_DIR / "combined" / f"{PACKAGE_NAME}.md"
+		)
+
+	# http server if needed
+	# --------------------------------------------------
+	if parsed_args.serve:
+		import http.server
+		import os
+		import socketserver
+
+		port: int = 8000
+		os.chdir(OUTPUT_DIR)
+		with socketserver.TCPServer(
+			("", port), http.server.SimpleHTTPRequestHandler
+		) as httpd:
+			print(f"Serving at http://localhost:{port}")
+			httpd.serve_forever()
+
+``````{ end_of_file="_resources/make_docs.py" }
 
 ``````{ path="myproject/__init__.py"  }
 """
@@ -752,7 +3147,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/_resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -1552,10 +3947,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 - copy `makefile` from this repo into the root of your repo
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
-- if you want automatic documentation generation, copy `docs/.resources/`. it contains:
-  - `docs/.resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
-  - `docs/.resources/templates/`: jinja2 templates for the docs, template for the todolist
-  - `docs/.resources/css/`, `docs/.resources/svg/`: some css and icons for the docs
+- if you want automatic documentation generation, copy `docs/_resources/`. it contains:
+  - `docs/_resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
+  - `docs/_resources/templates/`: jinja2 templates for the docs, template for the todolist
+  - `docs/_resources/css/`, `docs/_resources/svg/`: some css and icons for the docs
 
 
 # Makefile
@@ -2170,7 +4565,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/_resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -2662,20 +5057,20 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info
+# see `docs/_resources/make_docs.py` and the templates in `docs/_resources/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/_resources/make_docs.py
 
-# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
+# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/_resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
 # docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/_resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -2710,12 +5105,12 @@ cov:
 docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script
+# removed all generated documentation files, but leaves the templates and the `docs/_resources/make_docs.py` script
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs"
-	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name ".*" -exec rm -rf {} +
+	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name "_*" -exec rm -rf {} +
 
 
 .PHONY: todo
@@ -3272,20 +5667,20 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info
+# see `docs/_resources/make_docs.py` and the templates in `docs/_resources/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/_resources/make_docs.py
 
-# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
+# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/_resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
 # docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/_resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -3320,12 +5715,12 @@ cov:
 docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script
+# removed all generated documentation files, but leaves the templates and the `docs/_resources/make_docs.py` script
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs"
-	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name ".*" -exec rm -rf {} +
+	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name "_*" -exec rm -rf {} +
 
 
 .PHONY: todo

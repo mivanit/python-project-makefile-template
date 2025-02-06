@@ -553,7 +553,7 @@ class Config:
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
 
-	template_html_source: Path = Path("docs/.resources/templates/todo-template.html")
+	template_html_source: Path = Path("docs/_resources/templates/todo-template.html")
 	# template source for the output html file (interactive table)
 
 	@property
@@ -1045,20 +1045,20 @@ check: clean format-check test typing
 # ==================================================
 
 # generates a whole tree of documentation in html format.
-# see `docs/.resources/make_docs.py` and the templates in `docs/.resources/templates/html/` for more info
+# see `docs/_resources/make_docs.py` and the templates in `docs/_resources/templates/html/` for more info
 .PHONY: docs-html
 docs-html:
 	@echo "generate html docs"
-	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py
+	$(PYTHON) $(DOCS_DIR)/_resources/make_docs.py
 
-# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/.resources/templates/markdown/`.
+# instead of a whole website, generates a single markdown file with all docs using the templates in `docs/_resources/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
 # docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
-	$(PYTHON) $(DOCS_DIR)/.resources/make_docs.py --combined
+	$(PYTHON) $(DOCS_DIR)/_resources/make_docs.py --combined
 
 # after running docs-md, this will convert the combined markdown file to other formats:
 # gfm (github-flavored markdown), plain text, and html
@@ -1093,12 +1093,12 @@ cov:
 docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves the templates and the `docs/.resources/make_docs.py` script
+# removed all generated documentation files, but leaves the templates and the `docs/_resources/make_docs.py` script
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs"
-	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name ".*" -exec rm -rf {} +
+	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -name "_*" -exec rm -rf {} +
 
 
 .PHONY: todo
