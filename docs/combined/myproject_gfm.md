@@ -48,13 +48,13 @@ they are machine-readable.
   - there are also a variety of other variables you can modify – most
     are at the top of the makefile
 - if you want automatic documentation generation, copy
-  `docs/_resources/`. it contains:
-  - `docs/_resources/make_docs.py` script to generate the docs using
+  `docs/resources/`. it contains:
+  - `docs/resources/make_docs.py` script to generate the docs using
     pdoc. reads everything it needs from your `pyproject.toml`
-  - `docs/_resources/templates/`: jinja2 templates for the docs,
-    template for the todolist
-  - `docs/_resources/css/`, `docs/_resources/svg/`: some css and icons
-    for the docs
+  - `docs/resources/templates/`: jinja2 templates for the docs, template
+    for the todolist
+  - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for
+    the docs
 
 # Makefile
 
@@ -172,13 +172,13 @@ they are machine-readable.
   - there are also a variety of other variables you can modify – most
     are at the top of the makefile
 - if you want automatic documentation generation, copy
-  `docs/_resources/`. it contains:
-  - `docs/_resources/make_docs.py` script to generate the docs using
+  `docs/resources/`. it contains:
+  - `docs/resources/make_docs.py` script to generate the docs using
     pdoc. reads everything it needs from your `pyproject.toml`
-  - `docs/_resources/templates/`: jinja2 templates for the docs,
-    template for the todolist
-  - `docs/_resources/css/`, `docs/_resources/svg/`: some css and icons
-    for the docs
+  - `docs/resources/templates/`: jinja2 templates for the docs, template
+    for the todolist
+  - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for
+    the docs
 
 ### Makefile
 
