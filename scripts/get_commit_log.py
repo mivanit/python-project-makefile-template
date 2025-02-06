@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from typing import List
 
 last_version: str = sys.argv[1].strip()
 commit_log_file: str = sys.argv[2].strip()

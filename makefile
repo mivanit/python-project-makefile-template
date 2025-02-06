@@ -2,7 +2,7 @@
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.1.0                                                  |
+#| version: v0.1.1                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -267,6 +267,7 @@ export SCRIPT_GET_VERSION
 define SCRIPT_GET_COMMIT_LOG
 import subprocess
 import sys
+from typing import List
 
 last_version: str = sys.argv[1].strip()
 commit_log_file: str = sys.argv[2].strip()
