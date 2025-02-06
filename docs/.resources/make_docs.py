@@ -45,7 +45,9 @@ def get_package_meta_global(config_path: Union[str, Path] = Path("pyproject.toml
 	PACKAGE_CODE_URL = f"{PACKAGE_REPO_URL}/blob/{PACKAGE_VERSION}/"
 
 
-def add_package_meta_pdoc_globals(config_path: Union[str, Path] = Path("pyproject.toml")):
+def add_package_meta_pdoc_globals(
+	config_path: Union[str, Path] = Path("pyproject.toml"),
+):
 	"adds the package meta to the pdoc globals"
 	get_package_meta_global(config_path)
 	pdoc.render.env.globals["package_version"] = PACKAGE_VERSION

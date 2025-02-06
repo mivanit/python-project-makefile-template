@@ -1,8 +1,8 @@
 # Stats
 - 22 files
-- 3634 (3.6K) lines
-- 121211 (121K) chars
-- 14678 (15K) `whitespace-split` tokens
+- 3637 (3.6K) lines
+- 121323 (121K) chars
+- 14690 (15K) `whitespace-split` tokens
 
 # File Tree
 
@@ -23,10 +23,10 @@ python-project-makefile-template
 │   ├── helloworld.py                [   12L    359C    49T]
 │   └── other.py                     [    3L    128C    17T]
 ├── scripts                          
-│   ├── assemble_make.py             [   54L  1,356C   132T]
-│   ├── check_torch.py               [  157L  4,404C   419T]
+│   ├── assemble_make.py             [   55L  1,380C   136T]
+│   ├── check_torch.py               [  157L  4,424C   419T]
 │   ├── export_requirements.py       [   78L  2,049C   237T]
-│   ├── get_commit_log.py            [   26L    647C    61T]
+│   ├── get_commit_log.py            [   27L    671C    65T]
 │   ├── get_todos.py                 [  342L  8,820C   986T]
 │   ├── get_version.py               [   17L    339C    37T]
 │   └── pdoc_markdown2_cli.py        [   54L  1,448C   144T]
@@ -34,7 +34,7 @@ python-project-makefile-template
 │   └── test_nothing.py              [    2L     42C     5T]
 ├── LICENSE                          [  427L 20,133C 2,769T]
 ├── README.md                        [   88L  5,059C   659T]
-├── makefile                         [1,281L 39,428C 4,776T]
+├── makefile                         [1,282L 39,472C 4,780T]
 ├── makefile.template                [  607L 21,839C 2,895T]
 ├── pyproject.toml                   [  130L  2,893C   370T]
 ```
@@ -295,7 +295,7 @@ wcmatch==10.0
 ``````{ end_of_file=".meta/requirements/requirements.txt" }
 
 ``````{ path=".meta/versions/.version"  }
-v0.0.6
+v0.1.1
 ``````{ end_of_file=".meta/versions/.version" }
 
 ``````{ path="myproject/__init__.py"  }
@@ -331,6 +331,7 @@ def another_function():
 ``````{ path="scripts/assemble_make.py"  }
 from pathlib import Path
 import tomllib
+from typing import Dict
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
@@ -342,8 +343,8 @@ with open("pyproject.toml", "rb") as f_pyproject:
 	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
 
 
-def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
-	scripts: dict[str, str] = {}
+def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
+	scripts: Dict[str, str] = {}
 	for script in scripts_dir.iterdir():
 		if script.is_file() and script.suffix == ".py":
 			scripts[script.stem] = script.read_text()
@@ -352,7 +353,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> dict[str, str]:
 
 def main():
 	contents: str = TEMPLATE_PATH.read_text()
-	scripts: dict[str, str] = read_scripts()
+	scripts: Dict[str, str] = read_scripts()
 
 	# inline each script
 	for script_name, script_contents in scripts.items():
@@ -391,7 +392,7 @@ import os
 import sys
 import re
 import subprocess
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 def print_info_dict(
@@ -419,7 +420,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		text=True,
 	)
 	output: str = result.stdout
-	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
+	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
 	assert len(lines) == 5, (
@@ -433,7 +434,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: Dict[str, Tuple[int, re.Pattern, int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -447,7 +448,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	info: Dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: re.Match | None = pattern.search(lines[line_index])
+		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
 			raise ValueError(
 				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
@@ -459,7 +460,7 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> tuple[List[Exception], Dict[str, str]]:
+def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
 	exceptions: List[Exception] = []
 	info: Dict[str, str] = {}
 
@@ -632,6 +633,7 @@ for export in exports:
 ``````{ path="scripts/get_commit_log.py"  }
 import subprocess
 import sys
+from typing import List
 
 last_version: str = sys.argv[1].strip()
 commit_log_file: str = sys.argv[2].strip()
@@ -642,13 +644,13 @@ if last_version == "NULL":
 	sys.exit(1)
 
 try:
-	log_cmd: list[str] = [
+	log_cmd: List[str] = [
 		"git",
 		"log",
 		f"{last_version}..HEAD",
 		"--pretty=format:- %s (%h)",
 	]
-	commits: list[str] = (
+	commits: List[str] = (
 		subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
 	)
 	with open(commit_log_file, "w") as f:
@@ -725,7 +727,7 @@ class Config:
 	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	tag_label_map: dict[str, str] = field(
+	tag_label_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
 			"TODO": "enhancement",
@@ -734,7 +736,7 @@ class Config:
 			"HACK": "enhancement",
 		}
 	)
-	extension_lang_map: dict[str, str] = field(
+	extension_lang_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"py": "python",
 			"md": "markdown",
@@ -1617,7 +1619,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.1.0                                                  |
+#| version: v0.1.1                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -1882,6 +1884,7 @@ export SCRIPT_GET_VERSION
 define SCRIPT_GET_COMMIT_LOG
 import subprocess
 import sys
+from typing import List
 
 last_version: str = sys.argv[1].strip()
 commit_log_file: str = sys.argv[2].strip()
@@ -1892,13 +1895,13 @@ if last_version == "NULL":
 	sys.exit(1)
 
 try:
-	log_cmd: list[str] = [
+	log_cmd: List[str] = [
 		"git",
 		"log",
 		f"{last_version}..HEAD",
 		"--pretty=format:- %s (%h)",
 	]
-	commits: list[str] = (
+	commits: List[str] = (
 		subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
 	)
 	with open(commit_log_file, "w") as f:
@@ -1917,7 +1920,7 @@ import os
 import sys
 import re
 import subprocess
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 def print_info_dict(
@@ -1945,7 +1948,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		text=True,
 	)
 	output: str = result.stdout
-	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
+	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
 	assert len(lines) == 5, (
@@ -1959,7 +1962,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: Dict[str, Tuple[int, re.Pattern, int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -1973,7 +1976,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	info: Dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: re.Match | None = pattern.search(lines[line_index])
+		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
 			raise ValueError(
 				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
@@ -1985,7 +1988,7 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> tuple[List[Exception], Dict[str, str]]:
+def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
 	exceptions: List[Exception] = []
 	info: Dict[str, str] = {}
 
@@ -2142,7 +2145,7 @@ class Config:
 	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	tag_label_map: dict[str, str] = field(
+	tag_label_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
 			"TODO": "enhancement",
@@ -2151,7 +2154,7 @@ class Config:
 			"HACK": "enhancement",
 		}
 	)
-	extension_lang_map: dict[str, str] = field(
+	extension_lang_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"py": "python",
 			"md": "markdown",
@@ -3510,7 +3513,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.1.0"
+	version = "0.1.1"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
