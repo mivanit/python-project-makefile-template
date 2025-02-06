@@ -223,9 +223,9 @@ if __name__ == "__main__":
 			PACKAGE_NAME: PACKAGE_CODE_URL,
 		},
 		template_directory=(
-			Path("docs/.resources/templates/html/")
+			Path("docs/_resources/templates/html/")
 			if not parsed_args.combined
-			else Path("docs/.resources/templates/markdown/")
+			else Path("docs/_resources/templates/markdown/")
 		),
 		show_source=True,
 		math=True,
