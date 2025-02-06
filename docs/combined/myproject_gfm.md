@@ -1,6 +1,6 @@
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.1.2
+> v0.1.3
 
 ## Contents
 
@@ -124,7 +124,7 @@ python scripts/assemble_make.py
 - [`other`](#other)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/__init__.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/__init__.py)
 
 # `myproject`
 
@@ -243,11 +243,11 @@ python scripts/assemble_make.py
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/__init__.py#L0-L2)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/__init__.py#L0-L2)
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.1.2
+> v0.1.3
 
 ## API Documentation
 
@@ -255,12 +255,12 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/_
 - [`critical_function`](#critical_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/helloworld.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py)
 
 # `myproject.helloworld`
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/helloworld.py#L0-L11)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L0-L11)
 
 ### `def some_function`
 
@@ -269,7 +269,7 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/h
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/helloworld.py#L6-L7)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L6-L7)
 
 ### `def critical_function`
 
@@ -278,23 +278,23 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/h
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/helloworld.py#L11-L12)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L11-L12)
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.1.2
+> v0.1.3
 
 ## API Documentation
 
 - [`another_function`](#another_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/other.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py)
 
 # `myproject.other`
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/other.py#L0-L2)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py#L0-L2)
 
 ### `def another_function`
 
@@ -303,4 +303,4 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/o
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/other.py#L2-L3)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py#L2-L3)

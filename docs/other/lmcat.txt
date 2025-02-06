@@ -1619,7 +1619,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.1.2                                                  |
+#| version: v0.1.3                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -3527,7 +3527,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.1.2"
+	version = "0.1.3"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
