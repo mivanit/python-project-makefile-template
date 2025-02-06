@@ -85,7 +85,7 @@
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.1.1/__init__.py">Edit on GitHub</a>
+                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/__init__.py">Edit on GitHub</a>
                     <h1 class="modulename">
 myproject    </h1>
 
@@ -477,7 +477,7 @@ myproject    </h1>
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.1.1/helloworld.py">Edit on GitHub</a>
+                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/helloworld.py">Edit on GitHub</a>
                     <h1 class="modulename">
 <a href="./../myproject.html">myproject</a><wbr>.helloworld    </h1>
 
@@ -810,7 +810,7 @@ myproject    </h1>
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.1.1/other.py">Edit on GitHub</a>
+                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.1.2/other.py">Edit on GitHub</a>
                     <h1 class="modulename">
 <a href="./../myproject.html">myproject</a><wbr>.other    </h1>
 
