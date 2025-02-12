@@ -21,6 +21,7 @@ jobs:
           - python: "3.10"
           - python: "3.11"
           - python: "3.12"
+          - python: "3.13"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -81,38 +82,3 @@ jobs:
 
       - name: Unit tests
         run: make test
-  
-  # the following tests are only for making sure the makefile works properly. you can remove them.
-  make-docs:
-    name: make docs (and coverage too)
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        versions:
-          - python: "3.8"
-          - python: "3.9"
-          - python: "3.10"
-          - python: "3.11"
-          - python: "3.12"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.versions.python }}
-
-      - name: install
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          make setup
-      
-      - name: Install pandoc
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: pandoc
-          version: '3.3'
-      
-      - name: Check pandoc version
-        run: pandoc --version
-
-      - name: docs
-        run: make docs
