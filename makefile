@@ -1247,7 +1247,8 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo lmcat
+docs: cov docs-html docs-combined todo
+	-$(MAKE) lmcat
 	@echo "generate all documentation and coverage reports"
 
 # removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
