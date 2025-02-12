@@ -43,49 +43,43 @@ jobs:
           packages: pandoc
           version: '3.3'
 
-      - name: Test info commands
-        run: |
-          make help
-          make info
-          make info-long
-          make version
+      # Info commands
+      - run: make
+      - run: make help
+      - run: make info
+      - run: make info-long
+      - run: make version
 
-      - name: Test dependency commands
-        run: |
-          make dep-check
-          make dep
-          make dep-check-torch
+      # Dependency commands  
+      - run: make dep-check
+      - run: make dep
+      - run: make dep-check-torch
 
-      - name: Test code quality commands
-        run: |
-          make format
-          make format-check
-          make typing
+      # Code quality commands
+      - run: make format 
+      - run: make format-check
+      - run: make typing
 
-      - name: Test build commands
-        run: |
-          make build
-          make verify-git
+      # Build commands
+      - run: make build
+      - run: make verify-git
 
-      - name: Test testing commands
-        run: |
-          make test
-          make check
-          make cov
+      # Testing commands
+      - run: make test
+      - run: make check
+      - run: make cov
 
-      - name: Test documentation commands
-        run: |
-          make docs-html
-          make docs-md
-          make docs-combined
-          make docs
-          make todo
-          make lmcat
-          make lmcat-tree
+      # Documentation commands
+      - run: make docs-html
+      - run: make docs-md
+      - run: make docs-combined
+      - run: make docs
+      - run: make todo
+      - run: make lmcat
+      - run: make lmcat-tree
 
-      - name: Test cleanup commands
-        run: |
-          make docs-clean
-          make clean
-          make dep-clean
-          make clean-all
+      # Cleanup commands  
+      - run: make docs-clean
+      - run: make clean
+      - run: make dep-clean
+      - run: make clean-all
