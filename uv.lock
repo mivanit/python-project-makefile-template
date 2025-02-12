@@ -1199,7 +1199,7 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "muutils", specifier = ">=0.7.0" },
     { name = "numpy", specifier = ">=1.21.0" },
-    { name = "torch", specifier = ">=2.0.0" },
+    { name = "torch", specifier = ">=1.13.0" },
     { name = "torch", marker = "extra == 'torch-cu124'", specifier = ">=2.0.0", index = "https://download.pytorch.org/whl/cu124", conflict = { package = "myproject", extra = "torch-cu124" } },
 ]
 
