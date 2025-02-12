@@ -32,6 +32,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for the docs
 
 
+# docs
+
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+
 # Makefile
 
 `make help` Displays the help message listing all available make targets and variables. running just `make` will also display this message.
