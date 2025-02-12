@@ -15,6 +15,7 @@
 		"numpy>=1.21.0",
 		"torch>=2.0.0",
 		"muutils>=0.7.0",
+		"ipykernel>=6.29.5",
 	]
 
 [project.optional-dependencies]
