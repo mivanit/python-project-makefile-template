@@ -542,7 +542,7 @@ try:
 except ImportError:
 	import tomli as tomllib
 
-TOOL_PATH: str = "tool.makefile.uv-exports"
+TOOL_PATH: str = "tool.makefile.inline-todo"
 
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
