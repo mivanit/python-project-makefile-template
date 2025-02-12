@@ -4,6 +4,8 @@
 appnope==0.1.4 ; sys_platform == 'darwin'
 asttokens==3.0.0
 attrs==25.1.0
+beautifulsoup4==4.13.3
+bleach==6.2.0
 bracex==2.5.post1
 cffi==1.17.1 ; implementation_name == 'pypy'
 cli-exit-tools==1.2.7
@@ -14,7 +16,9 @@ coverage==7.6.10
 coverage-badge==1.1.2
 debugpy==1.8.12
 decorator==5.1.1
+defusedxml==0.7.1
 executing==2.2.0
+fastjsonschema==2.21.1
 filelock==3.17.0
 fire==0.7.0
 fsspec==2025.2.0
@@ -24,8 +28,11 @@ ipykernel==6.29.5
 ipython==8.32.0
 jedi==0.19.2
 jinja2==3.1.5
+jsonschema==4.23.0
+jsonschema-specifications==2024.10.1
 jupyter-client==8.6.3
 jupyter-core==5.7.2
+jupyterlab-pygments==0.3.0
 lib-detect-testenv==2.0.8
 libcst==1.6.0
 lmcat==0.2.0
@@ -33,10 +40,14 @@ markdown-it-py==3.0.0
 markupsafe==3.0.2
 matplotlib-inline==0.1.7
 mdurl==0.1.2
+mistune==3.1.1
 mpmath==1.3.0
 muutils==0.7.0
 mypy==1.14.1
 mypy-extensions==1.0.0
+nbclient==0.10.2
+nbconvert==7.16.6
+nbformat==5.10.4
 nest-asyncio==1.6.0
 networkx==3.4.2
 numpy==2.2.2
@@ -54,6 +65,7 @@ nvidia-nccl-cu12==2.21.5 ; platform_machine == 'x86_64' and sys_platform == 'lin
 nvidia-nvjitlink-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
 nvidia-nvtx-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
 packaging==24.2
+pandocfilters==1.5.1
 parso==0.8.4
 pathspec==0.12.1
 pdoc==15.0.1
@@ -73,14 +85,18 @@ python-dateutil==2.9.0.post0
 pywin32==308 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32'
 pyyaml==6.0.2
 pyzmq==26.2.1
+referencing==0.36.2
 rich==13.9.4
+rpds-py==0.22.3
 ruff==0.9.4
 setuptools==75.8.0
 shellingham==1.5.4
 six==1.17.0
+soupsieve==2.6
 stack-data==0.6.3
 sympy==1.13.1
 termcolor==2.5.0
+tinycss2==1.4.0
 tomli==2.2.1 ; python_full_version <= '3.11'
 tomlkit==0.13.2
 torch==2.6.0+cu124
@@ -91,3 +107,4 @@ typer==0.15.1
 typing-extensions==4.12.2
 wcmatch==10.0
 wcwidth==0.2.13
+webencodings==0.5.1
