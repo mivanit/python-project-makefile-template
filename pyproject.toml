@@ -20,7 +20,7 @@
 
 [project.optional-dependencies]
 	# handling torch
-	torch-cu124 = [ "torch>=2.0.0" ]
+	torch-cu124 = [ "torch>=1.13.0" ]
 
 	# for example purposes only
 	cli = [
