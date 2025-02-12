@@ -14,7 +14,7 @@
 	dependencies = [
 		"numpy>=1.21.0",
 		"torch>=2.0.0",
-		"muutils>=0.6.12",
+		"muutils>=0.7.0",
 	]
 
 [project.optional-dependencies]
@@ -87,37 +87,40 @@
 		indent-style = "tab"
 		skip-magic-trailing-comma = false
 
-# Custom export configurations
-[tool.uv-exports]
-	args = [
-		"--no-hashes"
-	]
-	exports = [
-		# no groups, no extras, just the base dependencies
-		{ name = "base", groups = false, extras = false },
-		# all groups
-		{ name = "groups", groups = true, extras = false },
-		# only the lint group -- custom options for this
-		{ name = "lint", options = ["--only-group", "lint"] },
-		# # all groups and extras
-		{ name = "all", filename="requirements.txt", groups = true, extras=true },
-		# # all groups and extras, a different way
-		{ name = "all", groups = true, options = ["--all-extras"] },
-	]
+# for configuring this tool (makefile, make_docs.py)
+[tool.makefile]
+
+	# Custom export configurations
+	[tool.makefile.uv-exports]
+		args = [
+			"--no-hashes"
+		]
+		exports = [
+			# no groups, no extras, just the base dependencies
+			{ name = "base", groups = false, extras = false },
+			# all groups
+			{ name = "groups", groups = true, extras = false },
+			# only the lint group -- custom options for this
+			{ name = "lint", options = ["--only-group", "lint"] },
+			# # all groups and extras
+			{ name = "all", filename="requirements.txt", groups = true, extras=true },
+			# # all groups and extras, a different way
+			{ name = "all", groups = true, options = ["--all-extras"] },
+		]
 
 
 
-[tool.inline-todo]
-	search_dir = "."
-	out_file = "docs/other/todo-inline.md" # changing this might mean it wont be accessible from the docs
-	context_lines = 2
-	extensions = ["py", "md"]
-	tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG"]
-	exclude = [
-		"docs/**",
-		".venv/**",
-		"scripts/get_todos.py",
-	]
+	[tool.makefile.inline-todo]
+		search_dir = "."
+		out_file = "docs/other/todo-inline.md" # changing this might mean it wont be accessible from the docs
+		context_lines = 2
+		extensions = ["py", "md"]
+		tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG"]
+		exclude = [
+			"docs/**",
+			".venv/**",
+			"scripts/get_todos.py",
+		]
 
 [tool.lmcat]
 	output = "docs/other/lmcat.txt" # changing this might mean it wont be accessible from the docs

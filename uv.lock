@@ -321,11 +321,11 @@ wheels = [
 
 [[package]]
 name = "muutils"
-version = "0.6.21"
+version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c8/c4/2fd7d9676618d785602f4b115d2269d70fac8a09b76d9bbb5552769c7d67/muutils-0.6.21.tar.gz", hash = "sha256:7ba2c9a5e0d8299bd642fa12bf42e6a1520a5d5cd1cb000446a36506ae7817b9", size = 2212610 }
+sdist = { url = "https://files.pythonhosted.org/packages/7e/5a/adf2787c34e693b24b589726b60f8a27efdd2d3d43bff9713eeaad7cdf4b/muutils-0.7.0.tar.gz", hash = "sha256:d5b0cb8240d518527204d6a9a4ec082d1ae119c71d8e1d87641c07df758269f5", size = 2425816 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/79/c73abcc9a532460b8898e0ad5eebb094cbaeaefe25bd0ea788c68dd548bb/muutils-0.6.21-py3-none-any.whl", hash = "sha256:6f2fbd483890d41131ede2f9dcf396e9b874e227c5917342a738b37c56f4b689", size = 104363 },
+    { url = "https://files.pythonhosted.org/packages/c4/e5/e528b9a21f00c5e0b40b412ad24f1aff42ad79f3cccec29748d5a9da67fa/muutils-0.7.0-py3-none-any.whl", hash = "sha256:c6f881f0652c59b420581da759c780577b670cac31fa22b11af6a1a2aa9f3e1c", size = 106718 },
 ]
 
 [[package]]
@@ -363,7 +363,7 @@ lint = [
 [package.metadata]
 requires-dist = [
     { name = "fire", marker = "extra == 'cli'", specifier = ">=0.6.0" },
-    { name = "muutils", specifier = ">=0.6.12" },
+    { name = "muutils", specifier = ">=0.7.0" },
     { name = "numpy", specifier = ">=1.21.0" },
     { name = "torch", specifier = ">=2.0.0" },
     { name = "torch", marker = "extra == 'torch-cu124'", specifier = ">=2.0.0", index = "https://download.pytorch.org/whl/cu124", conflict = { package = "myproject", extra = "torch-cu124" } },
