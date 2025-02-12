@@ -34,7 +34,7 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 
 # docs
 
-you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](https://miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](https://miv.name/python-project-makefile-template/notebooks)
 
 # Makefile
 
