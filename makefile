@@ -162,43 +162,41 @@ default: help
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
 import sys
+import warnings
 
 if sys.version_info >= (3, 11):
 	import tomllib
 else:
 	import tomli as tomllib
 from pathlib import Path
-from typing import Union, List
+from typing import Any, Union, List
+from functools import reduce
 
-pyproject_path: Path = Path(sys.argv[1])
-output_dir: Path = Path(sys.argv[2])
+TOOL_PATH: str = "tool.makefile.uv-exports"
 
-with open(pyproject_path, "rb") as f:
-	pyproject_data: dict = tomllib.load(f)
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+	return reduce(
+		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
+		sequence=path.split(sep) if isinstance(path, str) else path,
+		initial=d,
+	)
 
-# all available groups
-all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-all_extras: List[str] = list(
-	pyproject_data.get("project", {}).get("optional-dependencies", {}).keys()
-)
+def export_configuration(
+		export: dict,
+		all_groups: List[str],
+		all_extras: List[str],
+		export_opts: dict,
+		output_dir: Path,
+	):
 
-# options for exporting
-export_opts: dict = pyproject_data.get("tool", {}).get("uv-exports", {})
-
-# what are we exporting?
-exports: List[str] = export_opts.get("exports", [])
-if not exports:
-	exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
-
-# export each configuration
-for export in exports:
 	# get name and validate
 	name = export.get("name")
 	if not name or not name.isalnum():
-		print(
-			f"Export configuration missing valid 'name' field {export}", file=sys.stderr
+		warnings.warn(
+			f"Export configuration missing valid 'name' field {export}",
+			file=sys.stderr,
 		)
-		continue
+		return
 
 	# get other options with default fallbacks
 	filename: str = export.get("filename") or f"requirements-{name}.txt"
@@ -235,14 +233,52 @@ for export in exports:
 	for extra in extras_list:
 		cmd.extend(["--extra", extra])
 
+	# add extra options
 	cmd.extend(options)
 
+	# assemble the command and print to console -- makefile will run it
 	output_path = output_dir / filename
 	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
 
+def main(
+	pyproject_path: Path,
+	output_dir: Path,
+):
+	# read pyproject.toml
+	with open(pyproject_path, "rb") as f:
+		pyproject_data: dict = tomllib.load(f)
+
+	# all available groups
+	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
+	all_extras: List[str] = list(deep_get(pyproject_data, "project.optional-dependencies", {}).keys())
+
+	# options for exporting
+	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
+
+	# what are we exporting?
+	exports: List[str] = export_opts.get("exports", [])
+	if not exports:
+		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
+
+	# export each configuration
+	for export in exports:
+		export_configuration(
+			export=export,
+			all_groups=all_groups,
+			all_extras=all_extras,
+			export_opts=export_opts,
+			output_dir=output_dir,
+		)
+
+if __name__ == "__main__":
+	main(
+		pyproject_path = Path(sys.argv[1]),
+		output_dir = Path(sys.argv[2]),
+	)
 endef
 
 export SCRIPT_EXPORT_REQUIREMENTS
+
 
 # get the version from `pyproject.toml:project.version`
 define SCRIPT_GET_VERSION
@@ -275,33 +311,41 @@ import subprocess
 import sys
 from typing import List
 
-last_version: str = sys.argv[1].strip()
-commit_log_file: str = sys.argv[2].strip()
 
-if last_version == "NULL":
-	print("!!! ERROR !!!", file=sys.stderr)
-	print("LAST_VERSION is NULL, can't get commit log!", file=sys.stderr)
-	sys.exit(1)
+def main(
+	last_version: str,
+	commit_log_file: str,
+):
+	if last_version == "NULL":
+		print("!!! ERROR !!!", file=sys.stderr)
+		print("LAST_VERSION is NULL, can't get commit log!", file=sys.stderr)
+		sys.exit(1)
 
-try:
-	log_cmd: List[str] = [
-		"git",
-		"log",
-		f"{last_version}..HEAD",
-		"--pretty=format:- %s (%h)",
-	]
-	commits: List[str] = (
-		subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
+	try:
+		log_cmd: List[str] = [
+			"git",
+			"log",
+			f"{last_version}..HEAD",
+			"--pretty=format:- %s (%h)",
+		]
+		commits: List[str] = (
+			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
+		)
+		with open(commit_log_file, "w") as f:
+			f.write("\n".join(reversed(commits)))
+	except subprocess.CalledProcessError as e:
+		print(f"Error: {e}", file=sys.stderr)
+		sys.exit(1)
+
+if __name__ == "__main__":
+	main(
+		last_version=sys.argv[1].strip(),
+		commit_log_file=sys.argv[2].strip(),
 	)
-	with open(commit_log_file, "w") as f:
-		f.write("\n".join(reversed(commits)))
-except subprocess.CalledProcessError as e:
-	print(f"Error: {e}", file=sys.stderr)
-	sys.exit(1)
-
 endef
 
 export SCRIPT_GET_COMMIT_LOG
+
 
 # get cuda information and whether torch sees it
 define SCRIPT_CHECK_TORCH
@@ -467,6 +511,7 @@ endef
 
 export SCRIPT_CHECK_TORCH
 
+
 # get todo's from the code
 define SCRIPT_GET_TODOS
 from __future__ import annotations
@@ -478,6 +523,7 @@ from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Union
+from functools import reduce
 import warnings
 from jinja2 import Template
 
@@ -485,6 +531,15 @@ try:
 	import tomllib  # Python 3.11+
 except ImportError:
 	import tomli as tomllib
+
+TOOL_PATH: str = "tool.makefile.uv-exports"
+
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+	return reduce(
+		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
+		sequence=path.split(sep) if isinstance(path, str) else path,
+		initial=d,
+	)
 
 
 TEMPLATE_MD: str = """\
@@ -605,8 +660,8 @@ class Config:
 				)
 
 			# load the inline-todo config if present
-			data_inline_todo: Dict[str, Any] = data.get("tool", {}).get(
-				"inline-todo", {}
+			data_inline_todo: Dict[str, Any] = deep_get(
+				d=data, path=TOOL_PATH, default={}
 			)
 
 			if "repo_url" not in data_inline_todo:
@@ -816,6 +871,7 @@ endef
 
 export SCRIPT_GET_TODOS
 
+
 # markdown to html using pdoc
 define SCRIPT_PDOC_MARKDOWN2_CLI
 import argparse
@@ -876,6 +932,84 @@ if __name__ == "__main__":
 endef
 
 export SCRIPT_PDOC_MARKDOWN2_CLI
+
+# clean up the docs (configurable in pyproject.toml)
+define SCRIPT_DOCS_CLEAN
+import sys
+import shutil
+from functools import reduce
+from pathlib import Path
+from typing import Any, List, Optional, Set
+
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
+	import tomli as tomllib
+	
+TOOL_PATH: str = "tool.makefile.docs"
+
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+	"""Get nested dictionary value via separated path with default."""
+	return reduce(
+		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
+		path=path.split(sep),
+		initial=d
+	)
+
+def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
+	if not pyproject_path.is_file():
+		return set()
+		
+	with pyproject_path.open("rb") as f:
+		config = tomllib.load(f)
+	
+	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
+	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", "docs"))
+
+	# Convert to absolute paths and validate
+	preserve_set: Set[Path] = set()
+	for p in preserved:
+		full_path = (docs_dir / p).resolve()
+		if not full_path.as_posix().startswith(docs_dir.resolve().as_posix()):
+			raise ValueError(f"Preserved path '{p}' must be within docs directory")
+		preserve_set.add(docs_dir / p)
+	
+	return docs_dir, preserve_set
+
+def clean_docs(docs_dir: Path, preserved: Set[Path]) -> None:
+	for path in docs_dir.iterdir():
+		if path.is_file() and path not in preserved:
+			path.unlink()
+		elif path.is_dir() and path not in preserved:
+			shutil.rmtree(path)
+
+def main(
+		pyproject_path: str,
+		docs_dir_cli: str,
+		extra_preserve: list[str],
+	) -> None:
+	docs_dir: Path
+	preserved: Set[Path]
+	docs_dir, preserved = read_config(Path(pyproject_path))
+
+	assert docs_dir.is_dir(), f"Docs directory '{docs_dir}' not found"
+	assert docs_dir == Path(docs_dir_cli), f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
+
+	for x in extra_preserve:
+		preserved.add(Path(x))
+	clean_docs(docs_dir, preserved)
+
+if __name__ == "__main__":
+	main(
+		sys.argv[1],
+		sys.argv[2],
+		sys.argv[3:]
+	)
+	
+
+endef
+
+export SCRIPT_DOCS_CLEAN
 
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
@@ -1100,13 +1234,13 @@ docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
 # removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
-# (templates, svg, css, make_docs.py scropy)
+# and leaves things defined in `pyproject.toml:tool.makefile.docs.no_clean`
+# (templates, svg, css, make_docs.py script)
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs except resources"
-	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -path "$(DOCS_RESOURCES_DIR)" -exec rm -rf {} +
-
+	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
 .PHONY: todo
 todo:

@@ -17,6 +17,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import warnings
 from pathlib import Path
 
+import jinja2
 import pdoc  # type: ignore[import-not-found]
 import pdoc.doc  # type: ignore[import-not-found]
 import pdoc.extract  # type: ignore[import-not-found]
@@ -24,6 +25,19 @@ import pdoc.render  # type: ignore[import-not-found]
 import pdoc.render_helpers  # type: ignore[import-not-found]
 from markupsafe import Markup
 
+
+
+"""
+ ######  ######## ######## ##     ## ########
+##    ## ##          ##    ##     ## ##     ##
+##       ##          ##    ##     ## ##     ##
+ ######  ######      ##    ##     ## ########
+      ## ##          ##    ##     ## ##
+##    ## ##          ##    ##     ## ##
+ ######  ########    ##     #######  ##
+"""
+# setup
+# ============================================================
 
 CONFIG_PATH: Path = Path("pyproject.toml")
 TOOL_PATH: str = "tool.makefile.docs"
@@ -36,6 +50,7 @@ HTML_TO_MD_MAP: Dict[str, str] = {
 	"&#39": "'",
 	"&apos;": "'",
 }
+
 pdoc.render_helpers.markdown_extensions["alerts"] = True
 pdoc.render_helpers.markdown_extensions["admonitions"] = True
 
@@ -65,51 +80,6 @@ _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
 </html>
 """
 
-# ====================================================================================================
-# CONFIGURATION -- read from CONFIG_PATH, assumed to be a pyproject.toml
-@dataclass
-class Config:
-	# under main pyproject.toml
-	package_name: str = "unknown"
-	package_repo_url: str = "unknown"
-	package_version: str = "unknown"
-	# under tool_path
-	output_dir_str: str = "docs"
-	markdown_headings_increment: int = 2
-	notebooks_enabled: bool = False
-	notebooks_descriptions: dict[str, str] = dict()
-	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
-	warnings_ignore: list[str] = []
-
-	@property
-	def package_code_url(self) -> str:
-		if "unknown" not in (self.package_name, self.package_version):
-			return self.package_repo_url + "/blob/" + self.package_version
-		else:
-			return "unknown"
-		
-	@property
-	def output_dir(self) -> Path:
-		return Path(self.output_dir_str)
-
-
-CONFIG: Config
-
-_CFG_PATHS: dict[str, str] = dict(
-	package_name="project.name",
-	package_repo_url="project.urls.Repository",
-	package_version="project.version",
-	output_dir=f"{TOOL_PATH}.output_dir",
-	markdown_headings_increment=f"{TOOL_PATH}.markdown_headings_increment",
-	notebooks_enabled=f"{TOOL_PATH}.notebooks.enabled",
-	notebooks_descriptions=f"{TOOL_PATH}.notebooks.descriptions",
-	notebooks_index_template=f"{TOOL_PATH}.notebooks.index_template",
-	warnings_ignore=f"{TOOL_PATH}.warnings_ignore",
-)
-# ====================================================================================================
-
-
-
 def deep_get(
 		d: dict,
 		path: str,
@@ -128,6 +98,64 @@ def deep_get(
 		warnings.warn(warn_msg_on_default.format(path=path))
 
 	return output
+
+
+
+# CONFIGURATION -- read from CONFIG_PATH, assumed to be a pyproject.toml
+# ============================================================
+
+@dataclass
+class Config:
+	# under main pyproject.toml
+	package_name: str = "unknown"
+	package_repo_url: str = "unknown"
+	package_version: str = "unknown"
+	# under tool_path
+	output_dir_str: str = "docs"
+	markdown_headings_increment: int = 2
+	warnings_ignore: list[str] = []
+	notebooks_enabled: bool = False
+	notebooks_descriptions: dict[str, str] = dict()
+	notebooks_source_path_str: str = "notebooks"
+	notebooks_output_path_relative_str: str = "notebooks"
+	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
+
+	@property
+	def package_code_url(self) -> str:
+		if "unknown" not in (self.package_name, self.package_version):
+			return self.package_repo_url + "/blob/" + self.package_version
+		else:
+			return "unknown"
+		
+	@property
+	def output_dir(self) -> Path:
+		return Path(self.output_dir_str)
+	
+	@property
+	def notebooks_source_path(self) -> Path:
+		return Path(self.notebooks_source_path_str)
+	
+	@property
+	def notebooks_output_path(self) -> Path:
+		return self.output_dir / self.notebooks_output_path_relative_str
+
+
+CONFIG: Config
+
+_CFG_PATHS: dict[str, str] = dict(
+	package_name="project.name",
+	package_repo_url="project.urls.Repository",
+	package_version="project.version",
+	output_dir=f"{TOOL_PATH}.output_dir",
+	markdown_headings_increment=f"{TOOL_PATH}.markdown_headings_increment",
+	warnings_ignore=f"{TOOL_PATH}.warnings_ignore",
+	notebooks_enabled=f"{TOOL_PATH}.notebooks.enabled",
+	notebooks_descriptions=f"{TOOL_PATH}.notebooks.descriptions",
+	notebooks_index_template=f"{TOOL_PATH}.notebooks.index_template",
+	notebooks_source_path_str=f"{TOOL_PATH}.notebooks.source_path",
+	notebooks_output_path_relative_str=f"{TOOL_PATH}.notebooks.output_path_relative",
+)
+
 
 def set_global_config():
 	"""set global var `CONFIG` from pyproject.toml"""
@@ -159,6 +187,18 @@ def set_global_config():
 	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url
 	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url
 
+
+"""
+##     ## ########
+###   ### ##     ##
+#### #### ##     ##
+## ### ## ##     ##
+##     ## ##     ##
+##     ## ##     ##
+##     ## ########
+"""
+# markdown
+# ============================================================
 
 def replace_heading(match):
 	current_level: int = len(match.group(1))
@@ -227,12 +267,80 @@ def use_markdown_format():
 	pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
 
 
+
+"""
+##    ## ########
+###   ## ##     ##
+####  ## ##     ##
+## ## ## ########
+##  #### ##     ##
+##   ### ##     ##
+##    ## ########
+"""
+# notebook
+# ============================================================
+def convert_notebooks():
+	
+	try:
+		import nbformat
+		import nbconvert
+	except ImportError:
+		raise ImportError('nbformat and nbconvert are required to convert notebooks to HTML, add "nbconvert>=7.16.4" to dev/docs deps')
+
+	# create output directory
+	CONFIG.notebooks_output_path.mkdir(parents=True, exist_ok=True)
+
+	# read in the notebook metadata
+	notebook_names: list[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
+	notebooks: list[dict[str, str]] = [
+		dict(
+			ipynb=notebook.name,
+			html=notebook.with_suffix(".html").name,
+			desc=CONFIG.notebooks_descriptions.get(notebook.stem, ""),
+		)
+		for notebook in notebook_names
+	]
+
+	# Render the index template
+	template: jinja2.Template = jinja2.Template(CONFIG.notebooks_index_template)
+	rendered_index: str = template.render(notebooks=notebooks)
+
+	# Write the rendered index to a file
+	index_path: Path = CONFIG.notebooks_output_path / "index.html"
+	index_path.write_text(rendered_index)
+
+	# convert with nbconvert
+	for notebook in notebook_names:
+		output_notebook: Path = CONFIG.notebooks_output_path / notebook.with_suffix(".html").name
+		with open(notebook, "r") as f:
+			nb: nbformat.NotebookNode = nbformat.read(f, as_version=4)
+			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()
+			body: str
+			body, _ = html_exporter.from_notebook_node(nb)
+			with open(output_notebook, "w") as f:
+				f.write(body)
+
+
+
+
+"""
+##     ##    ###    #### ##    ##
+###   ###   ## ##    ##  ###   ##
+#### ####  ##   ##   ##  ####  ##
+## ### ## ##     ##  ##  ## ## ##
+##     ## #########  ##  ##  ####
+##     ## ##     ##  ##  ##   ###
+##     ## ##     ## #### ##    ##
+"""
+# main
+# ============================================================
+
 def pdoc_combined(*modules, output_file: Path) -> None:
 	"""Render the documentation for a list of modules into a single HTML file.
 
 	Args:
-	    *modules: Paths or names of the modules to document.
-	    output_file: Path to the output HTML file.
+		*modules: Paths or names of the modules to document.
+		output_file: Path to the output HTML file.
 
 	This function will:
 	1. Extract all modules and submodules.
@@ -327,6 +435,10 @@ if __name__ == "__main__":
 		pdoc_combined(
 			CONFIG.package_name, output_file=CONFIG.output_dir / "combined" / f"{CONFIG.package_name}.md"
 		)
+
+	# convert notebooks if needed
+	if CONFIG.notebooks_enabled:
+		convert_notebooks()
 
 	# http server if needed
 	# --------------------------------------------------

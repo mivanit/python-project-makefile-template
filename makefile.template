@@ -166,6 +166,7 @@ endef
 
 export SCRIPT_EXPORT_REQUIREMENTS
 
+
 # get the version from `pyproject.toml:project.version`
 define SCRIPT_GET_VERSION
 ##[[SCRIPT_GET_VERSION]]##
@@ -181,12 +182,14 @@ endef
 
 export SCRIPT_GET_COMMIT_LOG
 
+
 # get cuda information and whether torch sees it
 define SCRIPT_CHECK_TORCH
 ##[[SCRIPT_CHECK_TORCH]]##
 endef
 
 export SCRIPT_CHECK_TORCH
+
 
 # get todo's from the code
 define SCRIPT_GET_TODOS
@@ -195,12 +198,20 @@ endef
 
 export SCRIPT_GET_TODOS
 
+
 # markdown to html using pdoc
 define SCRIPT_PDOC_MARKDOWN2_CLI
 ##[[SCRIPT_PDOC_MARKDOWN2_CLI]]##
 endef
 
 export SCRIPT_PDOC_MARKDOWN2_CLI
+
+# clean up the docs (configurable in pyproject.toml)
+define SCRIPT_DOCS_CLEAN
+##[[SCRIPT_DOCS_CLEAN]]##
+endef
+
+export SCRIPT_DOCS_CLEAN
 
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
@@ -425,13 +436,13 @@ docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
 # removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
-# (templates, svg, css, make_docs.py scropy)
+# and leaves things defined in `pyproject.toml:tool.makefile.docs.no_clean`
+# (templates, svg, css, make_docs.py script)
 # distinct from `make clean`
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs except resources"
-	@find $(DOCS_DIR) -mindepth 1 -maxdepth 1 -not -path "$(DOCS_RESOURCES_DIR)" -exec rm -rf {} +
-
+	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
 .PHONY: todo
 todo:
