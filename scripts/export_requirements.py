@@ -13,9 +13,9 @@ TOOL_PATH: str = "tool.makefile.uv-exports"
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	return reduce(
-		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
-		sequence=path.split(sep) if isinstance(path, str) else path,
-		initial=d,
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path, # sequence
+		d, # initial
 	)
 
 def export_configuration(

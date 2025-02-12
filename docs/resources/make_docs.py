@@ -89,9 +89,9 @@ def deep_get(
 	) -> Any:
 
 	output: Any = reduce(
-		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
-		sequence=path.split(sep) if isinstance(path, str) else path,
-		initial=d,
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path, # sequence
+		d, # initial
 	)
 
 	if warn_msg_on_default and output == default:

@@ -14,9 +14,9 @@ TOOL_PATH: str = "tool.makefile.docs"
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	"""Get nested dictionary value via separated path with default."""
 	return reduce(
-		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
-		path=path.split(sep),
-		initial=d
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path, # sequence
+		d, # initial
 	)
 
 def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
