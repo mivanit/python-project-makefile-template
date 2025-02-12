@@ -77,7 +77,8 @@ jobs:
       - run: make todo
 
       # only if version is > 3.11
-      - if: matrix.versions.python >= '3.11'
+      - name: lmcat
+        if: ${{ matrix.versions.python }} >= '3.11'
         run: |
           make lmcat-tree
           make lmcat
