@@ -1247,8 +1247,7 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo
-	-$(MAKE) lmcat
+docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
 # removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
@@ -1269,12 +1268,12 @@ todo:
 .PHONY: lmcat-tree
 lmcat-tree:
 	@echo "show in console the lmcat tree view"
-	$(PYTHON) -m lmcat -t --output STDOUT
+	-$(PYTHON) -m lmcat -t --output STDOUT
 
 .PHONY: lmcat
 lmcat:
 	@echo "write the lmcat full output to pyproject.toml:[tool.lmcat.output]"
-	$(PYTHON) -m lmcat
+	-$(PYTHON) -m lmcat
 
 ########  ##     ## #### ##       ########
 ##     ## ##     ##  ##  ##       ##     ##

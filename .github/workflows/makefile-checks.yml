@@ -74,13 +74,9 @@ jobs:
       - run: make docs-combined
       - run: make docs
       - run: make todo
-
-      # only if version is > 3.11
-      - name: lmcat
-        if: ${{ matrix.versions.python }} >= '3.11'
-        run: |
-          make lmcat-tree
-          make lmcat
+      # these two will not work under python < 3.11
+      - run: make lmcat-tree
+      - run: make lmcat
 
       # Cleanup commands  
       - run: make docs-clean

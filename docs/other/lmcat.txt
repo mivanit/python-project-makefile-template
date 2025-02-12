@@ -1,8 +1,8 @@
 # Stats
-- 19 files
-- 3585 (3.6K) lines
-- 108100 (108K) chars
-- 12895 (13K) `whitespace-split` tokens
+- 20 files
+- 3654 (3.7K) lines
+- 109621 (110K) chars
+- 13102 (13K) `whitespace-split` tokens
 
 # File Tree
 
@@ -10,7 +10,8 @@
 python-project-makefile-template  
 ├── .github                       
 │   └── workflows                 
-│    └── checks.yml               [  118L  2,618C   262T]
+│    ├── checks.yml               [   80L  1,643C   162T]
+│    └── makefile-checks.yml      [   85L  1,901C   232T]
 ├── myproject                     
 │   ├── __init__.py               [    3L     34C     5T]
 │   ├── helloworld.py             [   12L    359C    49T]
@@ -19,20 +20,20 @@ python-project-makefile-template
 │   ├── example.ipynb             [   66L  1,154C   133T]
 │   └── no_desc.ipynb             [   34L    640C    72T]
 ├── scripts                       
-│   ├── assemble_make.py          [   55L  1,380C   136T]
-│   ├── check_torch.py            [  157L  4,424C   419T]
+│   ├── assemble_make.py          [   59L  1,448C   146T]
+│   ├── check_torch.py            [  161L  4,514C   431T]
 │   ├── docs_clean.py             [   73L  2,165C   254T]
-│   ├── export_requirements.py    [  119L  2,896C   336T]
+│   ├── export_requirements.py    [  119L  2,899C   336T]
 │   ├── get_commit_log.py         [   36L    777C    72T]
 │   ├── get_todos.py              [  353L  9,179C 1,036T]
-│   ├── get_version.py            [   17L    339C    37T]
+│   ├── get_version.py            [   17L    342C    37T]
 │   └── pdoc_markdown2_cli.py     [   54L  1,448C   144T]
 ├── tests                         
 │   └── test_nothing.py           [    2L     42C     5T]
-├── README.md                     [   92L  5,353C   681T]
-├── makefile                      [1,436L 43,530C 5,249T]
-├── makefile.template             [  627L 22,445C 2,955T]
-├── pyproject.toml                [  224L  6,135C   769T]
+├── README.md                     [   92L  5,369C   681T]
+├── makefile                      [1,443L 43,676C 5,270T]
+├── makefile.template             [  630L 22,495C 2,964T]
+├── pyproject.toml                [  224L  6,176C   779T]
 ```
 
 # File Contents
@@ -56,11 +57,8 @@ jobs:
     strategy:
       matrix:
         versions:
-          - python: "3.8"
-          - python: "3.9"
-          - python: "3.10"
           - python: "3.11"
-          - python: "3.12"
+          # - python: "3.12"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -107,7 +105,7 @@ jobs:
       matrix:
         versions:
           - python: "3.11"
-          - python: "3.12"
+          # - python: "3.12"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -121,42 +119,95 @@ jobs:
 
       - name: Unit tests
         run: make test
-  
-  # the following tests are only for making sure the makefile works properly. you can remove them.
-  make-docs:
-    name: make docs (and coverage too)
+``````{ end_of_file=".github/workflows/checks.yml" }
+
+``````{ path=".github/workflows/makefile-checks.yml"  }
+name: Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - main
+
+jobs:
+  test-make:
+    name: Test Make Recipes
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false  # Continue with other versions if one fails
       matrix:
         versions:
-          - python: "3.8"
           - python: "3.9"
           - python: "3.10"
           - python: "3.11"
           - python: "3.12"
+          - python: "3.13"	  
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version commands
+      
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.versions.python }}
 
-      - name: install
+      - name: Setup
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           make setup
-      
-      - name: Install pandoc
+
+      - name: Install system dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pandoc
           version: '3.3'
-      
-      - name: Check pandoc version
-        run: pandoc --version
 
-      - name: docs
-        run: make docs
-``````{ end_of_file=".github/workflows/checks.yml" }
+      # Info commands
+      - run: make
+      - run: make help
+      - run: make info
+      - run: make info-long
+      - run: make version
+
+      # Dependency commands  
+      - run: make dep-check
+      - run: make dep
+      - run: make dep-check-torch
+
+      # Code quality commands
+      - run: make format-check
+      - run: make format 
+      - run: make typing
+
+      # Build commands
+      - run: make build
+      - run: make verify-git
+
+      # Testing commands
+      - run: make test
+      - run: make check
+      - run: make cov
+
+      # Documentation commands
+      - run: make docs-html
+      - run: make docs-md
+      - run: make docs-combined
+      - run: make docs
+      - run: make todo
+      # these two will not work under python < 3.11
+      - run: make lmcat-tree
+      - run: make lmcat
+
+      # Cleanup commands  
+      - run: make docs-clean
+      - run: make clean
+      - run: make dep-clean
+      - run: make clean-all
+``````{ end_of_file=".github/workflows/makefile-checks.yml" }
 
 ``````{ path="myproject/__init__.py"  }
 """
@@ -298,8 +349,12 @@ def another_function():
 
 ``````{ path="scripts/assemble_make.py"  }
 from pathlib import Path
-import tomllib
 from typing import Dict
+
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
+	import tomli as tomllib
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
@@ -380,13 +435,17 @@ def print_info_dict(
 
 def get_nvcc_info() -> Dict[str, str]:
 	# Run the nvcc command.
-	result: subprocess.CompletedProcess[str] = subprocess.run(
-		["nvcc", "--version"],
-		check=True,
-		stdout=subprocess.PIPE,
-		stderr=subprocess.PIPE,
-		text=True,
-	)
+	try:
+		result: subprocess.CompletedProcess[str] = subprocess.run(
+			["nvcc", "--version"],
+			check=True,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.PIPE,
+			text=True,
+		)
+	except Exception as e:
+		return {"Failed to run 'nvcc --version'": str(e)}
+
 	output: str = result.stdout
 	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
@@ -597,9 +656,9 @@ if __name__ == "__main__":
 import sys
 import warnings
 
-if sys.version_info >= (3, 11):
-	import tomllib
-else:
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
 	import tomli as tomllib
 from pathlib import Path
 from typing import Any, Union, List
@@ -1117,9 +1176,9 @@ if __name__ == "__main__":
 import sys
 
 try:
-	if sys.version_info >= (3, 11):
-		import tomllib
-	else:
+	try:
+		import tomllib  # Python 3.11+
+	except ImportError:
 		import tomli as tomllib
 
 	pyproject_path: str = sys.argv[1].strip()
@@ -1235,7 +1294,7 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 
 # docs
 
-you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](https://miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](https://miv.name/python-project-makefile-template/notebooks)
 
 # Makefile
 
@@ -1298,7 +1357,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.1.3                                                  |
+#| version: v0.2.0                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -1462,9 +1521,9 @@ define SCRIPT_EXPORT_REQUIREMENTS
 import sys
 import warnings
 
-if sys.version_info >= (3, 11):
-	import tomllib
-else:
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
 	import tomli as tomllib
 from pathlib import Path
 from typing import Any, Union, List
@@ -1589,9 +1648,9 @@ define SCRIPT_GET_VERSION
 import sys
 
 try:
-	if sys.version_info >= (3, 11):
-		import tomllib
-	else:
+	try:
+		import tomllib  # Python 3.11+
+	except ImportError:
 		import tomli as tomllib
 
 	pyproject_path: str = sys.argv[1].strip()
@@ -1679,13 +1738,17 @@ def print_info_dict(
 
 def get_nvcc_info() -> Dict[str, str]:
 	# Run the nvcc command.
-	result: subprocess.CompletedProcess[str] = subprocess.run(
-		["nvcc", "--version"],
-		check=True,
-		stdout=subprocess.PIPE,
-		stderr=subprocess.PIPE,
-		text=True,
-	)
+	try:
+		result: subprocess.CompletedProcess[str] = subprocess.run(
+			["nvcc", "--version"],
+			check=True,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.PIPE,
+			text=True,
+		)
+	except Exception as e:
+		return {"Failed to run 'nvcc --version'": str(e)}
+
 	output: str = result.stdout
 	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
@@ -2560,12 +2623,12 @@ todo:
 .PHONY: lmcat-tree
 lmcat-tree:
 	@echo "show in console the lmcat tree view"
-	$(PYTHON) -m lmcat -t --output STDOUT
+	-$(PYTHON) -m lmcat -t --output STDOUT
 
 .PHONY: lmcat
 lmcat:
 	@echo "write the lmcat full output to pyproject.toml:[tool.lmcat.output]"
-	$(PYTHON) -m lmcat
+	-$(PYTHON) -m lmcat
 
 ########  ##     ## #### ##       ########
 ##     ## ##     ##  ##  ##       ##     ##
@@ -2587,11 +2650,14 @@ verify-git:
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Git is not on the $(PUBLISH_BRANCH) branch, exiting!"; \
+		git branch; \
+		git status; \
 		exit 1; \
 	fi; \
 	if [ -n "$(shell git status --porcelain)" ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Git is not clean, exiting!"; \
+		git status; \
 		exit 1; \
 	fi; \
 
@@ -2654,7 +2720,7 @@ clean:
 	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
 
 .PHONY: clean-all
-clean-all: clean dep-clean docs-clean
+clean-all: clean docs-clean dep-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
 
 
@@ -3190,12 +3256,12 @@ todo:
 .PHONY: lmcat-tree
 lmcat-tree:
 	@echo "show in console the lmcat tree view"
-	$(PYTHON) -m lmcat -t --output STDOUT
+	-$(PYTHON) -m lmcat -t --output STDOUT
 
 .PHONY: lmcat
 lmcat:
 	@echo "write the lmcat full output to pyproject.toml:[tool.lmcat.output]"
-	$(PYTHON) -m lmcat
+	-$(PYTHON) -m lmcat
 
 ########  ##     ## #### ##       ########
 ##     ## ##     ##  ##  ##       ##     ##
@@ -3217,11 +3283,14 @@ verify-git:
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Git is not on the $(PUBLISH_BRANCH) branch, exiting!"; \
+		git branch; \
+		git status; \
 		exit 1; \
 	fi; \
 	if [ -n "$(shell git status --porcelain)" ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Git is not clean, exiting!"; \
+		git status; \
 		exit 1; \
 	fi; \
 
@@ -3284,7 +3353,7 @@ clean:
 	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
 
 .PHONY: clean-all
-clean-all: clean dep-clean docs-clean
+clean-all: clean docs-clean dep-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
 
 
@@ -3366,26 +3435,26 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.1.3"
+	version = "0.2.0"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
 	]
 	readme = "README.md"
-	requires-python = ">=3.11"
+	requires-python = ">=3.9"
 
 	# dependencies
 
 	dependencies = [
 		"numpy>=1.21.0",
-		"torch>=2.0.0",
+		"torch>=1.13.0",
 		"muutils>=0.7.0",
 		"ipykernel>=6.29.5",
 	]
 
 [project.optional-dependencies]
 	# handling torch
-	torch-cu124 = [ "torch>=2.0.0" ]
+	# torch-cu124 = [ "torch>=1.13.0" ]
 
 	# for example purposes only
 	cli = [
@@ -3405,7 +3474,7 @@ help: help-targets info
 		'pdoc>=14.6.0',
 		"nbconvert>=7.16.4", # for notebooks
 		# lmcat -- a custom library. not exactly docs, but lets an LLM see all the code
-		"lmcat>=0.2.0",
+		"lmcat>=0.2.0; python_version >= '3.11'",
 		# tomli since no tomlib in python < 3.11
 		"tomli>=2.1.0; python_version < '3.11'",
 	]
@@ -3430,13 +3499,13 @@ help: help-targets info
 [tool.uv]
 	default-groups = ["dev", "lint"]
 
-	[tool.uv.sources]
-		torch = [ { index = "pytorch-cu124", extra = "torch-cu124" } ]
+	# [tool.uv.sources]
+	# 	torch = [ { index = "pytorch-cu124", extra = "torch-cu124" } ]
 
-	[[tool.uv.index]]
-	name = "pytorch-cu124"
-	url = "https://download.pytorch.org/whl/cu124"
-	explicit = true
+	# [[tool.uv.index]]
+	# name = "pytorch-cu124"
+	# url = "https://download.pytorch.org/whl/cu124"
+	# explicit = true
 
 [build-system]
 	requires = ["hatchling"]
