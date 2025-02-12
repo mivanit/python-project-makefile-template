@@ -161,7 +161,7 @@ class Config:
 	@classmethod
 	def load(cls, data: dict) -> Config:
 		data = {
-			k: Path(v) if k in {"search_dir", "out_file"} else v
+			k: Path(v) if k in {"search_dir", "out_file", "template_html_source"} else v
 			for k, v in data.items()
 		}
 
@@ -230,7 +230,7 @@ class TodoItem:
 	def file_lang(self) -> str:
 		"""Returns the language for the file extension"""
 		ext: str = Path(self.file).suffix.lstrip(".")
-		return CFG.extension_lang_map.get(ext, "text")
+		return CFG.extension_lang_map.get(ext, ext)
 
 
 def scrape_file(
