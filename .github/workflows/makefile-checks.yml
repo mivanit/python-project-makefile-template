@@ -56,8 +56,8 @@ jobs:
       - run: make dep-check-torch
 
       # Code quality commands
-      - run: make format 
       - run: make format-check
+      - run: make format 
       - run: make typing
 
       # Build commands
