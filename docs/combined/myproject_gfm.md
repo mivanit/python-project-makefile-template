@@ -56,6 +56,13 @@ they are machine-readable.
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for
     the docs
 
+# docs
+
+you can see the generated docs for this repo at
+[`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template),
+or the generated docs for the notebooks at
+[`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+
 # Makefile
 
 `make help` Displays the help message listing all available make targets
@@ -124,7 +131,7 @@ python scripts/assemble_make.py
 - [`other`](#other)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/__init__.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3__init__.py)
 
 # `myproject`
 
@@ -179,6 +186,13 @@ they are machine-readable.
     for the todolist
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for
     the docs
+
+### docs
+
+you can see the generated docs for this repo at
+[`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template),
+or the generated docs for the notebooks at
+[`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
 
 ### Makefile
 
@@ -243,7 +257,7 @@ python scripts/assemble_make.py
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/__init__.py#L0-L2)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3__init__.py#L0-L2)
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
@@ -255,12 +269,12 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/_
 - [`critical_function`](#critical_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py)
 
 # `myproject.helloworld`
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L0-L11)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L0-L11)
 
 ### `def some_function`
 
@@ -269,7 +283,7 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/h
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L6-L7)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L6-L7)
 
 ### `def critical_function`
 
@@ -278,7 +292,7 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/h
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L11-L12)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L11-L12)
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
@@ -289,12 +303,12 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/h
 - [`another_function`](#another_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py)
 
 # `myproject.other`
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py#L0-L2)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py#L0-L2)
 
 ### `def another_function`
 
@@ -303,4 +317,4 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/o
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py#L2-L3)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py#L2-L3)

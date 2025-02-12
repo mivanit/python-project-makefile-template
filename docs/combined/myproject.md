@@ -36,6 +36,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for the docs
 
 
+# docs
+
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+
 # Makefile
 
 `make help` Displays the help message listing all available make targets and variables. running just `make` will also display this message.
@@ -100,7 +104,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3__init__.py)
 
 # `myproject` { #myproject }
 
@@ -137,6 +141,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - `docs/resources/templates/`: jinja2 templates for the docs, template for the todolist
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for the docs
 
+
+### docs
+
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
 
 ### Makefile
 
@@ -194,7 +202,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/__init__.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3__init__.py#L0-L2)
 
 
 
@@ -213,12 +221,12 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L0-L11)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L0-L11)
 
 
 
@@ -228,7 +236,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L6-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L6-L7)
 
 
 
@@ -239,7 +247,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/helloworld.py#L11-L12)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L11-L12)
 
 
 
@@ -258,12 +266,12 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py)
 
 # `myproject.other` { #myproject.other }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py#L0-L2)
 
 
 
@@ -273,7 +281,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3/other.py#L2-L3)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py#L2-L3)
 
 
 
