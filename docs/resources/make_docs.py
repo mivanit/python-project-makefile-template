@@ -13,7 +13,7 @@ from functools import reduce
 import inspect
 import re
 import tomllib
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 import warnings
 from pathlib import Path
 
@@ -24,7 +24,6 @@ import pdoc.extract  # type: ignore[import-not-found]
 import pdoc.render  # type: ignore[import-not-found]
 import pdoc.render_helpers  # type: ignore[import-not-found]
 from markupsafe import Markup
-
 
 
 """
@@ -80,18 +79,18 @@ _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
 </html>
 """
 
-def deep_get(
-		d: dict,
-		path: str,
-		default: Any = None,
-		sep: str = ".",
-		warn_msg_on_default: Optional[str] = None,
-	) -> Any:
 
+def deep_get(
+	d: dict,
+	path: str,
+	default: Any = None,
+	sep: str = ".",
+	warn_msg_on_default: Optional[str] = None,
+) -> Any:
 	output: Any = reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path, # sequence
-		d, # initial
+		path.split(sep) if isinstance(path, str) else path,  # sequence
+		d,  # initial
 	)
 
 	if warn_msg_on_default and output == default:
@@ -100,9 +99,9 @@ def deep_get(
 	return output
 
 
-
 # CONFIGURATION -- read from CONFIG_PATH, assumed to be a pyproject.toml
 # ============================================================
+
 
 @dataclass
 class Config:
@@ -126,15 +125,15 @@ class Config:
 			return self.package_repo_url + "/blob/" + self.package_version
 		else:
 			return "unknown"
-		
+
 	@property
 	def output_dir(self) -> Path:
 		return Path(self.output_dir_str)
-	
+
 	@property
 	def notebooks_source_path(self) -> Path:
 		return Path(self.notebooks_source_path_str)
-	
+
 	@property
 	def notebooks_output_path(self) -> Path:
 		return self.output_dir / self.notebooks_output_path_relative_str
@@ -173,7 +172,9 @@ def set_global_config():
 			d=pyproject_data,
 			path=path,
 			default=getattr(cfg_default, key),
-			warn_msg_on_default=f"could not find {path}" if key.startswith("package") else None,
+			warn_msg_on_default=f"could not find {path}"
+			if key.startswith("package")
+			else None,
 		)
 		for key, path in _CFG_PATHS.items()
 	}
@@ -200,10 +201,14 @@ def set_global_config():
 # markdown
 # ============================================================
 
+
 def replace_heading(match):
 	current_level: int = len(match.group(1))
-	new_level: int = min(current_level + CONFIG.markdown_headings_increment, 6)  # Cap at h6
+	new_level: int = min(
+		current_level + CONFIG.markdown_headings_increment, 6
+	)  # Cap at h6
 	return "#" * new_level + match.group(2)
+
 
 def increment_markdown_headings(markdown_text: str) -> str:
 	"""
@@ -267,7 +272,6 @@ def use_markdown_format():
 	pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
 
 
-
 """
 ##    ## ########
 ###   ## ##     ##
@@ -277,15 +281,18 @@ def use_markdown_format():
 ##   ### ##     ##
 ##    ## ########
 """
+
+
 # notebook
 # ============================================================
 def convert_notebooks():
-	
 	try:
 		import nbformat
 		import nbconvert
 	except ImportError:
-		raise ImportError('nbformat and nbconvert are required to convert notebooks to HTML, add "nbconvert>=7.16.4" to dev/docs deps')
+		raise ImportError(
+			'nbformat and nbconvert are required to convert notebooks to HTML, add "nbconvert>=7.16.4" to dev/docs deps'
+		)
 
 	# create output directory
 	CONFIG.notebooks_output_path.mkdir(parents=True, exist_ok=True)
@@ -311,7 +318,9 @@ def convert_notebooks():
 
 	# convert with nbconvert
 	for notebook in notebook_names:
-		output_notebook: Path = CONFIG.notebooks_output_path / notebook.with_suffix(".html").name
+		output_notebook: Path = (
+			CONFIG.notebooks_output_path / notebook.with_suffix(".html").name
+		)
 		with open(notebook, "r") as f:
 			nb: nbformat.NotebookNode = nbformat.read(f, as_version=4)
 			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()
@@ -319,8 +328,6 @@ def convert_notebooks():
 			body, _ = html_exporter.from_notebook_node(nb)
 			with open(output_notebook, "w") as f:
 				f.write(body)
-
-
 
 
 """
@@ -334,6 +341,7 @@ def convert_notebooks():
 """
 # main
 # ============================================================
+
 
 def pdoc_combined(*modules, output_file: Path) -> None:
 	"""Render the documentation for a list of modules into a single HTML file.
@@ -433,7 +441,8 @@ if __name__ == "__main__":
 	else:
 		use_markdown_format()
 		pdoc_combined(
-			CONFIG.package_name, output_file=CONFIG.output_dir / "combined" / f"{CONFIG.package_name}.md"
+			CONFIG.package_name,
+			output_file=CONFIG.output_dir / "combined" / f"{CONFIG.package_name}.md",
 		)
 
 	# convert notebooks if needed

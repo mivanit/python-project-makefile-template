@@ -176,21 +176,22 @@ from functools import reduce
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
 
+
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path, # sequence
-		d, # initial
+		path.split(sep) if isinstance(path, str) else path,  # sequence
+		d,  # initial
 	)
 
-def export_configuration(
-		export: dict,
-		all_groups: List[str],
-		all_extras: List[str],
-		export_opts: dict,
-		output_dir: Path,
-	):
 
+def export_configuration(
+	export: dict,
+	all_groups: List[str],
+	all_extras: List[str],
+	export_opts: dict,
+	output_dir: Path,
+):
 	# get name and validate
 	name = export.get("name")
 	if not name or not name.isalnum():
@@ -242,6 +243,7 @@ def export_configuration(
 	output_path = output_dir / filename
 	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
 
+
 def main(
 	pyproject_path: Path,
 	output_dir: Path,
@@ -252,7 +254,9 @@ def main(
 
 	# all available groups
 	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-	all_extras: List[str] = list(deep_get(pyproject_data, "project.optional-dependencies", {}).keys())
+	all_extras: List[str] = list(
+		deep_get(pyproject_data, "project.optional-dependencies", {}).keys()
+	)
 
 	# options for exporting
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
@@ -272,11 +276,13 @@ def main(
 			output_dir=output_dir,
 		)
 
+
 if __name__ == "__main__":
 	main(
-		pyproject_path = Path(sys.argv[1]),
-		output_dir = Path(sys.argv[2]),
+		pyproject_path=Path(sys.argv[1]),
+		output_dir=Path(sys.argv[2]),
 	)
+
 endef
 
 export SCRIPT_EXPORT_REQUIREMENTS
@@ -339,11 +345,13 @@ def main(
 		print(f"Error: {e}", file=sys.stderr)
 		sys.exit(1)
 
+
 if __name__ == "__main__":
 	main(
 		last_version=sys.argv[1].strip(),
 		commit_log_file=sys.argv[2].strip(),
 	)
+
 endef
 
 export SCRIPT_GET_COMMIT_LOG
@@ -536,11 +544,12 @@ except ImportError:
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
 
+
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path, # sequence
-		d, # initial
+		path.split(sep) if isinstance(path, str) else path,  # sequence
+		d,  # initial
 	)
 
 
@@ -679,7 +688,7 @@ class Config:
 	@classmethod
 	def load(cls, data: dict) -> Config:
 		data = {
-			k: Path(v) if k in {"search_dir", "out_file"} else v
+			k: Path(v) if k in {"search_dir", "out_file", "template_html_source"} else v
 			for k, v in data.items()
 		}
 
@@ -748,7 +757,7 @@ class TodoItem:
 	def file_lang(self) -> str:
 		"""Returns the language for the file extension"""
 		ext: str = Path(self.file).suffix.lstrip(".")
-		return CFG.extension_lang_map.get(ext, "text")
+		return CFG.extension_lang_map.get(ext, ext)
 
 
 def scrape_file(
@@ -941,30 +950,32 @@ import sys
 import shutil
 from functools import reduce
 from pathlib import Path
-from typing import Any, List, Optional, Set
+from typing import Any, List, Set
 
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
 	import tomli as tomllib
-	
+
 TOOL_PATH: str = "tool.makefile.docs"
+
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	"""Get nested dictionary value via separated path with default."""
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path, # sequence
-		d, # initial
+		path.split(sep) if isinstance(path, str) else path,  # sequence
+		d,  # initial
 	)
+
 
 def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	if not pyproject_path.is_file():
 		return set()
-		
+
 	with pyproject_path.open("rb") as f:
 		config = tomllib.load(f)
-	
+
 	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
 	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", "docs"))
 
@@ -975,8 +986,9 @@ def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 		if not full_path.as_posix().startswith(docs_dir.resolve().as_posix()):
 			raise ValueError(f"Preserved path '{p}' must be within docs directory")
 		preserve_set.add(docs_dir / p)
-	
+
 	return docs_dir, preserve_set
+
 
 def clean_docs(docs_dir: Path, preserved: Set[Path]) -> None:
 	for path in docs_dir.iterdir():
@@ -985,29 +997,28 @@ def clean_docs(docs_dir: Path, preserved: Set[Path]) -> None:
 		elif path.is_dir() and path not in preserved:
 			shutil.rmtree(path)
 
+
 def main(
-		pyproject_path: str,
-		docs_dir_cli: str,
-		extra_preserve: list[str],
-	) -> None:
+	pyproject_path: str,
+	docs_dir_cli: str,
+	extra_preserve: list[str],
+) -> None:
 	docs_dir: Path
 	preserved: Set[Path]
 	docs_dir, preserved = read_config(Path(pyproject_path))
 
 	assert docs_dir.is_dir(), f"Docs directory '{docs_dir}' not found"
-	assert docs_dir == Path(docs_dir_cli), f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
+	assert docs_dir == Path(docs_dir_cli), (
+		f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
+	)
 
 	for x in extra_preserve:
 		preserved.add(Path(x))
 	clean_docs(docs_dir, preserved)
 
+
 if __name__ == "__main__":
-	main(
-		sys.argv[1],
-		sys.argv[2],
-		sys.argv[3:]
-	)
-	
+	main(sys.argv[1], sys.argv[2], sys.argv[3:])
 
 endef
 

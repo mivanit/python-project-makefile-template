@@ -11,21 +11,22 @@ from functools import reduce
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
 
+
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path, # sequence
-		d, # initial
+		path.split(sep) if isinstance(path, str) else path,  # sequence
+		d,  # initial
 	)
 
-def export_configuration(
-		export: dict,
-		all_groups: List[str],
-		all_extras: List[str],
-		export_opts: dict,
-		output_dir: Path,
-	):
 
+def export_configuration(
+	export: dict,
+	all_groups: List[str],
+	all_extras: List[str],
+	export_opts: dict,
+	output_dir: Path,
+):
 	# get name and validate
 	name = export.get("name")
 	if not name or not name.isalnum():
@@ -77,6 +78,7 @@ def export_configuration(
 	output_path = output_dir / filename
 	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
 
+
 def main(
 	pyproject_path: Path,
 	output_dir: Path,
@@ -87,7 +89,9 @@ def main(
 
 	# all available groups
 	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-	all_extras: List[str] = list(deep_get(pyproject_data, "project.optional-dependencies", {}).keys())
+	all_extras: List[str] = list(
+		deep_get(pyproject_data, "project.optional-dependencies", {}).keys()
+	)
 
 	# options for exporting
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
@@ -107,8 +111,9 @@ def main(
 			output_dir=output_dir,
 		)
 
+
 if __name__ == "__main__":
 	main(
-		pyproject_path = Path(sys.argv[1]),
-		output_dir = Path(sys.argv[2]),
+		pyproject_path=Path(sys.argv[1]),
+		output_dir=Path(sys.argv[2]),
 	)

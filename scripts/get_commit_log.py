@@ -28,6 +28,7 @@ def main(
 		print(f"Error: {e}", file=sys.stderr)
 		sys.exit(1)
 
+
 if __name__ == "__main__":
 	main(
 		last_version=sys.argv[1].strip(),
