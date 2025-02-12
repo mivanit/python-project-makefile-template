@@ -1295,11 +1295,14 @@ verify-git:
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Git is not on the $(PUBLISH_BRANCH) branch, exiting!"; \
+		git branch; \
+		git status; \
 		exit 1; \
 	fi; \
 	if [ -n "$(shell git status --porcelain)" ]; then \
 		echo "!!! ERROR !!!"; \
 		echo "Git is not clean, exiting!"; \
+		git status; \
 		exit 1; \
 	fi; \
 
