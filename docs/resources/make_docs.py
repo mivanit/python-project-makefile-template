@@ -8,11 +8,12 @@ as this makes it easier to find edits when updating
 """
 
 import argparse
+from dataclasses import dataclass
 from functools import reduce
 import inspect
 import re
 import tomllib
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 import warnings
 from pathlib import Path
 
@@ -23,15 +24,91 @@ import pdoc.render  # type: ignore[import-not-found]
 import pdoc.render_helpers  # type: ignore[import-not-found]
 from markupsafe import Markup
 
+
+CONFIG_PATH: Path = Path("pyproject.toml")
+TOOL_PATH: str = "tool.makefile.docs"
+
+HTML_TO_MD_MAP: Dict[str, str] = {
+	"&gt;": ">",
+	"&lt;": "<",
+	"&amp;": "&",
+	"&quot;": '"',
+	"&#39": "'",
+	"&apos;": "'",
+}
+pdoc.render_helpers.markdown_extensions["alerts"] = True
+pdoc.render_helpers.markdown_extensions["admonitions"] = True
+
+
+_CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Notebooks</title>
+	<link rel="stylesheet" href="../resources/css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" href="../resources/css/theme.css">
+	<link rel="stylesheet" href="../resources/css/content.css">
+</head>
+<body>    
+	<h1>Notebooks</h1>
+	<p>
+		You can find the source code for the notebooks at
+		<a href="{{ notebook_url }}">{{ notebook_url }}</a>.
+	<ul>
+		{% for notebook in notebooks %}
+		<li><a href="{{ notebook.html }}">{{ notebook.ipynb }}</a> {{ notebook.desc }}</li>
+		{% endfor %}
+	</ul>
+	<a href="../">Back to index</a>
+</body>
+</html>
+"""
+
 # ====================================================================================================
-# CONFIGURATION
-PACKAGE_NAME: str
-PACKAGE_REPO_URL: str
-PACKAGE_CODE_URL: str
-PACKAGE_VERSION: str
+# CONFIGURATION -- read from CONFIG_PATH, assumed to be a pyproject.toml
+@dataclass
+class Config:
+	# under main pyproject.toml
+	package_name: str = "unknown"
+	package_repo_url: str = "unknown"
+	package_version: str = "unknown"
+	# under tool_path
+	output_dir_str: str = "docs"
+	markdown_headings_increment: int = 2
+	notebooks_enabled: bool = False
+	notebooks_descriptions: dict[str, str] = dict()
+	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
+	warnings_ignore: list[str] = []
+
+	@property
+	def package_code_url(self) -> str:
+		if "unknown" not in (self.package_name, self.package_version):
+			return self.package_repo_url + "/blob/" + self.package_version
+		else:
+			return "unknown"
+		
+	@property
+	def output_dir(self) -> Path:
+		return Path(self.output_dir_str)
+
+
+CONFIG: Config
+
+_CFG_PATHS: dict[str, str] = dict(
+	package_name="project.name",
+	package_repo_url="project.urls.Repository",
+	package_version="project.version",
+	output_dir=f"{TOOL_PATH}.output_dir",
+	markdown_headings_increment=f"{TOOL_PATH}.markdown_headings_increment",
+	notebooks_enabled=f"{TOOL_PATH}.notebooks.enabled",
+	notebooks_descriptions=f"{TOOL_PATH}.notebooks.descriptions",
+	notebooks_index_template=f"{TOOL_PATH}.notebooks.index_template",
+	warnings_ignore=f"{TOOL_PATH}.warnings_ignore",
+)
 # ====================================================================================================
 
-TOOL_PATH: str = "tool.makefile.make-docs"
+
 
 def deep_get(
 		d: dict,
@@ -52,67 +129,58 @@ def deep_get(
 
 	return output
 
+def set_global_config():
+	"""set global var `CONFIG` from pyproject.toml"""
+	global CONFIG
 
-pdoc.render_helpers.markdown_extensions["alerts"] = True
-pdoc.render_helpers.markdown_extensions["admonitions"] = True
+	# get the default and read the data
+	cfg_default: Config = Config()
 
-
-def get_package_meta_global(config_path: Union[str, Path] = Path("pyproject.toml")):
-	"""set global vars from pyproject.toml
-
-	sets the global vars:
-
-	- `PACKAGE_NAME`
-	- `PACKAGE_REPO_URL`
-	- `PACKAGE_CODE_URL`
-	- `PACKAGE_VERSION`
-	"""
-	global PACKAGE_NAME, PACKAGE_REPO_URL, PACKAGE_CODE_URL, PACKAGE_VERSION
-	config_path = Path(config_path)
-	with config_path.open("rb") as f:
+	with CONFIG_PATH.open("rb") as f:
 		pyproject_data = tomllib.load(f)
-	PACKAGE_VERSION = deep_get(pyproject_data, "project.version", "unknown", warn_msg_on_default="could not find {path}")
-	PACKAGE_NAME = deep_get(pyproject_data, "project.name", "unknown", warn_msg_on_default="could not find {path}")
-	PACKAGE_REPO_URL = deep_get(pyproject_data, "project.urls.Repository", "unknown", warn_msg_on_default="could not find {path}")
-	PACKAGE_CODE_URL = f"{PACKAGE_REPO_URL}/blob/{PACKAGE_VERSION}/"
+
+	# apply the mapping from toml path to attribute
+	cfg_partial: dict = {
+		key: deep_get(
+			d=pyproject_data,
+			path=path,
+			default=getattr(cfg_default, key),
+			warn_msg_on_default=f"could not find {path}" if key.startswith("package") else None,
+		)
+		for key, path in _CFG_PATHS.items()
+	}
+
+	# set the global var
+	CONFIG = Config(**cfg_partial)
+
+	# add the package meta to the pdoc globals
+	pdoc.render.env.globals["package_version"] = CONFIG.package_version
+	pdoc.render.env.globals["package_name"] = CONFIG.package_name
+	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url
+	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url
 
 
-def add_package_meta_pdoc_globals(
-	config_path: Union[str, Path] = Path("pyproject.toml"),
-):
-	"adds the package meta to the pdoc globals"
-	get_package_meta_global(config_path)
-	pdoc.render.env.globals["package_version"] = PACKAGE_VERSION
-	pdoc.render.env.globals["package_name"] = PACKAGE_NAME
-	pdoc.render.env.globals["package_repo_url"] = PACKAGE_REPO_URL
-	pdoc.render.env.globals["package_code_url"] = PACKAGE_CODE_URL
+def replace_heading(match):
+	current_level: int = len(match.group(1))
+	new_level: int = min(current_level + CONFIG.markdown_headings_increment, 6)  # Cap at h6
+	return "#" * new_level + match.group(2)
 
-
-def increment_markdown_headings(markdown_text: str, increment: int = 2) -> str:
+def increment_markdown_headings(markdown_text: str) -> str:
 	"""
 	Increment all Markdown headings in the given text by the specified amount.
 
 	Args:
 	    markdown_text (str): The input Markdown text.
-	    increment (int): The number of levels to increment the headings by. Default is 2.
 
 	Returns:
 	    str: The Markdown text with incremented heading levels.
 	"""
 
-	def replace_heading(match):
-		current_level = len(match.group(1))
-		new_level = min(current_level + increment, 6)  # Cap at h6
-		return "#" * new_level + match.group(2)
-
 	# Regular expression to match Markdown headings
-	heading_pattern = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
+	heading_pattern: re.Pattern = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
 
 	# Replace all headings with incremented versions
 	return heading_pattern.sub(replace_heading, markdown_text)
-
-
-OUTPUT_DIR: Path = Path("docs")
 
 
 def format_signature(sig: inspect.Signature, colon: bool) -> str:
@@ -144,16 +212,6 @@ def format_signature(sig: inspect.Signature, colon: bool) -> str:
 	rendered = f"`(`{params_str}`{anno}`"
 
 	return rendered
-
-
-HTML_TO_MD_MAP: Dict[str, str] = {
-	"&gt;": ">",
-	"&lt;": "<",
-	"&amp;": "&",
-	"&quot;": '"',
-	"&#39": "'",
-	"&apos;": "'",
-}
 
 
 def markup_safe(sig: inspect.Signature) -> str:
@@ -203,17 +261,9 @@ def pdoc_combined(*modules, output_file: Path) -> None:
 		f.write(combined_content)
 
 
-def ignore_warnings(config_path: Union[str, Path] = Path("pyproject.toml")):
-	# Read the pyproject.toml file
-	config_path = Path(config_path)
-	with config_path.open("rb") as f:
-		pyproject_data = tomllib.load(f)
-
-	# Extract the warning messages from the tool.pdoc.ignore section
-	warning_messages: List[str] = deep_get(pyproject_data, f"{TOOL_PATH}.warnings_ignore", [])
-
+def ignore_warnings():
 	# Process and apply the warning filters
-	for message in warning_messages:
+	for message in CONFIG.warnings_ignore:
 		warnings.filterwarnings("ignore", message=message)
 
 
@@ -231,7 +281,7 @@ if __name__ == "__main__":
 		"--warn-all",
 		"-w",
 		action="store_true",
-		help="Whether to show all warnings, instead of ignoring the ones specified in pyproject.toml:tool.pdoc.ignore",
+		help=f"Whether to show all warnings, instead of ignoring the ones specified in pyproject.toml:{TOOL_PATH}.warnings_ignore",
 	)
 	argparser.add_argument(
 		"--combined",
@@ -243,19 +293,21 @@ if __name__ == "__main__":
 
 	# configure pdoc
 	# --------------------------------------------------
-	add_package_meta_pdoc_globals()
+	# read what we need from the pyproject.toml, add stuff to pdoc globals
+	set_global_config()
 
+	# ignore warnings if needed
 	if not parsed_args.warn_all:
 		ignore_warnings()
 
 	pdoc.render.configure(
 		edit_url_map={
-			PACKAGE_NAME: PACKAGE_CODE_URL,
+			CONFIG.package_name: CONFIG.package_code_url,
 		},
 		template_directory=(
-			Path("docs/resources/templates/html/")
+			CONFIG.output_dir / "resources/templates/html/"
 			if not parsed_args.combined
-			else Path("docs/resources/templates/markdown/")
+			else CONFIG.output_dir / "resources/templates/markdown/"
 		),
 		show_source=True,
 		math=True,
@@ -267,13 +319,13 @@ if __name__ == "__main__":
 	# --------------------------------------------------
 	if not parsed_args.combined:
 		pdoc.pdoc(
-			PACKAGE_NAME,
-			output_directory=OUTPUT_DIR,
+			CONFIG.package_name,
+			output_directory=CONFIG.output_dir,
 		)
 	else:
 		use_markdown_format()
 		pdoc_combined(
-			PACKAGE_NAME, output_file=OUTPUT_DIR / "combined" / f"{PACKAGE_NAME}.md"
+			CONFIG.package_name, output_file=CONFIG.output_dir / "combined" / f"{CONFIG.package_name}.md"
 		)
 
 	# http server if needed
@@ -284,7 +336,7 @@ if __name__ == "__main__":
 		import socketserver
 
 		port: int = 8000
-		os.chdir(OUTPUT_DIR)
+		os.chdir(CONFIG.output_dir)
 		with socketserver.TCPServer(
 			("", port), http.server.SimpleHTTPRequestHandler
 		) as httpd:
