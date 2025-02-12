@@ -1,0 +1,91 @@
+name: Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - main
+
+jobs:
+  test-make:
+    name: Test Make Recipes
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Continue with other versions if one fails
+      matrix:
+        versions:
+          - python: "3.8"
+          - python: "3.9"
+          - python: "3.10"
+          - python: "3.11"
+          - python: "3.12"
+          - python: "3.13"	  
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version commands
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.versions.python }}
+
+      - name: Setup
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          make setup
+
+      - name: Install system dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pandoc
+          version: '3.3'
+
+      - name: Test info commands
+        run: |
+          make help
+          make info
+          make info-long
+          make version
+
+      - name: Test dependency commands
+        run: |
+          make dep
+          make dep-check
+          make dep-check-torch
+
+      - name: Test code quality commands
+        run: |
+          make format
+          make format-check
+          make typing
+
+      - name: Test build commands
+        run: |
+          make build
+          make verify-git
+
+      - name: Test testing commands
+        run: |
+          make test
+          make check
+          make cov
+
+      - name: Test documentation commands
+        run: |
+          make docs-html
+          make docs-md
+          make docs-combined
+          make docs
+          make todo
+          make lmcat
+          make lmcat-tree
+
+      - name: Test cleanup commands
+        run: |
+          make docs-clean
+          make clean
+          make dep-clean
+          make clean-all
