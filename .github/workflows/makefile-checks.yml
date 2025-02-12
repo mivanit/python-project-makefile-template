@@ -17,7 +17,6 @@ jobs:
       fail-fast: false  # Continue with other versions if one fails
       matrix:
         versions:
-          - python: "3.8"
           - python: "3.9"
           - python: "3.10"
           - python: "3.11"
