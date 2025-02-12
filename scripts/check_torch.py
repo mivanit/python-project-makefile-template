@@ -22,13 +22,17 @@ def print_info_dict(
 
 def get_nvcc_info() -> Dict[str, str]:
 	# Run the nvcc command.
-	result: subprocess.CompletedProcess[str] = subprocess.run(
-		["nvcc", "--version"],
-		check=True,
-		stdout=subprocess.PIPE,
-		stderr=subprocess.PIPE,
-		text=True,
-	)
+	try:
+		result: subprocess.CompletedProcess[str] = subprocess.run(
+			["nvcc", "--version"],
+			check=True,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.PIPE,
+			text=True,
+		)
+	except Exception as e:
+		return {"Failed to run 'nvcc --version'": str(e)}
+
 	output: str = result.stdout
 	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
