@@ -1,6 +1,10 @@
 from pathlib import Path
-import tomllib
 from typing import Dict
+
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
+	import tomli as tomllib
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")

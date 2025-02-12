@@ -1,9 +1,9 @@
 import sys
 
 try:
-	if sys.version_info >= (3, 11):
-		import tomllib
-	else:
+	try:
+		import tomllib  # Python 3.11+
+	except ImportError:
 		import tomli as tomllib
 
 	pyproject_path: str = sys.argv[1].strip()

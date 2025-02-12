@@ -1,9 +1,9 @@
 import sys
 import warnings
 
-if sys.version_info >= (3, 11):
-	import tomllib
-else:
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
 	import tomli as tomllib
 from pathlib import Path
 from typing import Any, Union, List

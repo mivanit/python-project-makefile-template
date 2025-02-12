@@ -12,10 +12,14 @@ from dataclasses import dataclass, field
 from functools import reduce
 import inspect
 import re
-import tomllib
 from typing import Any, Dict, List, Optional
 import warnings
 from pathlib import Path
+
+try:
+	import tomllib  # Python 3.11+
+except ImportError:
+	import tomli as tomllib
 
 import jinja2
 import pdoc  # type: ignore[import-not-found]
