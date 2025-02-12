@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Union
+from functools import reduce
 import warnings
 from jinja2 import Template
 
@@ -14,6 +15,15 @@ try:
 	import tomllib  # Python 3.11+
 except ImportError:
 	import tomli as tomllib
+
+TOOL_PATH: str = "tool.makefile.uv-exports"
+
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+	return reduce(
+		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
+		sequence=path.split(sep) if isinstance(path, str) else path,
+		initial=d,
+	)
 
 
 TEMPLATE_MD: str = """\
@@ -134,8 +144,8 @@ class Config:
 				)
 
 			# load the inline-todo config if present
-			data_inline_todo: Dict[str, Any] = data.get("tool", {}).get(
-				"inline-todo", {}
+			data_inline_todo: Dict[str, Any] = deep_get(
+				d=data, path=TOOL_PATH, default={}
 			)
 
 			if "repo_url" not in data_inline_todo:

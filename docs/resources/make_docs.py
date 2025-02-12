@@ -1,8 +1,18 @@
+"""
+python project makefile template -- docs generation script
+originally by Michael Ivanitskiy (mivanits@umich.edu)
+https://github.com/mivanit/python-project-makefile-template
+license: https://creativecommons.org/licenses/by-sa/4.0/
+modifications from the original should be denoted with `~~~~~`
+as this makes it easier to find edits when updating
+"""
+
 import argparse
+from functools import reduce
 import inspect
 import re
 import tomllib
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 import warnings
 from pathlib import Path
 
@@ -20,6 +30,28 @@ PACKAGE_REPO_URL: str
 PACKAGE_CODE_URL: str
 PACKAGE_VERSION: str
 # ====================================================================================================
+
+TOOL_PATH: str = "tool.makefile.make-docs"
+
+def deep_get(
+		d: dict,
+		path: str,
+		default: Any = None,
+		sep: str = ".",
+		warn_msg_on_default: Optional[str] = None,
+	) -> Any:
+
+	output: Any = reduce(
+		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
+		sequence=path.split(sep) if isinstance(path, str) else path,
+		initial=d,
+	)
+
+	if warn_msg_on_default and output == default:
+		warnings.warn(warn_msg_on_default.format(path=path))
+
+	return output
+
 
 pdoc.render_helpers.markdown_extensions["alerts"] = True
 pdoc.render_helpers.markdown_extensions["admonitions"] = True
@@ -39,9 +71,9 @@ def get_package_meta_global(config_path: Union[str, Path] = Path("pyproject.toml
 	config_path = Path(config_path)
 	with config_path.open("rb") as f:
 		pyproject_data = tomllib.load(f)
-	PACKAGE_VERSION = pyproject_data["project"]["version"]
-	PACKAGE_NAME = pyproject_data["project"]["name"]
-	PACKAGE_REPO_URL = pyproject_data["project"]["urls"]["Repository"]
+	PACKAGE_VERSION = deep_get(pyproject_data, "project.version", "unknown", warn_msg_on_default="could not find {path}")
+	PACKAGE_NAME = deep_get(pyproject_data, "project.name", "unknown", warn_msg_on_default="could not find {path}")
+	PACKAGE_REPO_URL = deep_get(pyproject_data, "project.urls.Repository", "unknown", warn_msg_on_default="could not find {path}")
 	PACKAGE_CODE_URL = f"{PACKAGE_REPO_URL}/blob/{PACKAGE_VERSION}/"
 
 
@@ -178,9 +210,7 @@ def ignore_warnings(config_path: Union[str, Path] = Path("pyproject.toml")):
 		pyproject_data = tomllib.load(f)
 
 	# Extract the warning messages from the tool.pdoc.ignore section
-	warning_messages: List[str] = (
-		pyproject_data.get("tool", {}).get("pdoc", {}).get("warnings_ignore", [])
-	)
+	warning_messages: List[str] = deep_get(pyproject_data, f"{TOOL_PATH}.warnings_ignore", [])
 
 	# Process and apply the warning filters
 	for message in warning_messages:

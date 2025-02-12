@@ -1,41 +1,39 @@
 import sys
+import warnings
 
 if sys.version_info >= (3, 11):
 	import tomllib
 else:
 	import tomli as tomllib
 from pathlib import Path
-from typing import Union, List
+from typing import Any, Union, List
+from functools import reduce
 
-pyproject_path: Path = Path(sys.argv[1])
-output_dir: Path = Path(sys.argv[2])
+TOOL_PATH: str = "tool.makefile.uv-exports"
 
-with open(pyproject_path, "rb") as f:
-	pyproject_data: dict = tomllib.load(f)
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+	return reduce(
+		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
+		sequence=path.split(sep) if isinstance(path, str) else path,
+		initial=d,
+	)
 
-# all available groups
-all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-all_extras: List[str] = list(
-	pyproject_data.get("project", {}).get("optional-dependencies", {}).keys()
-)
+def export_configuration(
+		export: dict,
+		all_groups: List[str],
+		all_extras: List[str],
+		export_opts: dict,
+		output_dir: Path,
+	):
 
-# options for exporting
-export_opts: dict = pyproject_data.get("tool", {}).get("uv-exports", {})
-
-# what are we exporting?
-exports: List[str] = export_opts.get("exports", [])
-if not exports:
-	exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
-
-# export each configuration
-for export in exports:
 	# get name and validate
 	name = export.get("name")
 	if not name or not name.isalnum():
-		print(
-			f"Export configuration missing valid 'name' field {export}", file=sys.stderr
+		warnings.warn(
+			f"Export configuration missing valid 'name' field {export}",
+			file=sys.stderr,
 		)
-		continue
+		return
 
 	# get other options with default fallbacks
 	filename: str = export.get("filename") or f"requirements-{name}.txt"
@@ -72,7 +70,45 @@ for export in exports:
 	for extra in extras_list:
 		cmd.extend(["--extra", extra])
 
+	# add extra options
 	cmd.extend(options)
 
+	# assemble the command and print to console -- makefile will run it
 	output_path = output_dir / filename
 	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
+
+def main(
+	pyproject_path: Path,
+	output_dir: Path,
+):
+	# read pyproject.toml
+	with open(pyproject_path, "rb") as f:
+		pyproject_data: dict = tomllib.load(f)
+
+	# all available groups
+	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
+	all_extras: List[str] = list(deep_get(pyproject_data, "project.optional-dependencies", {}).keys())
+
+	# options for exporting
+	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
+
+	# what are we exporting?
+	exports: List[str] = export_opts.get("exports", [])
+	if not exports:
+		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
+
+	# export each configuration
+	for export in exports:
+		export_configuration(
+			export=export,
+			all_groups=all_groups,
+			all_extras=all_extras,
+			export_opts=export_opts,
+			output_dir=output_dir,
+		)
+
+if __name__ == "__main__":
+	main(
+		pyproject_path = Path(sys.argv[1]),
+		output_dir = Path(sys.argv[2]),
+	)
