@@ -30,6 +30,7 @@ PACKAGE_NAME := myproject
 PUBLISH_BRANCH := main
 
 # where to put docs
+# if you change this, you must also change pyproject.toml:tool.makefile.docs.output_dir to match
 DOCS_DIR := docs
 
 # where the tests are, for pytest
@@ -82,6 +83,7 @@ PANDOC ?= pandoc
 COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 
 # this stuff in the docs will be kept
+# in addition to anything specified in `pyproject.toml:tool.makefile.docs.no_clean`
 DOCS_RESOURCES_DIR := $(DOCS_DIR)/resources
 
 # location of the make docs script
@@ -176,9 +178,9 @@ TOOL_PATH: str = "tool.makefile.uv-exports"
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	return reduce(
-		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
-		sequence=path.split(sep) if isinstance(path, str) else path,
-		initial=d,
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path, # sequence
+		d, # initial
 	)
 
 def export_configuration(
@@ -536,9 +538,9 @@ TOOL_PATH: str = "tool.makefile.uv-exports"
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	return reduce(
-		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
-		sequence=path.split(sep) if isinstance(path, str) else path,
-		initial=d,
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path, # sequence
+		d, # initial
 	)
 
 
@@ -951,9 +953,9 @@ TOOL_PATH: str = "tool.makefile.docs"
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 	"""Get nested dictionary value via separated path with default."""
 	return reduce(
-		function=lambda x, y: x.get(y, default) if isinstance(x, dict) else default, 
-		path=path.split(sep),
-		initial=d
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path, # sequence
+		d, # initial
 	)
 
 def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:

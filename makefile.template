@@ -30,6 +30,7 @@ PACKAGE_NAME := myproject
 PUBLISH_BRANCH := main
 
 # where to put docs
+# if you change this, you must also change pyproject.toml:tool.makefile.docs.output_dir to match
 DOCS_DIR := docs
 
 # where the tests are, for pytest
@@ -82,6 +83,7 @@ PANDOC ?= pandoc
 COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 
 # this stuff in the docs will be kept
+# in addition to anything specified in `pyproject.toml:tool.makefile.docs.no_clean`
 DOCS_RESOURCES_DIR := $(DOCS_DIR)/resources
 
 # location of the make docs script
