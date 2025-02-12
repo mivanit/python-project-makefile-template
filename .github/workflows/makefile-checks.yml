@@ -52,8 +52,8 @@ jobs:
 
       - name: Test dependency commands
         run: |
-          make dep
           make dep-check
+          make dep
           make dep-check-torch
 
       - name: Test code quality commands
