@@ -8,7 +8,7 @@ as this makes it easier to find edits when updating
 """
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import reduce
 import inspect
 import re
@@ -112,9 +112,9 @@ class Config:
 	# under tool_path
 	output_dir_str: str = "docs"
 	markdown_headings_increment: int = 2
-	warnings_ignore: list[str] = []
+	warnings_ignore: list[str] = field(default_factory=list)
 	notebooks_enabled: bool = False
-	notebooks_descriptions: dict[str, str] = dict()
+	notebooks_descriptions: dict[str, str] = field(default_factory=dict)
 	notebooks_source_path_str: str = "notebooks"
 	notebooks_output_path_relative_str: str = "notebooks"
 	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
@@ -145,7 +145,7 @@ _CFG_PATHS: dict[str, str] = dict(
 	package_name="project.name",
 	package_repo_url="project.urls.Repository",
 	package_version="project.version",
-	output_dir=f"{TOOL_PATH}.output_dir",
+	output_dir_str=f"{TOOL_PATH}.output_dir",
 	markdown_headings_increment=f"{TOOL_PATH}.markdown_headings_increment",
 	warnings_ignore=f"{TOOL_PATH}.warnings_ignore",
 	notebooks_enabled=f"{TOOL_PATH}.notebooks.enabled",
