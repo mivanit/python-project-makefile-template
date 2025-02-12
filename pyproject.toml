@@ -108,6 +108,12 @@
 			{ name = "all", groups = true, options = ["--all-extras"] },
 		]
 
+	[tool.makefile.docs]
+		output_dir = "docs" # this must match `DOCS_DIR` in the makefile
+		no_clean = [
+			".nojekyll",
+		]
+
 
 
 	[tool.makefile.inline-todo]
@@ -125,9 +131,11 @@
 [tool.lmcat]
 	output = "docs/other/lmcat.txt" # changing this might mean it wont be accessible from the docs
 	ignore_patterns = [
+		"!docs/resources/make_docs.py",
 		"docs/**",
 		".venv/**",
 		".git/**",
-		".github/**",
+		".meta/**",
 		"uv.lock",
+		"LICENSE",
 	]
