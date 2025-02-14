@@ -4,7 +4,7 @@ from typing import Dict
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib # type: ignore
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
@@ -24,7 +24,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
 	return scripts
 
 
-def main():
+def main() -> None:
 	contents: str = TEMPLATE_PATH.read_text()
 	scripts: Dict[str, str] = read_scripts()
 

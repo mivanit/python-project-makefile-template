@@ -19,7 +19,7 @@ from pathlib import Path
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib # type: ignore
 
 import jinja2
 import pdoc  # type: ignore[import-not-found]
@@ -54,8 +54,8 @@ HTML_TO_MD_MAP: Dict[str, str] = {
 	"&apos;": "'",
 }
 
-pdoc.render_helpers.markdown_extensions["alerts"] = True
-pdoc.render_helpers.markdown_extensions["admonitions"] = True
+pdoc.render_helpers.markdown_extensions["alerts"] = True # type: ignore[assignment]
+pdoc.render_helpers.markdown_extensions["admonitions"] = True # type: ignore[assignment]
 
 
 _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
@@ -160,7 +160,7 @@ _CFG_PATHS: dict[str, str] = dict(
 )
 
 
-def set_global_config():
+def set_global_config() -> None:
 	"""set global var `CONFIG` from pyproject.toml"""
 	global CONFIG
 
@@ -206,7 +206,7 @@ def set_global_config():
 # ============================================================
 
 
-def replace_heading(match):
+def replace_heading(match: re.Match) -> str:
 	current_level: int = len(match.group(1))
 	new_level: int = min(
 		current_level + CONFIG.markdown_headings_increment, 6
@@ -269,7 +269,7 @@ def markup_safe(sig: inspect.Signature) -> str:
 	return Markup(output)
 
 
-def use_markdown_format():
+def use_markdown_format() -> None:
 	"set some functions to output markdown format"
 	pdoc.render_helpers.format_signature = format_signature
 	pdoc.render.env.filters["markup_safe"] = markup_safe
@@ -289,7 +289,7 @@ def use_markdown_format():
 
 # notebook
 # ============================================================
-def convert_notebooks():
+def convert_notebooks() -> None:
 	try:
 		import nbformat
 		import nbconvert
@@ -381,7 +381,7 @@ def pdoc_combined(*modules, output_file: Path) -> None:
 		f.write(combined_content)
 
 
-def ignore_warnings():
+def ignore_warnings() -> None:
 	# Process and apply the warning filters
 	for message in CONFIG.warnings_ignore:
 		warnings.filterwarnings("ignore", message=message)

@@ -4,9 +4,9 @@ import warnings
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib # type: ignore
 from pathlib import Path
-from typing import Any, Union, List
+from typing import Any, Dict, Union, List
 from functools import reduce
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
@@ -32,7 +32,6 @@ def export_configuration(
 	if not name or not name.isalnum():
 		warnings.warn(
 			f"Export configuration missing valid 'name' field {export}",
-			file=sys.stderr,
 		)
 		return
 
@@ -97,7 +96,7 @@ def main(
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
 
 	# what are we exporting?
-	exports: List[str] = export_opts.get("exports", [])
+	exports: List[Dict[str, Any]] = export_opts.get("exports", [])
 	if not exports:
 		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 

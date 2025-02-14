@@ -7,9 +7,10 @@ from typing import Any, List, Set
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib # type: ignore
 
 TOOL_PATH: str = "tool.makefile.docs"
+DEFAULT_DOCS_DIR: str = "docs"
 
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
@@ -23,13 +24,13 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 
 def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	if not pyproject_path.is_file():
-		return set()
+		return Path(DEFAULT_DOCS_DIR), set()
 
 	with pyproject_path.open("rb") as f:
 		config = tomllib.load(f)
 
 	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
-	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", "docs"))
+	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
 
 	# Convert to absolute paths and validate
 	preserve_set: Set[Path] = set()

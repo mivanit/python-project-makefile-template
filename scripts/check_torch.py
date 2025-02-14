@@ -74,9 +74,9 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
+def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 	exceptions: List[Exception] = []
-	info: Dict[str, str] = {}
+	info: Dict[str, Any] = {}
 
 	try:
 		import torch
@@ -94,7 +94,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: Dict[str, str] = {}
+						current_device_info: Dict[str, Union[str, int]] = {}
 
 						dev_prop = torch.cuda.get_device_properties(
 							torch.device(f"cuda:{current_device}")
@@ -147,7 +147,7 @@ if __name__ == "__main__":
 		}
 	)
 
-	nvcc_info: Dict[str, str] = get_nvcc_info()
+	nvcc_info: Dict[str, Any] = get_nvcc_info()
 	print("nvcc:")
 	print_info_dict(nvcc_info)
 
