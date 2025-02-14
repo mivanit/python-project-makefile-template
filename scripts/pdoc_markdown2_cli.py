@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-from pdoc.markdown2 import Markdown, _safe_mode # type: ignore
+from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
 
 
 def convert_file(

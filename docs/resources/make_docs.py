@@ -19,7 +19,7 @@ from pathlib import Path
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib # type: ignore
+	import tomli as tomllib  # type: ignore
 
 import jinja2
 import pdoc  # type: ignore[import-not-found]
@@ -54,8 +54,8 @@ HTML_TO_MD_MAP: Dict[str, str] = {
 	"&apos;": "'",
 }
 
-pdoc.render_helpers.markdown_extensions["alerts"] = True # type: ignore[assignment]
-pdoc.render_helpers.markdown_extensions["admonitions"] = True # type: ignore[assignment]
+pdoc.render_helpers.markdown_extensions["alerts"] = True  # type: ignore[assignment]
+pdoc.render_helpers.markdown_extensions["admonitions"] = True  # type: ignore[assignment]
 
 
 _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>

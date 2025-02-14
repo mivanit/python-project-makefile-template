@@ -4,7 +4,7 @@ try:
 	try:
 		import tomllib  # Python 3.11+
 	except ImportError:
-		import tomli as tomllib # type: ignore
+		import tomli as tomllib  # type: ignore
 
 	pyproject_path: str = sys.argv[1].strip()
 

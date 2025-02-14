@@ -14,7 +14,7 @@ from jinja2 import Template
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib # type: ignore
+	import tomli as tomllib  # type: ignore
 
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
