@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.1.3
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.2.1
 
 
 ## Contents
@@ -38,7 +38,7 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 
 # docs
 
-you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](https://miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](https://miv.name/python-project-makefile-template/notebooks)
 
 # Makefile
 
@@ -104,7 +104,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1__init__.py)
 
 # `myproject` { #myproject }
 
@@ -144,7 +144,7 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
 
 ### docs
 
-you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](miv.name/python-project-makefile-template/notebooks)
+you can see the generated docs for this repo at [`miv.name/python-project-makefile-template`](https://miv.name/python-project-makefile-template), or the generated docs for the notebooks at [`miv.name/python-project-makefile-template/notebooks`](https://miv.name/python-project-makefile-template/notebooks)
 
 ### Makefile
 
@@ -202,13 +202,13 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3__init__.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1__init__.py#L0-L2)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.1.3
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.2.1
 
 
 
@@ -221,12 +221,12 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L0-L11)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1helloworld.py#L0-L11)
 
 
 
@@ -236,7 +236,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L6-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1helloworld.py#L6-L7)
 
 
 
@@ -247,14 +247,14 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3helloworld.py#L11-L12)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1helloworld.py#L11-L12)
 
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.1.3
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.2.1
 
 
 
@@ -266,12 +266,12 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1other.py)
 
 # `myproject.other` { #myproject.other }
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1other.py#L0-L2)
 
 
 
@@ -281,7 +281,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.1.3other.py#L2-L3)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.1other.py#L2-L3)
 
 
 

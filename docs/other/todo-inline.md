@@ -24,10 +24,48 @@ def another_function():
 
 ## [`scripts/docs_clean.py`](/scripts/docs_clean.py)
 
+- S_DIR: str = "docs"  
+  local link: [`/scripts/docs_clean.py#13`](/scripts/docs_clean.py#13) 
+  | view on GitHub: [scripts/docs_clean.py#L13](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/docs_clean.py#L13)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=S_DIR%3A%20str%20%3D%20%22docs%22&body=%23%20source%0A%0A%5B%60scripts%2Fdocs_clean.py%23L13%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fdocs_clean.py%23L13%29%0A%0A%23%20context%0A%60%60%60python%0ATOOL_PATH%3A%20str%20%3D%20%22tool.makefile.docs%22%0ADEFAULT_DOCS_DIR%3A%20str%20%3D%20%22docs%22%0A%60%60%60&labels=documentation)
+
+  ```python
+TOOL_PATH: str = "tool.makefile.docs"
+DEFAULT_DOCS_DIR: str = "docs"
+  ```
+
+
+- S_DIR), set()  
+  local link: [`/scripts/docs_clean.py#27`](/scripts/docs_clean.py#27) 
+  | view on GitHub: [scripts/docs_clean.py#L27](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/docs_clean.py#L27)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=S_DIR%29%2C%20set%28%29&body=%23%20source%0A%0A%5B%60scripts%2Fdocs_clean.py%23L27%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fdocs_clean.py%23L27%29%0A%0A%23%20context%0A%60%60%60python%0Adef%20read_config%28pyproject_path%3A%20Path%29%20-%3E%20tuple%5BPath%2C%20Set%5BPath%5D%5D%3A%0A%09if%20not%20pyproject_path.is_file%28%29%3A%0A%09%09return%20Path%28DEFAULT_DOCS_DIR%29%2C%20set%28%29%0A%0A%09with%20pyproject_path.open%28%22rb%22%29%20as%20f%3A%0A%60%60%60&labels=documentation)
+
+  ```python
+def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
+	if not pyproject_path.is_file():
+		return Path(DEFAULT_DOCS_DIR), set()
+
+	with pyproject_path.open("rb") as f:
+  ```
+
+
+- S_DIR))  
+  local link: [`/scripts/docs_clean.py#33`](/scripts/docs_clean.py#33) 
+  | view on GitHub: [scripts/docs_clean.py#L33](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/docs_clean.py#L33)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=S_DIR%29%29&body=%23%20source%0A%0A%5B%60scripts%2Fdocs_clean.py%23L33%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fdocs_clean.py%23L33%29%0A%0A%23%20context%0A%60%60%60python%0A%09preserved%3A%20List%5Bstr%5D%20%3D%20deep_get%28config%2C%20f%22%7BTOOL_PATH%7D.no_clean%22%2C%20%5B%5D%29%0A%09docs_dir%3A%20Path%20%3D%20Path%28deep_get%28config%2C%20f%22%7BTOOL_PATH%7D.output_dir%22%2C%20DEFAULT_DOCS_DIR%29%29%0A%0A%09%23%20Convert%20to%20absolute%20paths%20and%20validate%0A%60%60%60&labels=documentation)
+
+  ```python
+preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
+	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
+
+	# Convert to absolute paths and validate
+  ```
+
+
 - S_DIR` (the latter) without updating the other."  
-  local link: [`/scripts/docs_clean.py#64`](/scripts/docs_clean.py#64) 
-  | view on GitHub: [scripts/docs_clean.py#L64](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/docs_clean.py#L64)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=S_DIR%60%20%28the%20latter%29%20without%20updating%20the%20other.%22&body=%23%20source%0A%0A%5B%60scripts%2Fdocs_clean.py%23L64%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fdocs_clean.py%23L64%29%0A%0A%23%20context%0A%60%60%60python%0A%09assert%20docs_dir.is_dir%28%29%2C%20f%22Docs%20directory%20%27%7Bdocs_dir%7D%27%20not%20found%22%0A%09assert%20docs_dir%20%3D%3D%20Path%28docs_dir_cli%29%2C%20%28%0A%09%09f%22Docs%20directory%20mismatch%3A%20%7Bdocs_dir%20%3D%20%7D%20%21%3D%20%7Bdocs_dir_cli%20%3D%20%7D.%20this%20is%20probably%20because%20you%20changed%20one%20of%20%60pyproject.toml%3A%7BTOOL_PATH%7D.output_dir%60%20%28the%20former%29%20or%20%60makefile%3ADOCS_DIR%60%20%28the%20latter%29%20without%20updating%20the%20other.%22%0A%09%29%0A%60%60%60&labels=documentation)
+  local link: [`/scripts/docs_clean.py#65`](/scripts/docs_clean.py#65) 
+  | view on GitHub: [scripts/docs_clean.py#L65](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/docs_clean.py#L65)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=S_DIR%60%20%28the%20latter%29%20without%20updating%20the%20other.%22&body=%23%20source%0A%0A%5B%60scripts%2Fdocs_clean.py%23L65%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fdocs_clean.py%23L65%29%0A%0A%23%20context%0A%60%60%60python%0A%09assert%20docs_dir.is_dir%28%29%2C%20f%22Docs%20directory%20%27%7Bdocs_dir%7D%27%20not%20found%22%0A%09assert%20docs_dir%20%3D%3D%20Path%28docs_dir_cli%29%2C%20%28%0A%09%09f%22Docs%20directory%20mismatch%3A%20%7Bdocs_dir%20%3D%20%7D%20%21%3D%20%7Bdocs_dir_cli%20%3D%20%7D.%20this%20is%20probably%20because%20you%20changed%20one%20of%20%60pyproject.toml%3A%7BTOOL_PATH%7D.output_dir%60%20%28the%20former%29%20or%20%60makefile%3ADOCS_DIR%60%20%28the%20latter%29%20without%20updating%20the%20other.%22%0A%09%29%0A%60%60%60&labels=documentation)
 
   ```python
 assert docs_dir.is_dir(), f"Docs directory '{docs_dir}' not found"

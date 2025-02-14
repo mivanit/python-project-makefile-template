@@ -1,8 +1,8 @@
 # Stats
 - 20 files
 - 3654 (3.7K) lines
-- 109621 (110K) chars
-- 13102 (13K) `whitespace-split` tokens
+- 109953 (110K) chars
+- 13151 (13K) `whitespace-split` tokens
 
 # File Tree
 
@@ -20,18 +20,18 @@ python-project-makefile-template
 │   ├── example.ipynb             [   66L  1,154C   133T]
 │   └── no_desc.ipynb             [   34L    640C    72T]
 ├── scripts                       
-│   ├── assemble_make.py          [   59L  1,448C   146T]
-│   ├── check_torch.py            [  161L  4,514C   431T]
-│   ├── docs_clean.py             [   73L  2,165C   254T]
-│   ├── export_requirements.py    [  119L  2,899C   336T]
+│   ├── assemble_make.py          [   59L  1,472C   151T]
+│   ├── check_torch.py            [  161L  4,526C   432T]
+│   ├── docs_clean.py             [   74L  2,246C   262T]
+│   ├── export_requirements.py    [  118L  2,912C   340T]
 │   ├── get_commit_log.py         [   36L    777C    72T]
-│   ├── get_todos.py              [  353L  9,179C 1,036T]
-│   ├── get_version.py            [   17L    342C    37T]
-│   └── pdoc_markdown2_cli.py     [   54L  1,448C   144T]
+│   ├── get_todos.py              [  353L  9,195C 1,039T]
+│   ├── get_version.py            [   17L    358C    40T]
+│   └── pdoc_markdown2_cli.py     [   54L  1,464C   147T]
 ├── tests                         
 │   └── test_nothing.py           [    2L     42C     5T]
 ├── README.md                     [   92L  5,369C   681T]
-├── makefile                      [1,443L 43,676C 5,270T]
+├── makefile                      [1,443L 43,830C 5,292T]
 ├── makefile.template             [  630L 22,495C 2,964T]
 ├── pyproject.toml                [  224L  6,176C   779T]
 ```
@@ -354,7 +354,7 @@ from typing import Dict
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 
 TEMPLATE_PATH: Path = Path("makefile.template")
 MAKEFILE_PATH: Path = Path("Makefile")
@@ -374,7 +374,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
 	return scripts
 
 
-def main():
+def main() -> None:
 	contents: str = TEMPLATE_PATH.read_text()
 	scripts: Dict[str, str] = read_scripts()
 
@@ -487,9 +487,9 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
+def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 	exceptions: List[Exception] = []
-	info: Dict[str, str] = {}
+	info: Dict[str, Any] = {}
 
 	try:
 		import torch
@@ -507,7 +507,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: Dict[str, str] = {}
+						current_device_info: Dict[str, Union[str, int]] = {}
 
 						dev_prop = torch.cuda.get_device_properties(
 							torch.device(f"cuda:{current_device}")
@@ -560,7 +560,7 @@ if __name__ == "__main__":
 		}
 	)
 
-	nvcc_info: Dict[str, str] = get_nvcc_info()
+	nvcc_info: Dict[str, Any] = get_nvcc_info()
 	print("nvcc:")
 	print_info_dict(nvcc_info)
 
@@ -585,9 +585,10 @@ from typing import Any, List, Set
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 
 TOOL_PATH: str = "tool.makefile.docs"
+DEFAULT_DOCS_DIR: str = "docs"
 
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
@@ -601,13 +602,13 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 
 def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	if not pyproject_path.is_file():
-		return set()
+		return Path(DEFAULT_DOCS_DIR), set()
 
 	with pyproject_path.open("rb") as f:
 		config = tomllib.load(f)
 
 	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
-	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", "docs"))
+	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
 
 	# Convert to absolute paths and validate
 	preserve_set: Set[Path] = set()
@@ -659,9 +660,9 @@ import warnings
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 from pathlib import Path
-from typing import Any, Union, List
+from typing import Any, Dict, Union, List
 from functools import reduce
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
@@ -687,7 +688,6 @@ def export_configuration(
 	if not name or not name.isalnum():
 		warnings.warn(
 			f"Export configuration missing valid 'name' field {export}",
-			file=sys.stderr,
 		)
 		return
 
@@ -752,7 +752,7 @@ def main(
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
 
 	# what are we exporting?
-	exports: List[str] = export_opts.get("exports", [])
+	exports: List[Dict[str, Any]] = export_opts.get("exports", [])
 	if not exports:
 		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 
@@ -832,7 +832,7 @@ from jinja2 import Template
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
@@ -1179,7 +1179,7 @@ try:
 	try:
 		import tomllib  # Python 3.11+
 	except ImportError:
-		import tomli as tomllib
+		import tomli as tomllib  # type: ignore
 
 	pyproject_path: str = sys.argv[1].strip()
 
@@ -1198,7 +1198,7 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-from pdoc.markdown2 import Markdown, _safe_mode
+from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
 
 
 def convert_file(
@@ -1357,7 +1357,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.2.0                                                  |
+#| version: v0.2.1                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -1524,9 +1524,9 @@ import warnings
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 from pathlib import Path
-from typing import Any, Union, List
+from typing import Any, Dict, Union, List
 from functools import reduce
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
@@ -1552,7 +1552,6 @@ def export_configuration(
 	if not name or not name.isalnum():
 		warnings.warn(
 			f"Export configuration missing valid 'name' field {export}",
-			file=sys.stderr,
 		)
 		return
 
@@ -1617,7 +1616,7 @@ def main(
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
 
 	# what are we exporting?
-	exports: List[str] = export_opts.get("exports", [])
+	exports: List[Dict[str, Any]] = export_opts.get("exports", [])
 	if not exports:
 		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 
@@ -1651,7 +1650,7 @@ try:
 	try:
 		import tomllib  # Python 3.11+
 	except ImportError:
-		import tomli as tomllib
+		import tomli as tomllib  # type: ignore
 
 	pyproject_path: str = sys.argv[1].strip()
 
@@ -1790,9 +1789,9 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
+def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 	exceptions: List[Exception] = []
-	info: Dict[str, str] = {}
+	info: Dict[str, Any] = {}
 
 	try:
 		import torch
@@ -1810,7 +1809,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, str]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: Dict[str, str] = {}
+						current_device_info: Dict[str, Union[str, int]] = {}
 
 						dev_prop = torch.cuda.get_device_properties(
 							torch.device(f"cuda:{current_device}")
@@ -1863,7 +1862,7 @@ if __name__ == "__main__":
 		}
 	)
 
-	nvcc_info: Dict[str, str] = get_nvcc_info()
+	nvcc_info: Dict[str, Any] = get_nvcc_info()
 	print("nvcc:")
 	print_info_dict(nvcc_info)
 
@@ -1899,7 +1898,7 @@ from jinja2 import Template
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
@@ -2248,7 +2247,7 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-from pdoc.markdown2 import Markdown, _safe_mode
+from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
 
 
 def convert_file(
@@ -2314,9 +2313,10 @@ from typing import Any, List, Set
 try:
 	import tomllib  # Python 3.11+
 except ImportError:
-	import tomli as tomllib
+	import tomli as tomllib  # type: ignore
 
 TOOL_PATH: str = "tool.makefile.docs"
+DEFAULT_DOCS_DIR: str = "docs"
 
 
 def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
@@ -2330,13 +2330,13 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
 
 def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	if not pyproject_path.is_file():
-		return set()
+		return Path(DEFAULT_DOCS_DIR), set()
 
 	with pyproject_path.open("rb") as f:
 		config = tomllib.load(f)
 
 	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
-	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", "docs"))
+	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
 
 	# Convert to absolute paths and validate
 	preserve_set: Set[Path] = set()
@@ -3435,7 +3435,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.2.0"
+	version = "0.2.1"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
