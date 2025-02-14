@@ -10,7 +10,7 @@ pycln==2.5.0
 pygments==2.19.1
 pyyaml==6.0.2
 rich==13.9.4
-ruff==0.9.4
+ruff==0.9.6
 shellingham==1.5.4
 tomlkit==0.13.2
 typer==0.15.1
