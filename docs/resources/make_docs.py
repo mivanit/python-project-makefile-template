@@ -17,7 +17,7 @@ import warnings
 from pathlib import Path
 
 try:
-	import tomllib  # Python 3.11+
+	import tomllib  # type: ignore[import-not-found]
 except ImportError:
 	import tomli as tomllib  # type: ignore
 
