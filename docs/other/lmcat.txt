@@ -1,8 +1,8 @@
 # Stats
-- 20 files
-- 3654 (3.7K) lines
-- 109953 (110K) chars
-- 13151 (13K) `whitespace-split` tokens
+- 21 files
+- 3770 (3.8K) lines
+- 112933 (113K) chars
+- 13489 (13K) `whitespace-split` tokens
 
 # File Tree
 
@@ -11,7 +11,7 @@ python-project-makefile-template
 ├── .github                       
 │   └── workflows                 
 │    ├── checks.yml               [   80L  1,643C   162T]
-│    └── makefile-checks.yml      [   85L  1,901C   232T]
+│    └── makefile-checks.yml      [   86L  1,933C   236T]
 ├── myproject                     
 │   ├── __init__.py               [    3L     34C     5T]
 │   ├── helloworld.py             [   12L    359C    49T]
@@ -27,12 +27,13 @@ python-project-makefile-template
 │   ├── get_commit_log.py         [   36L    777C    72T]
 │   ├── get_todos.py              [  353L  9,195C 1,039T]
 │   ├── get_version.py            [   17L    358C    40T]
+│   ├── mypy_report.py            [   46L  1,284C   149T]
 │   └── pdoc_markdown2_cli.py     [   54L  1,464C   147T]
 ├── tests                         
 │   └── test_nothing.py           [    2L     42C     5T]
 ├── README.md                     [   92L  5,369C   681T]
-├── makefile                      [1,443L 43,830C 5,292T]
-├── makefile.template             [  630L 22,495C 2,964T]
+├── makefile                      [1,498L 45,217C 5,452T]
+├── makefile.template             [  639L 22,624C 2,976T]
 ├── pyproject.toml                [  224L  6,176C   779T]
 ```
 
@@ -182,6 +183,7 @@ jobs:
       - run: make format-check
       - run: make format 
       - run: make typing
+      - run: make typing-report
 
       # Build commands
       - run: make build
@@ -1192,6 +1194,56 @@ except Exception:
 	sys.exit(1)
 
 ``````{ end_of_file="scripts/get_version.py" }
+
+``````{ path="scripts/mypy_report.py"  }
+"usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
+
+from __future__ import annotations
+import sys
+import argparse
+import re
+import json
+from typing import List, Dict, Tuple
+
+
+def parse_mypy_output(lines: List[str]) -> Dict[str, int]:
+	"given mypy output, turn it into a dict of `filename: error_count`"
+	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
+	counts: Dict[str, int] = {}
+	for line in lines:
+		m = pattern.match(line)
+		if m:
+			f: str = m.group("file")
+			counts[f] = counts.get(f, 0) + 1
+	return counts
+
+
+def main() -> None:
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
+	args = parser.parse_args()
+	lines: List[str] = sys.stdin.read().splitlines()
+	error_dict: Dict[str, int] = parse_mypy_output(lines)
+	sorted_errors: List[Tuple[str, int]] = sorted(
+		error_dict.items(), key=lambda x: x[1]
+	)
+	if len(sorted_errors) == 0:
+		print("# no errors found!")
+		return
+	if args.mode == "jsonl":
+		for fname, count in sorted_errors:
+			print(json.dumps({"filename": fname, "errors": count}))
+	elif args.mode == "toml":
+		for fname, count in sorted_errors:
+			print(f'"{fname}", # {count}')
+	else:
+		raise ValueError(f"unknown mode {args.mode}")
+
+
+if __name__ == "__main__":
+	main()
+
+``````{ end_of_file="scripts/mypy_report.py" }
 
 ``````{ path="scripts/pdoc_markdown2_cli.py"  }
 import argparse
@@ -2383,6 +2435,59 @@ endef
 
 export SCRIPT_DOCS_CLEAN
 
+# generate a report of the mypy output
+define SCRIPT_MYPY_REPORT
+"usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
+
+from __future__ import annotations
+import sys
+import argparse
+import re
+import json
+from typing import List, Dict, Tuple
+
+
+def parse_mypy_output(lines: List[str]) -> Dict[str, int]:
+	"given mypy output, turn it into a dict of `filename: error_count`"
+	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
+	counts: Dict[str, int] = {}
+	for line in lines:
+		m = pattern.match(line)
+		if m:
+			f: str = m.group("file")
+			counts[f] = counts.get(f, 0) + 1
+	return counts
+
+
+def main() -> None:
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
+	args = parser.parse_args()
+	lines: List[str] = sys.stdin.read().splitlines()
+	error_dict: Dict[str, int] = parse_mypy_output(lines)
+	sorted_errors: List[Tuple[str, int]] = sorted(
+		error_dict.items(), key=lambda x: x[1]
+	)
+	if len(sorted_errors) == 0:
+		print("# no errors found!")
+		return
+	if args.mode == "jsonl":
+		for fname, count in sorted_errors:
+			print(json.dumps({"filename": fname, "errors": count}))
+	elif args.mode == "toml":
+		for fname, count in sorted_errors:
+			print(f'"{fname}", # {count}')
+	else:
+		raise ValueError(f"unknown mode {args.mode}")
+
+
+if __name__ == "__main__":
+	main()
+
+endef
+
+export SCRIPT_MYPY_REPORT
+
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -2525,14 +2630,16 @@ format-check:
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
 # runs type checks with mypy
-# at some point, need to add back --check-untyped-defs to mypy call
-# but it complains when we specify arguments by keyword where positional is fine
-# not sure how to fix this
 .PHONY: typing
 typing: clean
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+
+# generates a report of the mypy output
+.PHONY: typing-report
+typing-report: clean
+	@echo "generate a report of the type check output -- errors per file"
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
 
 .PHONY: test
 test: clean
@@ -3016,6 +3123,13 @@ endef
 
 export SCRIPT_DOCS_CLEAN
 
+# generate a report of the mypy output
+define SCRIPT_MYPY_REPORT
+##[[SCRIPT_MYPY_REPORT]]##
+endef
+
+export SCRIPT_MYPY_REPORT
+
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -3158,14 +3272,16 @@ format-check:
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
 # runs type checks with mypy
-# at some point, need to add back --check-untyped-defs to mypy call
-# but it complains when we specify arguments by keyword where positional is fine
-# not sure how to fix this
 .PHONY: typing
 typing: clean
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+
+# generates a report of the mypy output
+.PHONY: typing-report
+typing-report: clean
+	@echo "generate a report of the type check output -- errors per file"
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
 
 .PHONY: test
 test: clean
@@ -3435,7 +3551,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.2.1"
+	version = "0.2.2"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }

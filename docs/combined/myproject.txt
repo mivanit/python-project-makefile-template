@@ -1,4 +1,4 @@
-  docs for myproject v0.2.1
+  docs for myproject v0.2.2
 
 Contents
 
@@ -233,7 +233,7 @@ and then run
 
 View Source on GitHub
 
-  docs for myproject v0.2.1
+  docs for myproject v0.2.2
 
 API Documentation
 
@@ -258,7 +258,7 @@ def critical_function
 
 View Source on GitHub
 
-  docs for myproject v0.2.1
+  docs for myproject v0.2.2
 
 API Documentation
 
