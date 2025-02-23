@@ -215,6 +215,13 @@ endef
 
 export SCRIPT_DOCS_CLEAN
 
+# generate a report of the mypy output
+define SCRIPT_MYPY_REPORT
+##[[SCRIPT_MYPY_REPORT]]##
+endef
+
+export SCRIPT_MYPY_REPORT
+
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -357,14 +364,16 @@ format-check:
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
 # runs type checks with mypy
-# at some point, need to add back --check-untyped-defs to mypy call
-# but it complains when we specify arguments by keyword where positional is fine
-# not sure how to fix this
 .PHONY: typing
 typing: clean
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+
+# generates a report of the mypy output
+.PHONY: typing-report
+typing-report: clean
+	@echo "generate a report of the type check output -- errors per file"
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode exclude
 
 .PHONY: test
 test: clean
