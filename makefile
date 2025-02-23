@@ -1028,6 +1028,54 @@ endef
 
 export SCRIPT_DOCS_CLEAN
 
+# generate a report of the mypy output
+define SCRIPT_MYPY_REPORT
+"usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
+
+import sys
+import argparse
+import re
+import json
+
+
+def parse_mypy_output(lines: list[str]) -> dict[str, int]:
+	"given mypy output, turn it into a dict of `filename: error_count`"
+	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
+	counts: dict[str, int] = {}
+	for line in lines:
+		m = pattern.match(line)
+		if m:
+			f: str = m.group("file")
+			counts[f] = counts.get(f, 0) + 1
+	return counts
+
+
+def main() -> None:
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
+	args = parser.parse_args()
+	lines: list[str] = sys.stdin.read().splitlines()
+	error_dict: dict[str, int] = parse_mypy_output(lines)
+	sorted_errors: list[tuple[str, int]] = sorted(
+		error_dict.items(), key=lambda x: x[1]
+	)
+	if args.mode == "jsonl":
+		for fname, count in sorted_errors:
+			print(json.dumps({"filename": fname, "errors": count}))
+	elif args.mode == "toml":
+		for fname, count in sorted_errors:
+			print(f'"{fname}", # {count}')
+	else:
+		raise ValueError(f"unknown mode {args.mode}")
+
+
+if __name__ == "__main__":
+	main()
+
+endef
+
+export SCRIPT_MYPY_REPORT
+
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -1170,14 +1218,16 @@ format-check:
 	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
 # runs type checks with mypy
-# at some point, need to add back --check-untyped-defs to mypy call
-# but it complains when we specify arguments by keyword where positional is fine
-# not sure how to fix this
 .PHONY: typing
 typing: clean
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(PACKAGE_NAME)/
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) $(TESTS_DIR)
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+
+# generates a report of the mypy output
+.PHONY: typing-report
+typing-report: clean
+	@echo "generate a report of the type check output -- errors per file"
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode exclude
 
 .PHONY: test
 test: clean
