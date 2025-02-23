@@ -1074,6 +1074,7 @@ def main() -> None:
 			print(f'"{fname}", # {count}')
 	else:
 		raise ValueError(f"unknown mode {args.mode}")
+	print(f"# total errors: {sum(error_dict.values())}")
 
 
 if __name__ == "__main__":
