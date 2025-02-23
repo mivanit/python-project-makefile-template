@@ -371,7 +371,7 @@ typing: clean
 
 # generates a report of the mypy output
 .PHONY: typing-report
-typing-report: clean
+typing-report:
 	@echo "generate a report of the type check output -- errors per file"
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
 
