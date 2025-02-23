@@ -373,7 +373,7 @@ typing: clean
 .PHONY: typing-report
 typing-report: clean
 	@echo "generate a report of the type check output -- errors per file"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode exclude
+	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
 
 .PHONY: test
 test: clean
