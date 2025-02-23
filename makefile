@@ -2,7 +2,7 @@
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.2.1                                                  |
+#| version: v0.2.2                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -167,7 +167,7 @@ import sys
 import warnings
 
 try:
-	import tomllib  # Python 3.11+
+	import tomllib  # type: ignore[import-not-found]
 except ImportError:
 	import tomli as tomllib  # type: ignore
 from pathlib import Path
@@ -293,7 +293,7 @@ import sys
 
 try:
 	try:
-		import tomllib  # Python 3.11+
+		import tomllib  # type: ignore[import-not-found]
 	except ImportError:
 		import tomli as tomllib  # type: ignore
 
@@ -541,7 +541,7 @@ import warnings
 from jinja2 import Template
 
 try:
-	import tomllib  # Python 3.11+
+	import tomllib  # type: ignore[import-not-found]
 except ImportError:
 	import tomli as tomllib  # type: ignore
 
@@ -956,7 +956,7 @@ from pathlib import Path
 from typing import Any, List, Set
 
 try:
-	import tomllib  # Python 3.11+
+	import tomllib  # type: ignore[import-not-found]
 except ImportError:
 	import tomli as tomllib  # type: ignore
 
