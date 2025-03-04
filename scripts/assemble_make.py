@@ -25,7 +25,10 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
 	scripts: Dict[str, str] = {}
 	for script in scripts_dir.iterdir():
 		if script.is_file() and script.suffix == ".py":
-			scripts[script.stem] = script.read_text()
+			script_text: str = script.read_text()
+			# add a link to the script
+			script_text = f"# source: https://github.com/mivanit/python-project-makefile-template/tree/main/{script.as_posix()}\n\n{script_text}"
+			scripts[script.stem] = script_text
 	return scripts
 
 
