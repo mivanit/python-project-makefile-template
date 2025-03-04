@@ -1102,7 +1102,7 @@ def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 		full_path = (docs_dir / p).resolve()
 		if not full_path.as_posix().startswith(docs_dir.resolve().as_posix()):
 			err_msg: str = (
-				f"Preserved path '{p.as_posix()}' must be within docs directory"
+				f"Preserved path '{p}' must be within docs directory"
 			)
 			raise ValueError(err_msg)
 		preserve_set.add(docs_dir / p)
@@ -1444,11 +1444,11 @@ docs-clean:
 	@echo "remove generated docs except resources"
 	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
+
 .PHONY: todo
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
-
 
 .PHONY: lmcat-tree
 lmcat-tree:

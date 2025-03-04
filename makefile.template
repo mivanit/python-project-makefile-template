@@ -455,11 +455,11 @@ docs-clean:
 	@echo "remove generated docs except resources"
 	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
+
 .PHONY: todo
 todo:
 	@echo "get all TODO's from the code"
 	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
-
 
 .PHONY: lmcat-tree
 lmcat-tree:
