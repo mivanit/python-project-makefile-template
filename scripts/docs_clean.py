@@ -42,9 +42,7 @@ def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	for p in preserved:
 		full_path = (docs_dir / p).resolve()
 		if not full_path.as_posix().startswith(docs_dir.resolve().as_posix()):
-			err_msg: str = (
-				f"Preserved path '{p}' must be within docs directory"
-			)
+			err_msg: str = f"Preserved path '{p}' must be within docs directory"
 			raise ValueError(err_msg)
 		preserve_set.add(docs_dir / p)
 

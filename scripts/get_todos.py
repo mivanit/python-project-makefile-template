@@ -392,7 +392,8 @@ def main(config_file: Path) -> None:
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
 		cfg.out_file_base.with_suffix(".html").write_text(
-			html_rendered, encoding="utf-8",
+			html_rendered,
+			encoding="utf-8",
 		)
 	except Exception as e:  # noqa: BLE001
 		warnings.warn(f"Failed to write html output: {e}")
