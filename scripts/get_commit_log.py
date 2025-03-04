@@ -10,7 +10,8 @@ from typing import List
 def main(
 	last_version: str,
 	commit_log_file: str,
-):
+) -> None:
+	"pretty print a commit log amd wrote it to a file"
 	if last_version == "NULL":
 		print("!!! ERROR !!!", file=sys.stderr)
 		print("LAST_VERSION is NULL, can't get commit log!", file=sys.stderr)
@@ -24,7 +25,7 @@ def main(
 			"--pretty=format:- %s (%h)",
 		]
 		commits: List[str] = (
-			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")
+			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n") # noqa: S603
 		)
 		with open(commit_log_file, "w") as f:
 			f.write("\n".join(reversed(commits)))

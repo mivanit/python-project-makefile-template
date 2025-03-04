@@ -103,6 +103,7 @@
 			# boolean positional arguments are fine
 			"FBT001", 
 			"FBT002",
+			"FBT003",
 			"PTH123", # opening files is fine
 			"RET505", # else return is fine
 			"FIX002", # `make todo` will give us the TODO comments
@@ -119,9 +120,18 @@
 			"TD002", # dont care about author
 			"TD003", # `make todo` will give us a table where we can create issues
 			"PLR0913", # sometimes you have to have a lot of args
+			"B028", # fine to omit stacklevel on warnings
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			# only for old version compatibility
 			"UP007", # `Optional` is ok, we might not want to use `|` for compatibility
+			# old style hints `Tuple`, `List`, etc. are fine
+			"UP006", 
+			"UP035",
+			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			# delete this section!
+			"INP001", # this isn't a package, just some scripts
+			"PGH003", # bare type ignore is fine
+			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		]
 		select = ["ALL"]
 		# select = ["ICN001"]
@@ -144,6 +154,10 @@
 				"PLR2004", # magic variables are fine
 				"N806", # uppercase vars are fine
 			]
+			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			# delete this!
+			"scripts/get_todos.py" = ["W291"] # we use trailing whitespace intentionally in the markdown template
+			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # `make lmcat` depends on the lmcat and can be configured here
 [tool.lmcat]

@@ -24,9 +24,10 @@ def parse_mypy_output(lines: List[str]) -> Dict[str, int]:
 
 
 def main() -> None:
-	parser = argparse.ArgumentParser()
+	"cli interface for mypy_report"
+	parser: argparse.ArgumentParser = argparse.ArgumentParser()
 	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
-	args = parser.parse_args()
+	args: argparse.Namespace = parser.parse_args()
 	lines: List[str] = sys.stdin.read().splitlines()
 	error_dict: Dict[str, int] = parse_mypy_output(lines)
 	sorted_errors: List[Tuple[str, int]] = sorted(
@@ -43,7 +44,8 @@ def main() -> None:
 		for fname, count in sorted_errors:
 			print(f'"{fname}", # {count}')
 	else:
-		raise ValueError(f"unknown mode {args.mode}")
+		msg: str = f"unknown mode {args.mode}"
+		raise ValueError(msg)
 	print(f"# total errors: {sum(error_dict.values())}")
 
 

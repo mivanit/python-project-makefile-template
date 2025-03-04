@@ -22,7 +22,8 @@ except ImportError:
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any: # noqa: ANN401
+	"get a value from a nested dictionary"
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
 		path.split(sep) if isinstance(path, str) else path,  # sequence
@@ -107,6 +108,7 @@ class Config:
 
 	@property
 	def template_html(self) -> str:
+		"read the html template"
 		return self.template_html_source.read_text(encoding="utf-8")
 
 	template_code_url_: str = "{repo_url}/blob/{branch}/{file}#L{line_num}"
@@ -114,6 +116,7 @@ class Config:
 
 	@property
 	def template_code_url(self) -> str:
+		"code url with repo url and branch substituted"
 		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
 			"{branch}",
 			self.branch,
@@ -127,6 +130,7 @@ class Config:
 
 	@classmethod
 	def read(cls, config_file: Path) -> Config:
+		"read from a file, or return default"
 		output: Config
 		if config_file.is_file():
 			# read file and load if present
@@ -143,7 +147,7 @@ class Config:
 					repo_url = urls["repository"]
 				if "github" in urls:
 					repo_url = urls["github"]
-			except Exception as e:
+			except Exception as e: # noqa: BLE001
 				warnings.warn(
 					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
 				)
@@ -167,6 +171,7 @@ class Config:
 
 	@classmethod
 	def load(cls, data: dict) -> Config:
+		"load from a dictionary, converting to `Path` as needed"
 		data = {
 			k: Path(v) if k in {"search_dir", "out_file", "template_html_source"} else v
 			for k, v in data.items()
@@ -190,6 +195,7 @@ class TodoItem:
 	context: str = ""
 
 	def serialize(self) -> Dict[str, Union[str, int]]:
+		"serialize to a dict we can dump to json"
 		return {
 			**asdict(self),
 			"issue_url": self.issue_url,
@@ -286,12 +292,11 @@ def collect_files(
 	for ext in extensions:
 		results.extend(search_dir.rglob(f"*.{ext}"))
 
-	filtered: List[Path] = []
-	for f in results:
-		# Skip if it matches any exclude glob
-		if not any(fnmatch.fnmatch(f.as_posix(), pattern) for pattern in exclude):
-			filtered.append(f)
-	return filtered
+	return [
+		f
+		for f in results
+		if not any(fnmatch.fnmatch(f.as_posix(), pattern) for pattern in exclude)
+	]
 
 
 def group_items_by_tag_and_file(
@@ -308,7 +313,8 @@ def group_items_by_tag_and_file(
 
 
 def main(config_file: Path) -> None:
-	global CFG
+	"cli interface to get todos"
+	global CFG # noqa: PLW0603
 	# read configuration
 	cfg: Config = Config.read(config_file)
 	CFG = cfg
@@ -346,7 +352,7 @@ def main(config_file: Path) -> None:
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
-	except Exception as e:
+	except Exception as e: # noqa: BLE001
 		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
