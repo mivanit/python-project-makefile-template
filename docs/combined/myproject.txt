@@ -1,4 +1,4 @@
-  docs for myproject v0.2.2
+  docs for myproject v0.3.1
 
 Contents
 
@@ -233,7 +233,11 @@ and then run
 
 View Source on GitHub
 
-  docs for myproject v0.2.2
+  docs for myproject v0.3.1
+
+Contents
+
+dummy module
 
 API Documentation
 
@@ -244,21 +248,31 @@ View Source on GitHub
 
 myproject.helloworld
 
+dummy module
+
 View Source on GitHub
 
 def some_function
 
-    ()
+    () -> None
 
 View Source on GitHub
+
+dummy docstring
 
 def critical_function
 
-    ()
+    () -> None
 
 View Source on GitHub
 
-  docs for myproject v0.2.2
+dummy docstring
+
+  docs for myproject v0.3.1
+
+Contents
+
+a module
 
 API Documentation
 
@@ -268,10 +282,14 @@ View Source on GitHub
 
 myproject.other
 
+a module
+
 View Source on GitHub
 
 def another_function
 
-    ()
+    () -> None
 
 View Source on GitHub
+
+dummy docstring

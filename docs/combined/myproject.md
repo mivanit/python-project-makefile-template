@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.2.2
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.1
 
 
 ## Contents
@@ -104,7 +104,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1__init__.py)
 
 # `myproject` { #myproject }
 
@@ -202,15 +202,17 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2__init__.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1__init__.py#L0-L0)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.2.2
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.1
 
 
+## Contents
+dummy module
 
 
 ## API Documentation
@@ -221,42 +223,47 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
+dummy module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2helloworld.py#L0-L11)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py#L0-L15)
 
 
 
 ### `def some_function` { #some_function }
 ```python
-()
+() -> None
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2helloworld.py#L6-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py#L8-L10)
 
 
+dummy docstring
 
 
 ### `def critical_function` { #critical_function }
 ```python
-()
+() -> None
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2helloworld.py#L11-L12)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py#L14-L16)
+
+
+dummy docstring
 
 
 
 
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.1
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.2.2
-
-
+## Contents
+a module
 
 
 ## API Documentation
@@ -266,24 +273,26 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1other.py)
 
 # `myproject.other` { #myproject.other }
 
+a module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2other.py#L0-L2)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1other.py#L0-L6)
 
 
 
 ### `def another_function` { #another_function }
 ```python
-()
+() -> None
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.2.2other.py#L2-L3)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1other.py#L5-L7)
 
 
+dummy docstring
 
 
 
