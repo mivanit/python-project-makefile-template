@@ -1,12 +1,13 @@
 "usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
 
 from __future__ import annotations
-import sys
+
 import argparse
-import re
 import json
-from typing import List, Dict, Tuple
+import re
+import sys
 from pathlib import Path
+from typing import Dict, List, Tuple
 
 
 def parse_mypy_output(lines: List[str]) -> Dict[str, int]:
@@ -29,7 +30,8 @@ def main() -> None:
 	lines: List[str] = sys.stdin.read().splitlines()
 	error_dict: Dict[str, int] = parse_mypy_output(lines)
 	sorted_errors: List[Tuple[str, int]] = sorted(
-		error_dict.items(), key=lambda x: x[1]
+		error_dict.items(),
+		key=lambda x: x[1],
 	)
 	if len(sorted_errors) == 0:
 		print("# no errors found!")

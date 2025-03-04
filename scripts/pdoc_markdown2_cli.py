@@ -1,8 +1,12 @@
+"cli to convert markdown files to HTML using pdoc's markdown2"
+
+from __future__ import annotations
+
 import argparse
 from pathlib import Path
 from typing import Optional
 
-from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
+from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore[import]
 
 
 def convert_file(
@@ -27,8 +31,9 @@ def convert_file(
 
 
 def main() -> None:
+	"cli entry point"
 	parser: argparse.ArgumentParser = argparse.ArgumentParser(
-		description="Convert markdown files to HTML using pdoc's markdown2"
+		description="Convert markdown files to HTML using pdoc's markdown2",
 	)
 	parser.add_argument("input", type=Path, help="Input markdown file path")
 	parser.add_argument("output", type=Path, help="Output HTML file path")
@@ -46,7 +51,10 @@ def main() -> None:
 	args: argparse.Namespace = parser.parse_args()
 
 	convert_file(
-		args.input, args.output, safe_mode=args.safe_mode, encoding=args.encoding
+		args.input,
+		args.output,
+		safe_mode=args.safe_mode,
+		encoding=args.encoding,
 	)
 
 

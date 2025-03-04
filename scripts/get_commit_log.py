@@ -1,3 +1,7 @@
+"pretty print a commit log amd wrote it to a file"
+
+from __future__ import annotations
+
 import subprocess
 import sys
 from typing import List

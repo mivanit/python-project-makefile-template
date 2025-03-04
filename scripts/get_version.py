@@ -1,3 +1,7 @@
+"write the current version of the project to a file"
+
+from __future__ import annotations
+
 import sys
 
 try:

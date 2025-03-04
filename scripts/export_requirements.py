@@ -1,3 +1,7 @@
+"export to requirements.txt files based on pyproject.toml configuration"
+
+from __future__ import annotations
+
 import sys
 import warnings
 
@@ -5,9 +9,9 @@ try:
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
 	import tomli as tomllib  # type: ignore
-from pathlib import Path
-from typing import Any, Dict, Union, List
 from functools import reduce
+from pathlib import Path
+from typing import Any, Dict, List, Union
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
 
@@ -37,7 +41,7 @@ def export_configuration(
 
 	# get other options with default fallbacks
 	filename: str = export.get("filename") or f"requirements-{name}.txt"
-	groups: Union[List[str], bool, None] = export.get("groups", None)
+	groups: Union[List[str], bool, None] = export.get("groups")
 	extras: Union[List[str], bool] = export.get("extras", [])
 	options: List[str] = export.get("options", [])
 
@@ -89,7 +93,7 @@ def main(
 	# all available groups
 	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
 	all_extras: List[str] = list(
-		deep_get(pyproject_data, "project.optional-dependencies", {}).keys()
+		deep_get(pyproject_data, "project.optional-dependencies", {}).keys(),
 	)
 
 	# options for exporting

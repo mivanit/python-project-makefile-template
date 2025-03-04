@@ -1,7 +1,11 @@
+"print info about current python, torch, cuda, and devices"
+
+from __future__ import annotations
+
 import os
-import sys
 import re
 import subprocess
+import sys
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
@@ -43,7 +47,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	# Compile shared regex for release info.
 	release_regex: re.Pattern = re.compile(
-		r"Cuda compilation tools,\s*release\s*([^,]+),\s*(V.+)"
+		r"Cuda compilation tools,\s*release\s*([^,]+),\s*(V.+)",
 	)
 
 	# Define a mapping for each desired field:
@@ -65,7 +69,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
 			raise ValueError(
-				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
+				f"Unable to parse {key} from nvcc output: {lines[line_index]}",
 			)
 		info[key] = transform(match.group(group_index))
 
@@ -97,7 +101,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 						current_device_info: Dict[str, Union[str, int]] = {}
 
 						dev_prop = torch.cuda.get_device_properties(
-							torch.device(f"cuda:{current_device}")
+							torch.device(f"cuda:{current_device}"),
 						)
 
 						current_device_info["name"] = dev_prop.name
@@ -121,12 +125,12 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 						exceptions.append(e)
 			else:
 				raise Exception(
-					f"{torch.cuda.device_count() = } devices detected, invalid"
+					f"{torch.cuda.device_count() = } devices detected, invalid",
 				)
 
 		else:
 			raise Exception(
-				f"CUDA is NOT available in torch: {torch.cuda.is_available() =}"
+				f"CUDA is NOT available in torch: {torch.cuda.is_available() =}",
 			)
 
 	except Exception as e:
@@ -144,7 +148,7 @@ if __name__ == "__main__":
 			"current working directory: os.getcwd()": os.getcwd(),
 			"Host name: os.name": os.name,
 			"CPU count: os.cpu_count()": str(os.cpu_count()),
-		}
+		},
 	)
 
 	nvcc_info: Dict[str, Any] = get_nvcc_info()

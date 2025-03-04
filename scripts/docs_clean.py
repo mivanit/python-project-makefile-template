@@ -1,5 +1,9 @@
-import sys
+"clean up docs directory based on pyproject.toml configuration"
+
+from __future__ import annotations
+
 import shutil
+import sys
 from functools import reduce
 from pathlib import Path
 from typing import Any, List, Set

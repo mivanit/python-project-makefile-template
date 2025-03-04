@@ -1,14 +1,17 @@
+"read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
+
 from __future__ import annotations
 
-import urllib.parse
 import argparse
 import fnmatch
-from dataclasses import asdict, dataclass, field
 import json
+import urllib.parse
+import warnings
+from dataclasses import asdict, dataclass, field
+from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, List, Union
-from functools import reduce
-import warnings
+
 from jinja2 import Template
 
 try:
@@ -66,10 +69,10 @@ TEMPLATE_ISSUE: str = """\
 class Config:
 	"""Configuration for the inline-todo scraper"""
 
-	search_dir: Path = Path(".")
+	search_dir: Path = Path()
 	out_file: Path = Path("docs/todo-inline.md")
 	tags: List[str] = field(
-		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"]
+		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"],
 	)
 	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
@@ -81,7 +84,7 @@ class Config:
 			"FIXME": "bug",
 			"BUG": "bug",
 			"HACK": "enhancement",
-		}
+		},
 	)
 	extension_lang_map: Dict[str, str] = field(
 		default_factory=lambda: {
@@ -90,7 +93,7 @@ class Config:
 			"html": "html",
 			"css": "css",
 			"js": "javascript",
-		}
+		},
 	)
 
 	template_md: str = TEMPLATE_MD
@@ -112,7 +115,8 @@ class Config:
 	@property
 	def template_code_url(self) -> str:
 		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
-			"{branch}", self.branch
+			"{branch}",
+			self.branch,
 		)
 
 	repo_url: str = "UNKNOWN"
@@ -141,12 +145,14 @@ class Config:
 					repo_url = urls["github"]
 			except Exception as e:
 				warnings.warn(
-					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}"
+					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
 				)
 
 			# load the inline-todo config if present
 			data_inline_todo: Dict[str, Any] = deep_get(
-				d=data, path=TOOL_PATH, default={}
+				d=data,
+				path=TOOL_PATH,
+				default={},
 			)
 
 			if "repo_url" not in data_inline_todo:
@@ -264,7 +270,7 @@ def scrape_file(
 						line_num=i + 1,
 						content=line.strip("\n"),
 						context=snippet.strip("\n"),
-					)
+					),
 				)
 				break
 	return items
@@ -325,7 +331,7 @@ def main(config_file: Path) -> None:
 
 	# group, render
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
-		all_items
+		all_items,
 	)
 
 	rendered: str = Template(cfg.template_md).render(grouped=grouped)
@@ -336,7 +342,8 @@ def main(config_file: Path) -> None:
 	# write html output
 	try:
 		html_rendered: str = cfg.template_html.replace(
-			"//{{DATA}}//", json.dumps([itm.serialize() for itm in all_items])
+			"//{{DATA}}//",
+			json.dumps([itm.serialize() for itm in all_items]),
 		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 	except Exception as e:

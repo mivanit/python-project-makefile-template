@@ -1,3 +1,7 @@
+"add scripts and version to the makefile -- this one isnt put in the makefile"
+
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Dict
 
@@ -34,7 +38,7 @@ def main() -> None:
 			continue
 
 		template_replace: str = TEMPLATE_SYNTAX.format(
-			var=f"SCRIPT_{script_name.upper()}"
+			var=f"SCRIPT_{script_name.upper()}",
 		)
 		assert template_replace in contents, (
 			f"Template syntax not found in {TEMPLATE_PATH}:\n{template_replace}"
