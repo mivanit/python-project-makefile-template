@@ -570,7 +570,7 @@ TEMPLATE_MD: str = """\
   | [Make Issue]({{ itm.issue_url | safe }})
 {% if itm.context %}
   ```{{ itm.file_lang }}
-{{ itm.context.strip() }}
+{{ itm.context_indented }}
   ```
 {% endif %}
 {% endfor %}
@@ -722,6 +722,11 @@ class TodoItem:
 		}
 
 	@property
+	def context_indented(self) -> str:
+		"""Returns the context with each line indented"""
+		return "\n".join(f"  {line}" for line in self.context.splitlines())
+
+	@property
 	def code_url(self) -> str:
 		"""Returns a URL to the code on GitHub"""
 		return CFG.template_code_url.format(
@@ -746,6 +751,7 @@ class TodoItem:
 			file=self.file,
 			line_num=self.line_num,
 			context=self.context,
+			context_indented=self.context_indented,
 			code_url=self.code_url,
 			file_lang=self.file_lang,
 		).strip()
