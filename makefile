@@ -646,6 +646,8 @@ class Config:
 	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
+	valid_post_tag: Union[str, List[str]] = " \t:<>|[](){{}}"
+	valid_pre_tag: Union[str, List[str]] = " \t:<>|[](){{}}#"
 	tag_label_map: Dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
@@ -742,7 +744,9 @@ class Config:
 		"load from a dictionary, converting to `Path` as needed"
 		# process variables that should be paths
 		data = {
-			k: Path(v) if k in {"search_dir", "out_file_base", "template_html_source"} else v
+			k: Path(v)
+			if k in {"search_dir", "out_file_base", "template_html_source"}
+			else v
 			for k, v in data.items()
 		}
 
@@ -829,8 +833,7 @@ class TodoItem:
 
 def scrape_file(
 	file_path: Path,
-	tags: List[str],
-	context_lines: int,
+	cfg: Config,
 ) -> List[TodoItem]:
 	"""Scrapes a file for lines containing any of the specified tags"""
 	items: List[TodoItem] = []
@@ -838,21 +841,32 @@ def scrape_file(
 		return items
 	lines: List[str] = file_path.read_text(encoding="utf-8").splitlines(True)
 
+	# over all lines
 	for i, line in enumerate(lines):
-		for tag in tags:
+		# over all tags
+		for tag in cfg.tags:
+			# check tag is present
 			if tag in line[:200]:
-				start: int = max(0, i - context_lines)
-				end: int = min(len(lines), i + context_lines + 1)
-				snippet: str = "".join(lines[start:end])
-				items.append(
-					TodoItem(
-						tag=tag,
-						file=file_path.as_posix(),
-						line_num=i + 1,
-						content=line.strip("\n"),
-						context=snippet.strip("\n"),
-					),
-				)
+				# check tag is surrounded by valid strings
+				tag_idx_start: int = line.index(tag)
+				tag_idx_end: int = tag_idx_start + len(tag)
+				if (
+					line[tag_idx_start - 1] in cfg.valid_pre_tag
+					and line[tag_idx_end] in cfg.valid_post_tag
+				):
+					# get the context and add the item
+					start: int = max(0, i - cfg.context_lines)
+					end: int = min(len(lines), i + cfg.context_lines + 1)
+					snippet: str = "".join(lines[start:end])
+					items.append(
+						TodoItem(
+							tag=tag,
+							file=file_path.as_posix(),
+							line_num=i + 1,
+							content=line.strip("\n"),
+							context=snippet.strip("\n"),
+						),
+					)
 				break
 	return items
 
@@ -900,7 +914,7 @@ def main(config_file: Path) -> None:
 	n_files: int = len(files)
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
-		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
+		all_items.extend(scrape_file(fpath, cfg))
 
 	# create dir
 	cfg.out_file_base.parent.mkdir(parents=True, exist_ok=True)
@@ -915,13 +929,13 @@ def main(config_file: Path) -> None:
 		all_items,
 	)
 
-
 	# render each template and save
 	for template_key, template in cfg.templates_md.items():
 		rendered: str = Template(template).render(grouped=grouped, all_items=all_items)
 		template_out_path: Path = Path(
-			cfg.out_file_base.with_stem(cfg.out_file_base.stem + f"-{template_key}")
-			.with_suffix(".md"),
+			cfg.out_file_base.with_stem(
+				cfg.out_file_base.stem + f"-{template_key}",
+			).with_suffix(".md"),
 		)
 		template_out_path.write_text(rendered, encoding="utf-8")
 
@@ -931,7 +945,9 @@ def main(config_file: Path) -> None:
 			"//{{DATA}}//",
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
-		cfg.out_file_base.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
+		cfg.out_file_base.with_suffix(".html").write_text(
+			html_rendered, encoding="utf-8",
+		)
 	except Exception as e:  # noqa: BLE001
 		warnings.warn(f"Failed to write html output: {e}")
 
