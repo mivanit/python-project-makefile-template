@@ -91,6 +91,7 @@ def deep_get(
 	sep: str = ".",
 	warn_msg_on_default: Optional[str] = None,
 ) -> Any:
+	"Get a value from a nested dictionary"
 	output: Any = reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
 		path.split(sep) if isinstance(path, str) else path,  # sequence

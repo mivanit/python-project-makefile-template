@@ -25,7 +25,7 @@ def main(
 			"--pretty=format:- %s (%h)",
 		]
 		commits: List[str] = (
-			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n") # noqa: S603
+			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")  # noqa: S603
 		)
 		with open(commit_log_file, "w") as f:
 			f.write("\n".join(reversed(commits)))

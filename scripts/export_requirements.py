@@ -16,7 +16,8 @@ from typing import Any, Dict, List, Union
 TOOL_PATH: str = "tool.makefile.uv-exports"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
+	"get a value from a nested dictionary"
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
 		path.split(sep) if isinstance(path, str) else path,  # sequence
@@ -30,7 +31,8 @@ def export_configuration(
 	all_extras: List[str],
 	export_opts: dict,
 	output_dir: Path,
-):
+) -> None:
+	"print to console a uv command for make which will export a requirements.txt file"
 	# get name and validate
 	name = export.get("name")
 	if not name or not name.isalnum():
@@ -46,7 +48,7 @@ def export_configuration(
 	options: List[str] = export.get("options", [])
 
 	# init command
-	cmd: List[str] = ["uv", "export"] + export_opts.get("args", [])
+	cmd: List[str] = ["uv", "export", *export_opts.get("args", [])]
 
 	# handle groups
 	if groups is not None:
@@ -85,7 +87,8 @@ def export_configuration(
 def main(
 	pyproject_path: Path,
 	output_dir: Path,
-):
+) -> None:
+	"export to requirements.txt files based on pyproject.toml configuration"
 	# read pyproject.toml
 	with open(pyproject_path, "rb") as f:
 		pyproject_data: dict = tomllib.load(f)

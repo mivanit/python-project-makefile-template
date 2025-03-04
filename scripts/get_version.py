@@ -16,6 +16,6 @@ try:
 		pyproject_data: dict = tomllib.load(f)
 
 	print("v" + pyproject_data["project"]["version"], end="")
-except Exception: # noqa: BLE001
+except Exception:  # noqa: BLE001
 	print("NULL", end="")
 	sys.exit(1)

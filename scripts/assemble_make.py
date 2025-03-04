@@ -21,6 +21,7 @@ with open("pyproject.toml", "rb") as f_pyproject:
 
 
 def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
+	"read script contents into a dict"
 	scripts: Dict[str, str] = {}
 	for script in scripts_dir.iterdir():
 		if script.is_file() and script.suffix == ".py":
@@ -29,6 +30,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
 
 
 def main() -> None:
+	"assemble the makefile"
 	contents: str = TEMPLATE_PATH.read_text()
 	scripts: Dict[str, str] = read_scripts()
 

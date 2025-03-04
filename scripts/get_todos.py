@@ -22,7 +22,7 @@ except ImportError:
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any: # noqa: ANN401
+def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
 	"get a value from a nested dictionary"
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
@@ -147,7 +147,7 @@ class Config:
 					repo_url = urls["repository"]
 				if "github" in urls:
 					repo_url = urls["github"]
-			except Exception as e: # noqa: BLE001
+			except Exception as e:  # noqa: BLE001
 				warnings.warn(
 					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
 				)
@@ -314,7 +314,7 @@ def group_items_by_tag_and_file(
 
 def main(config_file: Path) -> None:
 	"cli interface to get todos"
-	global CFG # noqa: PLW0603
+	global CFG  # noqa: PLW0603
 	# read configuration
 	cfg: Config = Config.read(config_file)
 	CFG = cfg
@@ -352,7 +352,7 @@ def main(config_file: Path) -> None:
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
 		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
-	except Exception as e: # noqa: BLE001
+	except Exception as e:  # noqa: BLE001
 		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")

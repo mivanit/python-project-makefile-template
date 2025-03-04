@@ -14,6 +14,7 @@ def print_info_dict(
 	indent: str = "  ",
 	level: int = 1,
 ) -> None:
+	"pretty print the info"
 	indent_str: str = indent * level
 	longest_key_len: int = max(map(len, info.keys()))
 	for key, value in info.items():
@@ -25,23 +26,23 @@ def print_info_dict(
 
 
 def get_nvcc_info() -> Dict[str, str]:
+	"get info about cuda from nvcc --version"
 	# Run the nvcc command.
 	try:
-		result: subprocess.CompletedProcess[str] = subprocess.run(
-			["nvcc", "--version"],
+		result: subprocess.CompletedProcess[str] = subprocess.run(  # noqa: S603
+			["nvcc", "--version"],  # noqa: S607
 			check=True,
-			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE,
+			capture_output=True,
 			text=True,
 		)
-	except Exception as e:
+	except Exception as e:  # noqa: BLE001
 		return {"Failed to run 'nvcc --version'": str(e)}
 
 	output: str = result.stdout
 	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
-	assert len(lines) == 5, (
+	assert len(lines) == 5, (  # noqa: PLR2004
 		f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
 	)
 
@@ -68,9 +69,10 @@ def get_nvcc_info() -> Dict[str, str]:
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
 		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
-			raise ValueError(
-				f"Unable to parse {key} from nvcc output: {lines[line_index]}",
+			err_msg: str = (
+				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
 			)
+			raise ValueError(err_msg)
 		info[key] = transform(match.group(group_index))
 
 	info["release_short"] = info["release"].replace(".", "").strip()
@@ -79,6 +81,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 
 def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
+	"get info about pytorch and cuda devices"
 	exceptions: List[Exception] = []
 	info: Dict[str, Any] = {}
 
@@ -121,19 +124,21 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 						info[f"device cuda:{current_device}"] = current_device_info
 
-					except Exception as e:
+					except Exception as e:  # noqa: PERF203,BLE001
 						exceptions.append(e)
 			else:
-				raise Exception(
-					f"{torch.cuda.device_count() = } devices detected, invalid",
+				err_msg_nodevice: str = (
+					f"{torch.cuda.device_count() = } devices detected, invalid"
 				)
+				raise ValueError(err_msg_nodevice)  # noqa: TRY301
 
 		else:
-			raise Exception(
-				f"CUDA is NOT available in torch: {torch.cuda.is_available() =}",
+			err_msg_nocuda: str = (
+				f"CUDA is NOT available in torch: {torch.cuda.is_available() = }"
 			)
+			raise ValueError(err_msg_nocuda)  # noqa: TRY301
 
-	except Exception as e:
+	except Exception as e:  # noqa: BLE001
 		exceptions.append(e)
 
 	return exceptions, info
@@ -145,7 +150,7 @@ if __name__ == "__main__":
 		{
 			"python executable path: sys.executable": str(sys.executable),
 			"sys.platform": sys.platform,
-			"current working directory: os.getcwd()": os.getcwd(),
+			"current working directory: os.getcwd()": os.getcwd(),  # noqa: PTH109
 			"Host name: os.name": os.name,
 			"CPU count: os.cpu_count()": str(os.cpu_count()),
 		},

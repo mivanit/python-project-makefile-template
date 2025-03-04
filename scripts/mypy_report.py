@@ -44,8 +44,8 @@ def main() -> None:
 		for fname, count in sorted_errors:
 			print(f'"{fname}", # {count}')
 	else:
-		msg: str = f"unknown mode {args.mode}"
-		raise ValueError(msg)
+		err_msg: str = f"unknown mode {args.mode}"
+		raise ValueError(err_msg)
 	print(f"# total errors: {sum(error_dict.values())}")
 
 
