@@ -585,7 +585,7 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  #
 	)
 
 
-TEMPLATE_MD: str = """\
+_TEMPLATE_MD_LIST: str = """\
 # Inline TODOs
 
 {% for tag, file_map in grouped|dictsort %}
@@ -608,6 +608,20 @@ TEMPLATE_MD: str = """\
 {% endfor %}
 """
 
+_TEMPLATE_MD_TABLE: str = """\
+# Inline TODOs
+
+| Location | Tag | Todo | GitHub | Issue |
+|:---------|:----|:-----|:-------|:------|
+{% for itm in all_items %}| [`{{ itm.file }}#{{ itm.line_num }}`](/{{ itm.file }}#{{ itm.line_num }}) | {{ itm.tag }} | {{ itm.stripped_title }} | [View]({{ itm.code_url | safe }}) | [Create]({{ itm.issue_url | safe }}) |
+{% endfor %}
+"""
+
+TEMPLATES_MD: Dict[str, str] = dict(
+	standard=_TEMPLATE_MD_LIST,
+	table=_TEMPLATE_MD_TABLE,
+)
+
 TEMPLATE_ISSUE: str = """\
 # source
 
@@ -625,7 +639,7 @@ class Config:
 	"""Configuration for the inline-todo scraper"""
 
 	search_dir: Path = Path()
-	out_file: Path = Path("docs/todo-inline.md")
+	out_file_base: Path = Path("docs/todo-inline")
 	tags: List[str] = field(
 		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"],
 	)
@@ -651,8 +665,8 @@ class Config:
 		},
 	)
 
-	template_md: str = TEMPLATE_MD
-	# template for the output markdown file
+	templates_md: dict[str, str] = field(default_factory=lambda: TEMPLATES_MD)
+	# templates for the output markdown file
 
 	template_issue: str = TEMPLATE_ISSUE
 	# template for the issue creation
@@ -726,9 +740,16 @@ class Config:
 	@classmethod
 	def load(cls, data: dict) -> Config:
 		"load from a dictionary, converting to `Path` as needed"
+		# process variables that should be paths
 		data = {
-			k: Path(v) if k in {"search_dir", "out_file", "template_html_source"} else v
+			k: Path(v) if k in {"search_dir", "out_file_base", "template_html_source"} else v
 			for k, v in data.items()
+		}
+
+		# default value for the templates
+		data["templates_md"] = {
+			**TEMPLATES_MD,
+			**data.get("templates_md", {}),
 		}
 
 		return cls(**data)
@@ -882,10 +903,10 @@ def main(config_file: Path) -> None:
 		all_items.extend(scrape_file(fpath, cfg.tags, cfg.context_lines))
 
 	# create dir
-	cfg.out_file.parent.mkdir(parents=True, exist_ok=True)
+	cfg.out_file_base.parent.mkdir(parents=True, exist_ok=True)
 
 	# write raw to jsonl
-	with open(cfg.out_file.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
+	with open(cfg.out_file_base.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
 		for itm in all_items:
 			f.write(json.dumps(itm.serialize()) + "\n")
 
@@ -894,10 +915,15 @@ def main(config_file: Path) -> None:
 		all_items,
 	)
 
-	rendered: str = Template(cfg.template_md).render(grouped=grouped)
 
-	# write md output
-	cfg.out_file.with_suffix(".md").write_text(rendered, encoding="utf-8")
+	# render each template and save
+	for template_key, template in cfg.templates_md.items():
+		rendered: str = Template(template).render(grouped=grouped, all_items=all_items)
+		template_out_path: Path = Path(
+			cfg.out_file_base.with_stem(cfg.out_file_base.stem + f"-{template_key}")
+			.with_suffix(".md"),
+		)
+		template_out_path.write_text(rendered, encoding="utf-8")
 
 	# write html output
 	try:
@@ -905,12 +931,12 @@ def main(config_file: Path) -> None:
 			"//{{DATA}}//",
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
-		cfg.out_file.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
+		cfg.out_file_base.with_suffix(".html").write_text(html_rendered, encoding="utf-8")
 	except Exception as e:  # noqa: BLE001
 		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
-	print(cfg.out_file.with_suffix(".md").as_posix())
+	print(cfg.out_file_base.with_suffix(".md").as_posix())
 
 
 if __name__ == "__main__":
