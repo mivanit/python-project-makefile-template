@@ -104,7 +104,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject.py)
 
 # `myproject` { #myproject }
 
@@ -202,7 +202,7 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2__init__.py#L0-L0)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject.py#L0-L0)
 
 
 
@@ -223,13 +223,13 @@ dummy module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 dummy module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py#L0-L15)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py#L0-L15)
 
 
 
@@ -239,7 +239,7 @@ dummy module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py#L8-L10)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py#L8-L10)
 
 
 dummy docstring
@@ -251,7 +251,7 @@ dummy docstring
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py#L14-L16)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py#L14-L16)
 
 
 dummy docstring
@@ -273,13 +273,13 @@ a module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/other.py)
 
 # `myproject.other` { #myproject.other }
 
 a module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2other.py#L0-L6)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/other.py#L0-L6)
 
 
 
@@ -289,7 +289,7 @@ a module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2other.py#L5-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/other.py#L5-L7)
 
 
 dummy docstring
