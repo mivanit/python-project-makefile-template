@@ -1,11 +1,12 @@
 {% extends "frame.html.jinja2" %}
 {% set path_to_root = "../" * (module.modulename.count(".")) %}
+{% set edit_url = package_code_url + module.modulename.replace(".", "/") + ".py" %}
 {% block title %}{{ module.modulename }} API documentation{% endblock %}
 {% block nav %}
     {% block module_list_link %}
         {% set parentmodule = ".".join(module.modulename.split(".")[:-1]) %}
         {% if parentmodule and parentmodule in all_modules %}
-            <a class="pdoc-button module-list-button" href="../{{ parentmodule.split(".")[-1] }}.html">
+            <a class="pdoc-button mod   ule-list-button" href="../{{ parentmodule.split(".")[-1] }}.html">
                 <img src="{{ path_to_root }}resources/svg/box-arrow-in-left.svg" alt="Back to parent module"/>
                 &nbsp;
                 {{- parentmodule -}}

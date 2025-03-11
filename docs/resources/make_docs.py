@@ -8,9 +8,10 @@ as this makes it easier to find edits when updating
 """
 
 import argparse
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from functools import reduce
 import inspect
+import json
 import re
 from typing import Any, Dict, List, Optional
 import warnings
@@ -130,6 +131,10 @@ class Config:
 			return self.package_repo_url + "/blob/" + self.package_version
 		else:
 			return "unknown"
+		
+	@property
+	def module_name(self) -> str:
+		return self.package_name.replace("-", "_")
 
 	@property
 	def output_dir(self) -> Path:
@@ -436,17 +441,19 @@ if __name__ == "__main__":
 		search=True,
 	)
 
+	print(json.dumps(asdict(CONFIG), indent=2))
+
 	# do the rendering
 	# --------------------------------------------------
 	if not parsed_args.combined:
 		pdoc.pdoc(
-			CONFIG.package_name,
+			CONFIG.module_name,
 			output_directory=CONFIG.output_dir,
 		)
 	else:
 		use_markdown_format()
 		pdoc_combined(
-			CONFIG.package_name,
+			CONFIG.module_name,
 			output_file=CONFIG.output_dir / "combined" / f"{CONFIG.package_name}.md",
 		)
 
