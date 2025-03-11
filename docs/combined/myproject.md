@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.1
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.2
 
 
 ## Contents
@@ -104,7 +104,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1__init__.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2__init__.py)
 
 # `myproject` { #myproject }
 
@@ -202,13 +202,13 @@ python scripts/assemble_make.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1__init__.py#L0-L0)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2__init__.py#L0-L0)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.1
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.2
 
 
 ## Contents
@@ -223,13 +223,13 @@ dummy module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 dummy module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py#L0-L15)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py#L0-L15)
 
 
 
@@ -239,7 +239,7 @@ dummy module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py#L8-L10)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py#L8-L10)
 
 
 dummy docstring
@@ -251,7 +251,7 @@ dummy docstring
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1helloworld.py#L14-L16)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2helloworld.py#L14-L16)
 
 
 dummy docstring
@@ -259,7 +259,7 @@ dummy docstring
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.1
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.3.2
 
 
 ## Contents
@@ -273,13 +273,13 @@ a module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2other.py)
 
 # `myproject.other` { #myproject.other }
 
 a module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1other.py#L0-L6)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2other.py#L0-L6)
 
 
 
@@ -289,7 +289,7 @@ a module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.1other.py#L5-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2other.py#L5-L7)
 
 
 dummy docstring

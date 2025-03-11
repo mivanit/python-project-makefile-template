@@ -1,7 +1,7 @@
 # Stats
 - 21 files
 - 4117 (4.1K) lines
-- 125199 (125K) chars
+- 125189 (125K) chars
 - 15007 (15K) `whitespace-split` tokens
 
 # File Tree
@@ -32,8 +32,8 @@ python-project-makefile-template
 ├── tests                         
 │   └── test_nothing.py           [    2L     42C     5T]
 ├── README.md                     [   92L  5,369C   681T]
-├── makefile                      [1,634L 50,101C 6,000T]
-├── makefile.template             [  639L 22,618C 2,975T]
+├── makefile                      [1,634L 50,096C 6,000T]
+├── makefile.template             [  639L 22,613C 2,975T]
 ├── pyproject.toml                [  300L  9,016C 1,167T]
 ```
 
@@ -369,7 +369,7 @@ except ImportError:
 	import tomli as tomllib  # type: ignore
 
 TEMPLATE_PATH: Path = Path("makefile.template")
-MAKEFILE_PATH: Path = Path("Makefile")
+MAKEFILE_PATH: Path = Path("makefile")
 SCRIPTS_DIR: Path = Path("scripts")
 TEMPLATE_SYNTAX: str = "##[[{var}]]##"
 IGNORE_SCRIPTS: set[str] = {"assemble_make"}
@@ -1544,7 +1544,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.3.1                                                  |
+#| version: v0.3.2                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -3095,7 +3095,7 @@ clean:
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
+	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
 
 .PHONY: clean-all
 clean-all: clean docs-clean dep-clean
@@ -3122,7 +3122,7 @@ clean-all: clean docs-clean dep-clean
 help-targets:
 	@echo -n "# make targets"
 	@echo ":"
-	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
+	@cat makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
 
 .PHONY: info
@@ -3737,7 +3737,7 @@ clean:
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
+	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
 
 .PHONY: clean-all
 clean-all: clean docs-clean dep-clean
@@ -3764,7 +3764,7 @@ clean-all: clean docs-clean dep-clean
 help-targets:
 	@echo -n "# make targets"
 	@echo ":"
-	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
+	@cat makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
 
 .PHONY: info
@@ -3822,7 +3822,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.3.1"
+	version = "0.3.2"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
