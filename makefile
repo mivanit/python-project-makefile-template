@@ -2,7 +2,7 @@
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.3.1                                                  |
+#| version: v0.3.2                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -1553,7 +1553,7 @@ clean:
 	rm -rf build
 	rm -rf $(PACKAGE_NAME).egg-info
 	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON_BASE) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
+	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
 
 .PHONY: clean-all
 clean-all: clean docs-clean dep-clean
@@ -1580,7 +1580,7 @@ clean-all: clean docs-clean dep-clean
 help-targets:
 	@echo -n "# make targets"
 	@echo ":"
-	@cat Makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
+	@cat makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
 
 .PHONY: info

@@ -11,7 +11,7 @@ except ImportError:
 	import tomli as tomllib  # type: ignore
 
 TEMPLATE_PATH: Path = Path("makefile.template")
-MAKEFILE_PATH: Path = Path("Makefile")
+MAKEFILE_PATH: Path = Path("makefile")
 SCRIPTS_DIR: Path = Path("scripts")
 TEMPLATE_SYNTAX: str = "##[[{var}]]##"
 IGNORE_SCRIPTS: set[str] = {"assemble_make"}
