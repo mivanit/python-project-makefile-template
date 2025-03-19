@@ -2,7 +2,7 @@
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.3.3                                                  |
+#| version: v0.3.4                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -471,7 +471,12 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	try:
 		import torch
+	except ImportError as e:
+		info["torch.__version__"] = "not available"
+		exceptions.append(e)
+		return exceptions, info
 
+	try:
 		info["torch.__version__"] = torch.__version__
 		info["torch.cuda.is_available()"] = torch.cuda.is_available()
 
@@ -524,7 +529,6 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	except Exception as e:  # noqa: BLE001
 		exceptions.append(e)
-		info["torch.__version__"] = "not available"
 
 	return exceptions, info
 

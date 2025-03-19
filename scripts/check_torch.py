@@ -87,7 +87,12 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	try:
 		import torch
+	except ImportError as e:
+		info["torch.__version__"] = "not available"
+		exceptions.append(e)
+		return exceptions, info
 
+	try:
 		info["torch.__version__"] = torch.__version__
 		info["torch.cuda.is_available()"] = torch.cuda.is_available()
 
@@ -140,7 +145,6 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	except Exception as e:  # noqa: BLE001
 		exceptions.append(e)
-		info["torch.__version__"] = "not available"
 
 	return exceptions, info
 
