@@ -140,6 +140,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	except Exception as e:  # noqa: BLE001
 		exceptions.append(e)
+		info["torch.__version__"] = "not available"
 
 	return exceptions, info
 
