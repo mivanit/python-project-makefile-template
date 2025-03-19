@@ -1,8 +1,8 @@
 # Stats
 - 21 files
-- 4127 (4.1K) lines
-- 125443 (125K) chars
-- 15033 (15K) `whitespace-split` tokens
+- 4143 (4.1K) lines
+- 125877 (126K) chars
+- 15107 (15K) `whitespace-split` tokens
 
 # File Tree
 
@@ -32,8 +32,8 @@ python-project-makefile-template
 ├── tests                         
 │   └── test_nothing.py           [    2L     42C     5T]
 ├── README.md                     [   92L  5,369C   681T]
-├── makefile                      [1,639L 50,223C 6,013T]
-├── makefile.template             [  639L 22,613C 2,975T]
+├── makefile                      [1,647L 50,440C 6,050T]
+├── makefile.template             [  647L 22,830C 3,012T]
 ├── pyproject.toml                [  300L  9,016C 1,167T]
 ```
 
@@ -1655,8 +1655,16 @@ PYTHON_VERSION := NULL
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
 RUN_GLOBAL ?= 0
 
+# for running tests or other commands without updating the env, set this to 1
+# and it will pass `--no-sync` to `uv run`
+UV_NOSYNC ?= 0
+
 ifeq ($(RUN_GLOBAL),0)
-	PYTHON = uv run $(PYTHON_BASE)
+	ifeq ($(UV_NOSYNC),1)
+		PYTHON = uv run --no-sync $(PYTHON_BASE)
+	else
+		PYTHON = uv run $(PYTHON_BASE)
+	endif
 else
 	PYTHON = $(PYTHON_BASE)
 endif
@@ -3297,8 +3305,16 @@ PYTHON_VERSION := NULL
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
 RUN_GLOBAL ?= 0
 
+# for running tests or other commands without updating the env, set this to 1
+# and it will pass `--no-sync` to `uv run`
+UV_NOSYNC ?= 0
+
 ifeq ($(RUN_GLOBAL),0)
-	PYTHON = uv run $(PYTHON_BASE)
+	ifeq ($(UV_NOSYNC),1)
+		PYTHON = uv run --no-sync $(PYTHON_BASE)
+	else
+		PYTHON = uv run $(PYTHON_BASE)
+	endif
 else
 	PYTHON = $(PYTHON_BASE)
 endif

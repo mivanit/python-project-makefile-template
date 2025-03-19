@@ -108,8 +108,16 @@ PYTHON_VERSION := NULL
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
 RUN_GLOBAL ?= 0
 
+# for running tests or other commands without updating the env, set this to 1
+# and it will pass `--no-sync` to `uv run`
+UV_NOSYNC ?= 0
+
 ifeq ($(RUN_GLOBAL),0)
-	PYTHON = uv run $(PYTHON_BASE)
+	ifeq ($(UV_NOSYNC),1)
+		PYTHON = uv run --no-sync $(PYTHON_BASE)
+	else
+		PYTHON = uv run $(PYTHON_BASE)
+	endif
 else
 	PYTHON = $(PYTHON_BASE)
 endif
