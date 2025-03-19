@@ -1,6 +1,6 @@
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.3.2
+> v0.3.3
 
 ## Contents
 
@@ -131,7 +131,7 @@ python scripts/assemble_make.py
 - [`other`](#other)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject.py)
 
 # `myproject`
 
@@ -257,11 +257,11 @@ python scripts/assemble_make.py
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject.py#L0-L0)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject.py#L0-L0)
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.3.2
+> v0.3.3
 
 ## Contents
 
@@ -273,14 +273,14 @@ dummy module
 - [`critical_function`](#critical_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/helloworld.py)
 
 # `myproject.helloworld`
 
 dummy module
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py#L0-L15)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/helloworld.py#L0-L15)
 
 ### `def some_function`
 
@@ -289,7 +289,7 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2my
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py#L8-L10)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/helloworld.py#L8-L10)
 
 dummy docstring
 
@@ -300,13 +300,13 @@ dummy docstring
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/helloworld.py#L14-L16)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/helloworld.py#L14-L16)
 
 dummy docstring
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.3.2
+> v0.3.3
 
 ## Contents
 
@@ -317,14 +317,14 @@ a module
 - [`another_function`](#another_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/other.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/other.py)
 
 # `myproject.other`
 
 a module
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/other.py#L0-L6)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/other.py#L0-L6)
 
 ### `def another_function`
 
@@ -333,6 +333,6 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2my
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.2myproject/other.py#L5-L7)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.3myproject/other.py#L5-L7)
 
 dummy docstring

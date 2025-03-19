@@ -1,4 +1,4 @@
-  docs for myproject v0.3.2
+  docs for myproject v0.3.3
 
 Contents
 
@@ -233,7 +233,7 @@ and then run
 
 View Source on GitHub
 
-  docs for myproject v0.3.2
+  docs for myproject v0.3.3
 
 Contents
 
@@ -268,7 +268,7 @@ View Source on GitHub
 
 dummy docstring
 
-  docs for myproject v0.3.2
+  docs for myproject v0.3.3
 
 Contents
 

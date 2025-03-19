@@ -1,8 +1,8 @@
 # Stats
 - 21 files
-- 4117 (4.1K) lines
-- 125189 (125K) chars
-- 15007 (15K) `whitespace-split` tokens
+- 4119 (4.1K) lines
+- 125281 (125K) chars
+- 15015 (15K) `whitespace-split` tokens
 
 # File Tree
 
@@ -21,7 +21,7 @@ python-project-makefile-template
 │   └── no_desc.ipynb             [   34L    640C    72T]
 ├── scripts                       
 │   ├── assemble_make.py          [   68L  1,869C   195T]
-│   ├── check_torch.py            [  170L  4,976C   502T]
+│   ├── check_torch.py            [  171L  5,022C   506T]
 │   ├── docs_clean.py             [   85L  2,588C   305T]
 │   ├── export_requirements.py    [  125L  3,265C   386T]
 │   ├── get_commit_log.py         [   41L    939C   103T]
@@ -32,7 +32,7 @@ python-project-makefile-template
 ├── tests                         
 │   └── test_nothing.py           [    2L     42C     5T]
 ├── README.md                     [   92L  5,369C   681T]
-├── makefile                      [1,634L 50,096C 6,000T]
+├── makefile                      [1,635L 50,142C 6,004T]
 ├── makefile.template             [  639L 22,613C 2,975T]
 ├── pyproject.toml                [  300L  9,016C 1,167T]
 ```
@@ -570,6 +570,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	except Exception as e:  # noqa: BLE001
 		exceptions.append(e)
+		info["torch.__version__"] = "not available"
 
 	return exceptions, info
 
@@ -1544,7 +1545,7 @@ python scripts/assemble_make.py
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.3.2                                                  |
+#| version: v0.3.3                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #| modifications from the original should be denoted with `~~~~~`   |
 #| as this makes it easier to find edits when updating makefile     |
@@ -2066,6 +2067,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 	except Exception as e:  # noqa: BLE001
 		exceptions.append(e)
+		info["torch.__version__"] = "not available"
 
 	return exceptions, info
 
@@ -3822,7 +3824,7 @@ help: help-targets info
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.3.2"
+	version = "0.3.3"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
