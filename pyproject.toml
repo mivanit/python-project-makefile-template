@@ -77,6 +77,15 @@
 	requires = ["hatchling"]
 	build-backend = "hatchling.build"
 
+
+# mypy config
+[tool.mypy]
+	exclude = [
+		".*/__pycache__/.*",
+		"docs/.*",
+	]
+
+
 # ruff config
 [tool.ruff]
 	exclude = ["__pycache__"]

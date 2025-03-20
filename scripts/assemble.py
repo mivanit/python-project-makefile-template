@@ -25,7 +25,7 @@ SCRIPTS_MAKE_DIR: Path = SCRIPTS_DIR / "make"
 TEMPLATE_SYNTAX: str = "##[[{var}]]##"
 "template syntax in the makefile and make_docs templates"
 
-IGNORE_SCRIPTS: set[str] = {}
+IGNORE_SCRIPTS: set[str] = set()
 "scripts from `SCRIPTS_MAKE_DIR` to ignore"
 
 DOCS_MAKE_PATH: Path = SCRIPTS_DIR / "make_docs.py"
