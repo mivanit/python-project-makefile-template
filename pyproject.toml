@@ -159,7 +159,8 @@
 			]
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			# delete this!
-			"scripts/get_todos.py" = ["W291"] # we use trailing whitespace intentionally in the markdown template
+			# we use trailing whitespace intentionally in the markdown template
+			"scripts/make/get_todos.py" = ["W291"]
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # `make lmcat` depends on the lmcat and can be configured here

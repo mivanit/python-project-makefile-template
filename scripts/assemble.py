@@ -49,6 +49,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_MAKE_DIR) -> Dict[str, str]:
 			scripts[script.stem] = script_text
 	return scripts
 
+
 def assemble_make() -> None:
 	"assemble the makefile"
 	contents: str = MAKEFILE_TEMPLATE_PATH.read_text()
@@ -80,7 +81,9 @@ def assemble_make() -> None:
 
 	MAKEFILE_PATH.write_text(contents)
 
+
 def assemble_make_docs() -> None:
+	"assemble the make_docs script"
 	make_docs_base: str = DOCS_MAKE_PATH.read_text()
 	make_docs_base = make_docs_base.replace(
 		TEMPLATE_SYNTAX.format(var="VERSION"),
