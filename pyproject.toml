@@ -43,6 +43,9 @@
 		"lmcat>=0.2.0; python_version >= '3.11'",
 		# tomli since no tomlib in python < 3.11
 		"tomli>=2.1.0; python_version < '3.11'",
+		# jinja2 vuln, see
+		# https://github.com/mivanit/python-project-makefile-template/security/dependabot/4
+		"jinja2>=3.1.6",
 	]
 	lint = [
 		# lint
