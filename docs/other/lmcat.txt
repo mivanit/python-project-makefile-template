@@ -1,8 +1,8 @@
 # Stats
 - 22 files
-- 4676 (4.7K) lines
-- 141619 (142K) chars
-- 16770 (17K) `whitespace-split` tokens
+- 4685 (4.7K) lines
+- 141703 (142K) chars
+- 16780 (17K) `whitespace-split` tokens
 
 # File Tree
 
@@ -29,14 +29,14 @@ python-project-makefile-template
 │   │   ├── get_version.py          [   21L    482C    57T]
 │   │   ├── mypy_report.py          [   53L  1,524C   171T]
 │   │   └── pdoc_markdown2_cli.py   [   62L  1,591C   164T]
-│   ├── assemble.py                 [   97L  2,730C   290T]
+│   ├── assemble.py                 [   97L  2,733C   290T]
 │   └── make_docs.py                [  496L 14,479C 1,537T]
 ├── tests                           
 │   └── test_nothing.py             [    2L     42C     5T]
 ├── README.md                       [   92L  5,369C   681T]
 ├── makefile                        [1,647L 50,480C 6,050T]
 ├── makefile.template               [  647L 22,830C 3,012T]
-├── pyproject.toml                  [  302L  9,069C 1,174T]
+├── pyproject.toml                  [  311L  9,150C 1,184T]
 ```
 
 # File Contents
@@ -1401,7 +1401,7 @@ SCRIPTS_MAKE_DIR: Path = SCRIPTS_DIR / "make"
 TEMPLATE_SYNTAX: str = "##[[{var}]]##"
 "template syntax in the makefile and make_docs templates"
 
-IGNORE_SCRIPTS: set[str] = {}
+IGNORE_SCRIPTS: set[str] = set()
 "scripts from `SCRIPTS_MAKE_DIR` to ignore"
 
 DOCS_MAKE_PATH: Path = SCRIPTS_DIR / "make_docs.py"
@@ -4454,6 +4454,15 @@ help: help-targets info
 [build-system]
 	requires = ["hatchling"]
 	build-backend = "hatchling.build"
+
+
+# mypy config
+[tool.mypy]
+	exclude = [
+		".*/__pycache__/.*",
+		"docs/.*",
+	]
+
 
 # ruff config
 [tool.ruff]
