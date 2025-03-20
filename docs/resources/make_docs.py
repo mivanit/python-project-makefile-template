@@ -7,6 +7,8 @@ modifications from the original should be denoted with `~~~~~`
 as this makes it easier to find edits when updating
 """
 
+from __future__ import annotations
+
 import argparse
 from dataclasses import asdict, dataclass, field
 from functools import reduce
@@ -18,6 +20,7 @@ import warnings
 from pathlib import Path
 
 try:
+	# python 3.11+
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
 	import tomli as tomllib  # type: ignore
@@ -118,9 +121,9 @@ class Config:
 	# under tool_path
 	output_dir_str: str = "docs"
 	markdown_headings_increment: int = 2
-	warnings_ignore: list[str] = field(default_factory=list)
+	warnings_ignore: List[str] = field(default_factory=list)
 	notebooks_enabled: bool = False
-	notebooks_descriptions: dict[str, str] = field(default_factory=dict)
+	notebooks_descriptions: Dict[str, str] = field(default_factory=dict)
 	notebooks_source_path_str: str = "notebooks"
 	notebooks_output_path_relative_str: str = "notebooks"
 	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
@@ -151,7 +154,7 @@ class Config:
 
 CONFIG: Config
 
-_CFG_PATHS: dict[str, str] = dict(
+_CFG_PATHS: Dict[str, str] = dict(
 	package_name="project.name",
 	package_repo_url="project.urls.Repository",
 	package_version="project.version",
@@ -308,8 +311,8 @@ def convert_notebooks() -> None:
 	CONFIG.notebooks_output_path.mkdir(parents=True, exist_ok=True)
 
 	# read in the notebook metadata
-	notebook_names: list[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
-	notebooks: list[dict[str, str]] = [
+	notebook_names: List[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
+	notebooks: List[Dict[str, str]] = [
 		dict(
 			ipynb=notebook.name,
 			html=notebook.with_suffix(".html").name,
