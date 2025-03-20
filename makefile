@@ -171,7 +171,7 @@ default: help
 
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/export_requirements.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/export_requirements.py
 
 "export to requirements.txt files based on pyproject.toml configuration"
 
@@ -306,7 +306,7 @@ export SCRIPT_EXPORT_REQUIREMENTS
 
 # get the version from `pyproject.toml:project.version`
 define SCRIPT_GET_VERSION
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/get_version.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_version.py
 
 "write the current version of the project to a file"
 
@@ -337,7 +337,7 @@ export SCRIPT_GET_VERSION
 
 # get the commit log since the last version from `$(LAST_VERSION_FILE)`
 define SCRIPT_GET_COMMIT_LOG
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/get_commit_log.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_commit_log.py
 
 "pretty print a commit log amd wrote it to a file"
 
@@ -388,7 +388,7 @@ export SCRIPT_GET_COMMIT_LOG
 
 # get cuda information and whether torch sees it
 define SCRIPT_CHECK_TORCH
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/check_torch.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/check_torch.py
 
 "print info about current python, torch, cuda, and devices"
 
@@ -573,7 +573,7 @@ export SCRIPT_CHECK_TORCH
 
 # get todo's from the code
 define SCRIPT_GET_TODOS
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/get_todos.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_todos.py
 
 "read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
 
@@ -1005,7 +1005,7 @@ export SCRIPT_GET_TODOS
 
 # markdown to html using pdoc
 define SCRIPT_PDOC_MARKDOWN2_CLI
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/pdoc_markdown2_cli.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/pdoc_markdown2_cli.py
 
 "cli to convert markdown files to HTML using pdoc's markdown2"
 
@@ -1076,7 +1076,7 @@ export SCRIPT_PDOC_MARKDOWN2_CLI
 
 # clean up the docs (configurable in pyproject.toml)
 define SCRIPT_DOCS_CLEAN
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/docs_clean.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/docs_clean.py
 
 "clean up docs directory based on pyproject.toml configuration"
 
@@ -1170,7 +1170,7 @@ export SCRIPT_DOCS_CLEAN
 
 # generate a report of the mypy output
 define SCRIPT_MYPY_REPORT
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/mypy_report.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/mypy_report.py
 
 "usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
 
