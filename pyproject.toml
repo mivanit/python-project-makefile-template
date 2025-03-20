@@ -133,6 +133,7 @@
 			# delete this section!
 			"INP001", # this isn't a package, just some scripts
 			"PGH003", # bare type ignore is fine
+			"SLF001", # private member access is fine
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		]
 		select = ["ALL"]
