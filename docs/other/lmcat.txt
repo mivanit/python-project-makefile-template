@@ -1,40 +1,42 @@
 # Stats
-- 21 files
-- 4143 (4.1K) lines
-- 125877 (126K) chars
-- 15107 (15K) `whitespace-split` tokens
+- 22 files
+- 4676 (4.7K) lines
+- 141619 (142K) chars
+- 16770 (17K) `whitespace-split` tokens
 
 # File Tree
 
 ```
-python-project-makefile-template  
-├── .github                       
-│   └── workflows                 
-│    ├── checks.yml               [   80L  1,643C   162T]
-│    └── makefile-checks.yml      [   86L  1,933C   236T]
-├── myproject                     
-│   ├── __init__.py               [    1L     32C     3T]
-│   ├── helloworld.py             [   16L    429C    59T]
-│   └── other.py                  [    7L    168C    23T]
-├── notebooks                     
-│   ├── example.ipynb             [   66L  1,154C   133T]
-│   └── no_desc.ipynb             [   34L    640C    72T]
-├── scripts                       
-│   ├── assemble_make.py          [   68L  1,869C   195T]
-│   ├── check_torch.py            [  175L  5,103C   515T]
-│   ├── docs_clean.py             [   85L  2,588C   305T]
-│   ├── export_requirements.py    [  125L  3,265C   386T]
-│   ├── get_commit_log.py         [   41L    939C   103T]
-│   ├── get_todos.py              [  422L 11,440C 1,318T]
-│   ├── get_version.py            [   21L    482C    57T]
-│   ├── mypy_report.py            [   53L  1,524C   171T]
-│   └── pdoc_markdown2_cli.py     [   62L  1,591C   164T]
-├── tests                         
-│   └── test_nothing.py           [    2L     42C     5T]
-├── README.md                     [   92L  5,369C   681T]
-├── makefile                      [1,647L 50,440C 6,050T]
-├── makefile.template             [  647L 22,830C 3,012T]
-├── pyproject.toml                [  300L  9,016C 1,167T]
+python-project-makefile-template    
+├── .github                         
+│   └── workflows                   
+│    ├── checks.yml                 [   80L  1,643C   162T]
+│    └── makefile-checks.yml        [   86L  1,933C   236T]
+├── myproject                       
+│   ├── __init__.py                 [    1L     32C     3T]
+│   ├── helloworld.py               [   16L    429C    59T]
+│   └── other.py                    [    7L    168C    23T]
+├── notebooks                       
+│   ├── example.ipynb               [   66L  1,154C   133T]
+│   └── no_desc.ipynb               [   34L    640C    72T]
+├── scripts                         
+│   ├── make                        
+│   │   ├── check_torch.py          [  175L  5,103C   515T]
+│   │   ├── docs_clean.py           [   85L  2,588C   305T]
+│   │   ├── export_requirements.py  [  125L  3,265C   386T]
+│   │   ├── get_commit_log.py       [   41L    939C   103T]
+│   │   ├── get_todos.py            [  422L 11,440C 1,318T]
+│   │   ├── get_version.py          [   21L    482C    57T]
+│   │   ├── mypy_report.py          [   53L  1,524C   171T]
+│   │   └── pdoc_markdown2_cli.py   [   62L  1,591C   164T]
+│   ├── assemble.py                 [   97L  2,730C   290T]
+│   └── make_docs.py                [  496L 14,479C 1,537T]
+├── tests                           
+│   └── test_nothing.py             [    2L     42C     5T]
+├── README.md                       [   92L  5,369C   681T]
+├── makefile                        [1,647L 50,480C 6,050T]
+├── makefile.template               [  647L 22,830C 3,012T]
+├── pyproject.toml                  [  302L  9,069C 1,174T]
 ```
 
 # File Contents
@@ -355,79 +357,7 @@ def another_function() -> None:
 
 ``````{ end_of_file="notebooks/no_desc.ipynb" }
 
-``````{ path="scripts/assemble_make.py"  }
-"add scripts and version to the makefile -- this one isnt put in the makefile"
-
-from __future__ import annotations
-
-from pathlib import Path
-from typing import Dict
-
-try:
-	import tomllib  # type: ignore[import-not-found]
-except ImportError:
-	import tomli as tomllib  # type: ignore
-
-TEMPLATE_PATH: Path = Path("makefile.template")
-MAKEFILE_PATH: Path = Path("makefile")
-SCRIPTS_DIR: Path = Path("scripts")
-TEMPLATE_SYNTAX: str = "##[[{var}]]##"
-IGNORE_SCRIPTS: set[str] = {"assemble_make"}
-
-with open("pyproject.toml", "rb") as f_pyproject:
-	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
-
-
-def read_scripts(scripts_dir: Path = SCRIPTS_DIR) -> Dict[str, str]:
-	"read script contents into a dict"
-	scripts: Dict[str, str] = {}
-	for script in scripts_dir.iterdir():
-		if script.is_file() and script.suffix == ".py":
-			script_text: str = script.read_text()
-			# add a link to the script
-			script_text = f"# source: https://github.com/mivanit/python-project-makefile-template/tree/main/{script.as_posix()}\n\n{script_text}"
-			scripts[script.stem] = script_text
-	return scripts
-
-
-def main() -> None:
-	"assemble the makefile"
-	contents: str = TEMPLATE_PATH.read_text()
-	scripts: Dict[str, str] = read_scripts()
-
-	# inline each script
-	for script_name, script_contents in scripts.items():
-		if script_name in IGNORE_SCRIPTS:
-			continue
-
-		template_replace: str = TEMPLATE_SYNTAX.format(
-			var=f"SCRIPT_{script_name.upper()}",
-		)
-		assert template_replace in contents, (
-			f"Template syntax not found in {TEMPLATE_PATH}:\n{template_replace}"
-		)
-
-		contents = contents.replace(
-			template_replace,
-			script_contents,
-		)
-
-	# version
-	version_str: str = f"#| version: v{VERSION}"
-	contents = contents.replace(
-		TEMPLATE_SYNTAX.format(var="VERSION"),
-		f"{version_str:<68}|",
-	)
-
-	MAKEFILE_PATH.write_text(contents)
-
-
-if __name__ == "__main__":
-	main()
-
-``````{ end_of_file="scripts/assemble_make.py" }
-
-``````{ path="scripts/check_torch.py"  }
+``````{ path="scripts/make/check_torch.py"  }
 "print info about current python, torch, cuda, and devices"
 
 from __future__ import annotations
@@ -604,9 +534,9 @@ if __name__ == "__main__":
 		for e in torch_exceptions:
 			print(f"  {e}")
 
-``````{ end_of_file="scripts/check_torch.py" }
+``````{ end_of_file="scripts/make/check_torch.py" }
 
-``````{ path="scripts/docs_clean.py"  }
+``````{ path="scripts/make/docs_clean.py"  }
 "clean up docs directory based on pyproject.toml configuration"
 
 from __future__ import annotations
@@ -693,9 +623,9 @@ def main(
 if __name__ == "__main__":
 	main(sys.argv[1], sys.argv[2], sys.argv[3:])
 
-``````{ end_of_file="scripts/docs_clean.py" }
+``````{ end_of_file="scripts/make/docs_clean.py" }
 
-``````{ path="scripts/export_requirements.py"  }
+``````{ path="scripts/make/export_requirements.py"  }
 "export to requirements.txt files based on pyproject.toml configuration"
 
 from __future__ import annotations
@@ -822,9 +752,9 @@ if __name__ == "__main__":
 		output_dir=Path(sys.argv[2]),
 	)
 
-``````{ end_of_file="scripts/export_requirements.py" }
+``````{ end_of_file="scripts/make/export_requirements.py" }
 
-``````{ path="scripts/get_commit_log.py"  }
+``````{ path="scripts/make/get_commit_log.py"  }
 "pretty print a commit log amd wrote it to a file"
 
 from __future__ import annotations
@@ -867,9 +797,9 @@ if __name__ == "__main__":
 		commit_log_file=sys.argv[2].strip(),
 	)
 
-``````{ end_of_file="scripts/get_commit_log.py" }
+``````{ end_of_file="scripts/make/get_commit_log.py" }
 
-``````{ path="scripts/get_todos.py"  }
+``````{ path="scripts/make/get_todos.py"  }
 "read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
 
 from __future__ import annotations
@@ -1293,9 +1223,9 @@ if __name__ == "__main__":
 	# call main
 	main(Path(args.config_file))
 
-``````{ end_of_file="scripts/get_todos.py" }
+``````{ end_of_file="scripts/make/get_todos.py" }
 
-``````{ path="scripts/get_version.py"  }
+``````{ path="scripts/make/get_version.py"  }
 "write the current version of the project to a file"
 
 from __future__ import annotations
@@ -1318,9 +1248,9 @@ except Exception:  # noqa: BLE001
 	print("NULL", end="")
 	sys.exit(1)
 
-``````{ end_of_file="scripts/get_version.py" }
+``````{ end_of_file="scripts/make/get_version.py" }
 
-``````{ path="scripts/mypy_report.py"  }
+``````{ path="scripts/make/mypy_report.py"  }
 "usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
 
 from __future__ import annotations
@@ -1375,9 +1305,9 @@ def main() -> None:
 if __name__ == "__main__":
 	main()
 
-``````{ end_of_file="scripts/mypy_report.py" }
+``````{ end_of_file="scripts/make/mypy_report.py" }
 
-``````{ path="scripts/pdoc_markdown2_cli.py"  }
+``````{ path="scripts/make/pdoc_markdown2_cli.py"  }
 "cli to convert markdown files to HTML using pdoc's markdown2"
 
 from __future__ import annotations
@@ -1441,7 +1371,608 @@ def main() -> None:
 if __name__ == "__main__":
 	main()
 
-``````{ end_of_file="scripts/pdoc_markdown2_cli.py" }
+``````{ end_of_file="scripts/make/pdoc_markdown2_cli.py" }
+
+``````{ path="scripts/assemble.py"  }
+"add scripts and version to the makefile -- this one isnt put in the makefile"
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Dict
+
+try:
+	import tomllib  # type: ignore[import-not-found]
+except ImportError:
+	import tomli as tomllib  # type: ignore
+
+MAKEFILE_TEMPLATE_PATH: Path = Path("makefile.template")
+"path of the makefile template which we read"
+
+MAKEFILE_PATH: Path = Path("makefile")
+"path of the assembled makefile which we write"
+
+SCRIPTS_DIR: Path = Path("scripts")
+"path to all scripts, including this one and make docs"
+
+SCRIPTS_MAKE_DIR: Path = SCRIPTS_DIR / "make"
+"path to scripts which go in the makefile"
+
+TEMPLATE_SYNTAX: str = "##[[{var}]]##"
+"template syntax in the makefile and make_docs templates"
+
+IGNORE_SCRIPTS: set[str] = {}
+"scripts from `SCRIPTS_MAKE_DIR` to ignore"
+
+DOCS_MAKE_PATH: Path = SCRIPTS_DIR / "make_docs.py"
+"path to the make_docs script template"
+
+DOCS_MAKE_PATH_OUT: Path = Path("docs/resources/make_docs.py")
+"path to the make_docs script output"
+
+with open("pyproject.toml", "rb") as f_pyproject:
+	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
+
+
+def read_scripts(scripts_dir: Path = SCRIPTS_MAKE_DIR) -> Dict[str, str]:
+	"read script contents into a dict"
+	scripts: Dict[str, str] = {}
+	for script in scripts_dir.iterdir():
+		if script.is_file() and script.suffix == ".py":
+			script_text: str = script.read_text()
+			# add a link to the script
+			script_text = f"# source: https://github.com/mivanit/python-project-makefile-template/tree/main/{script.as_posix()}\n\n{script_text}"
+			scripts[script.stem] = script_text
+	return scripts
+
+
+def assemble_make() -> None:
+	"assemble the makefile"
+	contents: str = MAKEFILE_TEMPLATE_PATH.read_text()
+	scripts: Dict[str, str] = read_scripts()
+
+	# inline each script
+	for script_name, script_contents in scripts.items():
+		if script_name in IGNORE_SCRIPTS:
+			continue
+
+		template_replace: str = TEMPLATE_SYNTAX.format(
+			var=f"SCRIPT_{script_name.upper()}",
+		)
+		assert template_replace in contents, (
+			f"Template syntax not found in {MAKEFILE_TEMPLATE_PATH}:\n{template_replace}"
+		)
+
+		contents = contents.replace(
+			template_replace,
+			script_contents,
+		)
+
+	# version
+	version_str: str = f"#| version: v{VERSION}"
+	contents = contents.replace(
+		TEMPLATE_SYNTAX.format(var="VERSION"),
+		f"{version_str:<68}|",
+	)
+
+	MAKEFILE_PATH.write_text(contents)
+
+
+def assemble_make_docs() -> None:
+	"assemble the make_docs script"
+	make_docs_base: str = DOCS_MAKE_PATH.read_text()
+	make_docs_base = make_docs_base.replace(
+		TEMPLATE_SYNTAX.format(var="VERSION"),
+		VERSION,
+	)
+	DOCS_MAKE_PATH_OUT.write_text(make_docs_base)
+
+
+if __name__ == "__main__":
+	assemble_make()
+	assemble_make_docs()
+
+``````{ end_of_file="scripts/assemble.py" }
+
+``````{ path="scripts/make_docs.py"  }
+"""python project makefile template -- docs generation script
+
+originally by Michael Ivanitskiy (mivanits@umich.edu)
+https://github.com/mivanit/python-project-makefile-template
+version: ##[[VERSION]]##
+license: https://creativecommons.org/licenses/by-sa/4.0/
+modifications from the original should be denoted with `~~~~~`
+as this makes it easier to find edits when updating
+"""
+
+from __future__ import annotations
+
+import argparse
+import inspect  # noqa: TC003
+import json
+import re
+import warnings
+from dataclasses import asdict, dataclass, field
+from functools import reduce
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+try:
+	# python 3.11+
+	import tomllib  # type: ignore[import-not-found]
+except ImportError:
+	import tomli as tomllib  # type: ignore
+
+import jinja2
+import pdoc  # type: ignore[import-not-found]
+import pdoc.doc  # type: ignore[import-not-found]
+import pdoc.extract  # type: ignore[import-not-found]
+import pdoc.render  # type: ignore[import-not-found]
+import pdoc.render_helpers  # type: ignore[import-not-found]
+from markupsafe import Markup
+
+"""
+ ######  ######## ######## ##     ## ########
+##    ## ##          ##    ##     ## ##     ##
+##       ##          ##    ##     ## ##     ##
+ ######  ######      ##    ##     ## ########
+      ## ##          ##    ##     ## ##
+##    ## ##          ##    ##     ## ##
+ ######  ########    ##     #######  ##
+"""
+# setup
+# ============================================================
+
+CONFIG_PATH: Path = Path("pyproject.toml")
+TOOL_PATH: str = "tool.makefile.docs"
+
+HTML_TO_MD_MAP: Dict[str, str] = {
+	"&gt;": ">",
+	"&lt;": "<",
+	"&amp;": "&",
+	"&quot;": '"',
+	"&#39": "'",
+	"&apos;": "'",
+}
+
+pdoc.render_helpers.markdown_extensions["alerts"] = True  # type: ignore[assignment]
+pdoc.render_helpers.markdown_extensions["admonitions"] = True  # type: ignore[assignment]
+
+
+_CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Notebooks</title>
+	<link rel="stylesheet" href="../resources/css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" href="../resources/css/theme.css">
+	<link rel="stylesheet" href="../resources/css/content.css">
+</head>
+<body>
+	<h1>Notebooks</h1>
+	<p>
+		You can find the source code for the notebooks at
+		<a href="{{ notebook_url }}">{{ notebook_url }}</a>.
+	<ul>
+		{% for notebook in notebooks %}
+		<li><a href="{{ notebook.html }}">{{ notebook.ipynb }}</a> {{ notebook.desc }}</li>
+		{% endfor %}
+	</ul>
+	<a href="../">Back to index</a>
+</body>
+</html>
+"""
+
+
+def deep_get(
+	d: dict,
+	path: str,
+	default: Any = None,  # noqa: ANN401
+	sep: str = ".",
+	warn_msg_on_default: Optional[str] = None,
+) -> Any:  # noqa: ANN401
+	"Get a value from a nested dictionary"
+	output: Any = reduce(
+		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
+		path.split(sep) if isinstance(path, str) else path,  # sequence
+		d,  # initial
+	)
+
+	if warn_msg_on_default and output == default:
+		warnings.warn(warn_msg_on_default.format(path=path))
+
+	return output
+
+
+# CONFIGURATION -- read from CONFIG_PATH, assumed to be a pyproject.toml
+# ============================================================
+
+
+@dataclass
+class Config:
+	"""Configuration for the documentation generation
+
+	read from a mix of package info and more specific configuration options under
+	`TOOL_PATH` in the `pyproject.toml`. see `_CFG_PATHS` for the mappings
+	"""
+
+	# under main pyproject.toml
+	package_name: str = "unknown"
+	package_repo_url: str = "unknown"
+	package_version: str = "unknown"
+	# under tool_path
+	output_dir_str: str = "docs"
+	markdown_headings_increment: int = 2
+	warnings_ignore: List[str] = field(default_factory=list)
+	notebooks_enabled: bool = False
+	notebooks_descriptions: Dict[str, str] = field(default_factory=dict)
+	notebooks_source_path_str: str = "notebooks"
+	notebooks_output_path_relative_str: str = "notebooks"
+	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
+
+	@property
+	def package_code_url(self) -> str:
+		"link to the code on the repo"
+		if "unknown" not in (self.package_name, self.package_version):
+			return self.package_repo_url + "/blob/" + self.package_version
+		else:
+			return "unknown"
+
+	@property
+	def module_name(self) -> str:
+		"""name of the module, which is the package name with '-' replaced by '_'
+
+		HACK: this is kid of fragile
+		"""
+		return self.package_name.replace("-", "_")
+
+	@property
+	def output_dir(self) -> Path:
+		"path to write the docs to, notebooks output dir is specified relative to this"
+		return Path(self.output_dir_str)
+
+	@property
+	def notebooks_source_path(self) -> Path:
+		"path to read notebooks from"
+		return Path(self.notebooks_source_path_str)
+
+	@property
+	def notebooks_output_path(self) -> Path:
+		"path to write converted html notebooks to"
+		return self.output_dir / self.notebooks_output_path_relative_str
+
+
+CONFIG: Config
+
+_CFG_PATHS: Dict[str, str] = dict(
+	package_name="project.name",
+	package_repo_url="project.urls.Repository",
+	package_version="project.version",
+	output_dir_str=f"{TOOL_PATH}.output_dir",
+	markdown_headings_increment=f"{TOOL_PATH}.markdown_headings_increment",
+	warnings_ignore=f"{TOOL_PATH}.warnings_ignore",
+	notebooks_enabled=f"{TOOL_PATH}.notebooks.enabled",
+	notebooks_descriptions=f"{TOOL_PATH}.notebooks.descriptions",
+	notebooks_index_template=f"{TOOL_PATH}.notebooks.index_template",
+	notebooks_source_path_str=f"{TOOL_PATH}.notebooks.source_path",
+	notebooks_output_path_relative_str=f"{TOOL_PATH}.notebooks.output_path_relative",
+)
+
+
+def set_global_config() -> None:
+	"""set global var `CONFIG` from pyproject.toml"""
+	global CONFIG  # noqa: PLW0603
+
+	# get the default and read the data
+	cfg_default: Config = Config()
+
+	with CONFIG_PATH.open("rb") as f:
+		pyproject_data = tomllib.load(f)
+
+	# apply the mapping from toml path to attribute
+	cfg_partial: dict = {
+		key: deep_get(
+			d=pyproject_data,
+			path=path,
+			default=getattr(cfg_default, key),
+			warn_msg_on_default=f"could not find {path}"
+			if key.startswith("package")
+			else None,
+		)
+		for key, path in _CFG_PATHS.items()
+	}
+
+	# set the global var
+	CONFIG = Config(**cfg_partial)
+
+	# add the package meta to the pdoc globals
+	pdoc.render.env.globals["package_version"] = CONFIG.package_version
+	pdoc.render.env.globals["package_name"] = CONFIG.package_name
+	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url
+	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url
+
+
+"""
+##     ## ########
+###   ### ##     ##
+#### #### ##     ##
+## ### ## ##     ##
+##     ## ##     ##
+##     ## ##     ##
+##     ## ########
+"""
+# markdown
+# ============================================================
+
+
+def replace_heading(match: re.Match) -> str:
+	"replace a matched heading with an incremented version"
+	current_level: int = len(match.group(1))
+	new_level: int = min(
+		current_level + CONFIG.markdown_headings_increment,
+		6,
+	)  # Cap at h6
+	return "#" * new_level + match.group(2)
+
+
+def increment_markdown_headings(markdown_text: str) -> str:
+	"""Increment all Markdown headings in the given text by the specified amount
+
+	# Parameters:
+	- `markdown_text : str`
+		The input Markdown text
+
+	# Returns:
+	- `str`
+		The Markdown text with incremented heading levels.
+	"""
+	# Regular expression to match Markdown headings
+	heading_pattern: re.Pattern = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
+
+	# Replace all headings with incremented versions
+	return heading_pattern.sub(replace_heading, markdown_text)
+
+
+def format_signature(sig: inspect.Signature, colon: bool) -> str:
+	"""Format a function signature for Markdown. Returns a single-line Markdown string."""
+	# First get a list with all params as strings.
+	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore
+	return_annot = pdoc.doc._PrettySignature._return_annotation_str(sig)  # type: ignore
+
+	def _format_param(param: str) -> str:
+		"""Format a parameter for Markdown, including potential links."""
+		# This is a simplified version. You might need to adjust this
+		# to properly handle links in your specific use case.
+		return f"`{param}`"
+
+	# Format each parameter
+	pretty_result = [_format_param(param) for param in result]
+
+	# Join parameters
+	params_str = ", ".join(pretty_result)
+
+	# Add return annotation
+	anno = ")"
+	if return_annot:
+		anno += f" -> `{return_annot}`"
+	if colon:
+		anno += ":"
+
+	# Construct the full signature
+	return f"`(`{params_str}`{anno}`"
+
+
+def markup_safe(sig: inspect.Signature) -> str:
+	"mark some text as safe, no escaping needed"
+	output: str = str(sig)
+	return Markup(output)
+
+
+def use_markdown_format() -> None:
+	"set some functions to output markdown format"
+	pdoc.render_helpers.format_signature = format_signature
+	pdoc.render.env.filters["markup_safe"] = markup_safe
+	pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
+
+
+"""
+##    ## ########
+###   ## ##     ##
+####  ## ##     ##
+## ## ## ########
+##  #### ##     ##
+##   ### ##     ##
+##    ## ########
+"""
+
+
+# notebook
+# ============================================================
+def convert_notebooks() -> None:
+	"""Convert Jupyter notebooks to HTML files"""
+	try:
+		import nbconvert
+		import nbformat
+	except ImportError as e:
+		err_msg: str = 'nbformat and nbconvert are required to convert notebooks to HTML, add "nbconvert>=7.16.4" to dev/docs deps'
+		raise ImportError(err_msg) from e
+
+	# create output directory
+	CONFIG.notebooks_output_path.mkdir(parents=True, exist_ok=True)
+
+	# read in the notebook metadata
+	notebook_names: List[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
+	notebooks: List[Dict[str, str]] = [
+		dict(
+			ipynb=notebook.name,
+			html=notebook.with_suffix(".html").name,
+			desc=CONFIG.notebooks_descriptions.get(notebook.stem, ""),
+		)
+		for notebook in notebook_names
+	]
+
+	# Render the index template
+	template: jinja2.Template = jinja2.Template(CONFIG.notebooks_index_template)
+	rendered_index: str = template.render(notebooks=notebooks)
+
+	# Write the rendered index to a file
+	index_path: Path = CONFIG.notebooks_output_path / "index.html"
+	index_path.write_text(rendered_index)
+
+	# convert with nbconvert
+	for notebook in notebook_names:
+		output_notebook: Path = (
+			CONFIG.notebooks_output_path / notebook.with_suffix(".html").name
+		)
+		with open(notebook, "r") as f_in:
+			nb: nbformat.NotebookNode = nbformat.read(f_in, as_version=4)
+			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()
+			body: str
+			body, _ = html_exporter.from_notebook_node(nb)
+			with open(output_notebook, "w") as f_out:
+				f_out.write(body)
+
+
+"""
+##     ##    ###    #### ##    ##
+###   ###   ## ##    ##  ###   ##
+#### ####  ##   ##   ##  ####  ##
+## ### ## ##     ##  ##  ## ## ##
+##     ## #########  ##  ##  ####
+##     ## ##     ##  ##  ##   ###
+##     ## ##     ## #### ##    ##
+"""
+# main
+# ============================================================
+
+
+def pdoc_combined(*modules, output_file: Path) -> None:  # noqa: ANN002
+	"""Render the documentation for a list of modules into a single HTML file.
+
+	Args:
+		*modules: Paths or names of the modules to document.
+		output_file: Path to the output HTML file.
+
+	This function will:
+	1. Extract all modules and submodules.
+	2. Generate documentation for each module.
+	3. Combine all module documentation into a single HTML file.
+	4. Write the combined documentation to the specified output file.
+
+	Rendering options can be configured by calling `pdoc.render.configure` in advance.
+
+	"""
+	# Extract all modules and submodules
+	all_modules: Dict[str, pdoc.doc.Module] = {}
+	for module_name in pdoc.extract.walk_specs(modules):
+		all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
+
+	# Generate HTML content for each module
+	module_contents: List[str] = []
+	for module in all_modules.values():
+		module_html = pdoc.render.html_module(module, all_modules)
+		module_contents.append(module_html)
+
+	# Combine all module contents
+	combined_content = "\n".join(module_contents)
+
+	# Write the combined content to the output file
+	with output_file.open("w", encoding="utf-8") as f:
+		f.write(combined_content)
+
+
+def ignore_warnings() -> None:
+	"Process and apply the warning filters"
+	for message in CONFIG.warnings_ignore:
+		warnings.filterwarnings("ignore", message=message)
+
+
+if __name__ == "__main__":
+	# parse args
+	# --------------------------------------------------
+	argparser: argparse.ArgumentParser = argparse.ArgumentParser()
+	argparser.add_argument(
+		"--serve",
+		"-s",
+		action="store_true",
+		help="Whether to start an HTTP server to serve the documentation",
+	)
+	argparser.add_argument(
+		"--warn-all",
+		"-w",
+		action="store_true",
+		help=f"Whether to show all warnings, instead of ignoring the ones specified in pyproject.toml:{TOOL_PATH}.warnings_ignore",
+	)
+	argparser.add_argument(
+		"--combined",
+		"-c",
+		action="store_true",
+		help="Whether to combine the documentation for multiple modules into a single markdown file",
+	)
+	parsed_args = argparser.parse_args()
+
+	# configure pdoc
+	# --------------------------------------------------
+	# read what we need from the pyproject.toml, add stuff to pdoc globals
+	set_global_config()
+
+	# ignore warnings if needed
+	if not parsed_args.warn_all:
+		ignore_warnings()
+
+	pdoc.render.configure(
+		edit_url_map={
+			CONFIG.package_name: CONFIG.package_code_url,
+		},
+		template_directory=(
+			CONFIG.output_dir / "resources/templates/html/"
+			if not parsed_args.combined
+			else CONFIG.output_dir / "resources/templates/markdown/"
+		),
+		show_source=True,
+		math=True,
+		mermaid=True,
+		search=True,
+	)
+
+	print(json.dumps(asdict(CONFIG), indent=2))
+
+	# do the rendering
+	# --------------------------------------------------
+	if not parsed_args.combined:
+		pdoc.pdoc(
+			CONFIG.module_name,
+			output_directory=CONFIG.output_dir,
+		)
+	else:
+		use_markdown_format()
+		pdoc_combined(
+			CONFIG.module_name,
+			output_file=CONFIG.output_dir / "combined" / f"{CONFIG.package_name}.md",
+		)
+
+	# convert notebooks if needed
+	if CONFIG.notebooks_enabled:
+		convert_notebooks()
+
+	# http server if needed
+	# --------------------------------------------------
+	if parsed_args.serve:
+		import http.server
+		import os
+		import socketserver
+
+		port: int = 8000
+		os.chdir(CONFIG.output_dir)
+		with socketserver.TCPServer(
+			("", port),
+			http.server.SimpleHTTPRequestHandler,
+		) as httpd:
+			print(f"Serving at http://localhost:{port}")
+			httpd.serve_forever()
+
+``````{ end_of_file="scripts/make_docs.py" }
 
 ``````{ path="tests/test_nothing.py"  }
 def test_nothing():
@@ -1718,7 +2249,7 @@ default: help
 
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/export_requirements.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/export_requirements.py
 
 "export to requirements.txt files based on pyproject.toml configuration"
 
@@ -1853,7 +2384,7 @@ export SCRIPT_EXPORT_REQUIREMENTS
 
 # get the version from `pyproject.toml:project.version`
 define SCRIPT_GET_VERSION
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/get_version.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_version.py
 
 "write the current version of the project to a file"
 
@@ -1884,7 +2415,7 @@ export SCRIPT_GET_VERSION
 
 # get the commit log since the last version from `$(LAST_VERSION_FILE)`
 define SCRIPT_GET_COMMIT_LOG
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/get_commit_log.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_commit_log.py
 
 "pretty print a commit log amd wrote it to a file"
 
@@ -1935,7 +2466,7 @@ export SCRIPT_GET_COMMIT_LOG
 
 # get cuda information and whether torch sees it
 define SCRIPT_CHECK_TORCH
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/check_torch.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/check_torch.py
 
 "print info about current python, torch, cuda, and devices"
 
@@ -2120,7 +2651,7 @@ export SCRIPT_CHECK_TORCH
 
 # get todo's from the code
 define SCRIPT_GET_TODOS
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/get_todos.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_todos.py
 
 "read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
 
@@ -2552,7 +3083,7 @@ export SCRIPT_GET_TODOS
 
 # markdown to html using pdoc
 define SCRIPT_PDOC_MARKDOWN2_CLI
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/pdoc_markdown2_cli.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/pdoc_markdown2_cli.py
 
 "cli to convert markdown files to HTML using pdoc's markdown2"
 
@@ -2623,7 +3154,7 @@ export SCRIPT_PDOC_MARKDOWN2_CLI
 
 # clean up the docs (configurable in pyproject.toml)
 define SCRIPT_DOCS_CLEAN
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/docs_clean.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/docs_clean.py
 
 "clean up docs directory based on pyproject.toml configuration"
 
@@ -2717,7 +3248,7 @@ export SCRIPT_DOCS_CLEAN
 
 # generate a report of the mypy output
 define SCRIPT_MYPY_REPORT
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/mypy_report.py
+# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/mypy_report.py
 
 "usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
 
@@ -3980,6 +4511,7 @@ help: help-targets info
 			# delete this section!
 			"INP001", # this isn't a package, just some scripts
 			"PGH003", # bare type ignore is fine
+			"SLF001", # private member access is fine
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		]
 		select = ["ALL"]
@@ -4005,7 +4537,8 @@ help: help-targets info
 			]
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			# delete this!
-			"scripts/get_todos.py" = ["W291"] # we use trailing whitespace intentionally in the markdown template
+			# we use trailing whitespace intentionally in the markdown template
+			"scripts/make/get_todos.py" = ["W291"]
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # `make lmcat` depends on the lmcat and can be configured here
