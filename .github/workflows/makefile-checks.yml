@@ -49,6 +49,24 @@ jobs:
       - run: make info-long
       - run: make version
 
+      # Test detailed help system
+      - name: Test detailed help for single target
+        run: make help=test
+      - name: Test detailed help for multiple targets
+        run: make HELP="test clean"
+      - name: Test detailed help with pattern matching
+        run: make help="dep*"
+      - name: Test detailed help with wildcard
+        run: make h="*clean"
+      - name: Test detailed help for all targets
+        run: make H=--all
+      - name: Test recipe_info.py script directly
+        run: python scripts/make/recipe_info.py -f makefile test
+      - name: Test recipe_info.py with --no-color
+        run: python scripts/make/recipe_info.py -f makefile --no-color test
+      - name: Test recipe_info.py error handling
+        run: python scripts/make/recipe_info.py -f makefile nonexistent 2>&1 | grep -q "not found"
+
       # Dependency commands  
       - run: make dep-check
       - run: make dep

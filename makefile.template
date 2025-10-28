@@ -231,6 +231,14 @@ endef
 export SCRIPT_MYPY_REPORT
 
 
+# get information about makefile recipes/targets
+define SCRIPT_RECIPE_INFO
+##[[SCRIPT_RECIPE_INFO]]##
+endef
+
+export SCRIPT_RECIPE_INFO
+
+
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
 ##     ## ##       ##     ## ##        ##  ##     ## ####  ##
@@ -627,10 +635,28 @@ info-long: info
 	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
 	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
 
-# immediately print out the help targets, and then local variables (but those take a bit longer)
+# Smart help command: shows general help, or detailed info about specific targets
+# Usage:
+#   make help              - shows general help (list of targets + makefile variables)
+#   make help="test"       - shows detailed info about the 'test' recipe
+#   make HELP="test clean" - shows detailed info about multiple recipes
+#   make h=*               - shows detailed info about all recipes (wildcard expansion)
+#   make H="test"          - same as HELP (case variations supported)
+#
+# All variations work: help/HELP/h/H with values like "foo", "foo bar", "*", "--all"
 .PHONY: help
-help: help-targets info
-	@echo -n ""
+help:
+	@$(eval HELP_ARG := $(or $(HELP),$(help),$(H),$(h)))
+	@$(eval HELP_EXPANDED := $(if $(filter *,$(HELP_ARG)),--all,$(HELP_ARG)))
+	@if [ -n "$(HELP_EXPANDED)" ]; then \
+		$(PYTHON) -c "$$SCRIPT_RECIPE_INFO" -f makefile $(HELP_EXPANDED); \
+	else \
+		$(MAKE) --no-print-directory help-targets info; \
+		echo ""; \
+		echo "To get detailed info about specific make targets, use:"; \
+		echo "  make help=TARGET    or    make HELP=\"TARGET1 TARGET2\""; \
+		echo "  make H=*            or    make h=--all"; \
+	fi
 
 
  ######  ##     ##  ######  ########  #######  ##     ##
