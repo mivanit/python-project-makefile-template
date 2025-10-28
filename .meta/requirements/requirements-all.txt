@@ -2,115 +2,306 @@
 #    uv export --no-hashes --group dev --group lint --all-extras
 -e .
 appnope==0.1.4 ; sys_platform == 'darwin'
+    # via ipykernel
 asttokens==3.0.0
+    # via stack-data
 attrs==25.1.0
+    # via
+    #   igittigitt
+    #   jsonschema
+    #   referencing
 beautifulsoup4==4.13.3
+    # via nbconvert
 bleach==6.2.0
+    # via nbconvert
 bracex==2.5.post1 ; python_full_version >= '3.11'
+    # via wcmatch
 cffi==1.17.1 ; implementation_name == 'pypy'
+    # via pyzmq
 cli-exit-tools==1.2.7 ; python_full_version >= '3.11'
+    # via igittigitt
 click==8.1.8
+    # via
+    #   cli-exit-tools
+    #   igittigitt
+    #   typer
 colorama==0.4.6 ; sys_platform == 'win32'
+    # via
+    #   click
+    #   ipython
+    #   pytest
 comm==0.2.2
+    # via ipykernel
 coverage==7.6.12
+    # via
+    #   coverage-badge
+    #   pytest-cov
 coverage-badge==1.1.2
 debugpy==1.8.12
+    # via ipykernel
 decorator==5.1.1
+    # via ipython
 defusedxml==0.7.1
+    # via nbconvert
 exceptiongroup==1.2.2 ; python_full_version < '3.11'
+    # via
+    #   ipython
+    #   pytest
 executing==2.2.0
+    # via stack-data
 fastjsonschema==2.21.1
+    # via nbformat
 filelock==3.17.0
+    # via torch
 fire==0.7.0
+    # via myproject
 fsspec==2025.2.0
+    # via torch
 igittigitt==2.1.5 ; python_full_version >= '3.11'
+    # via lmcat
 importlib-metadata==8.6.1 ; python_full_version < '3.10'
+    # via
+    #   jupyter-client
+    #   nbconvert
 iniconfig==2.0.0
+    # via pytest
 ipykernel==6.29.5
+    # via myproject
 ipython==8.18.1 ; python_full_version < '3.10'
+    # via ipykernel
 ipython==8.32.0 ; python_full_version >= '3.10'
+    # via ipykernel
 jedi==0.19.2
+    # via ipython
 jinja2==3.1.6
+    # via
+    #   nbconvert
+    #   pdoc
+    #   torch
 jsonschema==4.23.0
+    # via nbformat
 jsonschema-specifications==2024.10.1
+    # via jsonschema
 jupyter-client==8.6.3
+    # via
+    #   ipykernel
+    #   nbclient
 jupyter-core==5.7.2
+    # via
+    #   ipykernel
+    #   jupyter-client
+    #   nbclient
+    #   nbconvert
+    #   nbformat
 jupyterlab-pygments==0.3.0
+    # via nbconvert
 lib-detect-testenv==2.0.8 ; python_full_version >= '3.11'
+    # via
+    #   cli-exit-tools
+    #   igittigitt
 libcst==1.6.0
+    # via pycln
 lmcat==0.2.0 ; python_full_version >= '3.11'
 markdown-it-py==3.0.0
+    # via rich
 markupsafe==3.0.2
+    # via
+    #   jinja2
+    #   nbconvert
+    #   pdoc
 matplotlib-inline==0.1.7
+    # via
+    #   ipykernel
+    #   ipython
 mdurl==0.1.2
+    # via markdown-it-py
 mistune==3.1.1
+    # via nbconvert
 mpmath==1.3.0
+    # via sympy
 muutils==0.7.0
+    # via
+    #   lmcat
+    #   myproject
 mypy==1.15.0
 mypy-extensions==1.0.0
+    # via mypy
 nbclient==0.10.2
+    # via nbconvert
 nbconvert==7.16.6
 nbformat==5.10.4
+    # via
+    #   nbclient
+    #   nbconvert
 nest-asyncio==1.6.0
+    # via ipykernel
 networkx==3.2.1 ; python_full_version < '3.10'
+    # via torch
 networkx==3.4.2 ; python_full_version >= '3.10'
+    # via torch
 numpy==2.0.2 ; python_full_version < '3.10'
+    # via myproject
 numpy==2.2.3 ; python_full_version >= '3.10'
+    # via myproject
 nvidia-cublas-cu12==12.4.5.8 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via
+    #   nvidia-cudnn-cu12
+    #   nvidia-cusolver-cu12
+    #   torch
 nvidia-cuda-cupti-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-cuda-nvrtc-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-cuda-runtime-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-cudnn-cu12==9.1.0.70 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-cufft-cu12==11.2.1.3 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-curand-cu12==10.3.5.147 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-cusolver-cu12==11.6.1.9 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-cusparse-cu12==12.3.1.170 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via
+    #   nvidia-cusolver-cu12
+    #   torch
 nvidia-cusparselt-cu12==0.6.2 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-nccl-cu12==2.21.5 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 nvidia-nvjitlink-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via
+    #   nvidia-cufft-cu12
+    #   nvidia-cusolver-cu12
+    #   nvidia-cusparse-cu12
+    #   torch
 nvidia-nvtx-cu12==12.4.127 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 packaging==24.2
+    # via
+    #   ipykernel
+    #   nbconvert
+    #   pytest
 pandocfilters==1.5.1
+    # via nbconvert
 parso==0.8.4
+    # via jedi
 pathspec==0.12.1
+    # via pycln
 pdoc==15.0.1
 pexpect==4.9.0 ; (python_full_version < '3.10' and sys_platform == 'emscripten') or (sys_platform != 'emscripten' and sys_platform != 'win32')
+    # via ipython
 platformdirs==4.3.6
+    # via jupyter-core
 pluggy==1.5.0
+    # via pytest
 prompt-toolkit==3.0.50
+    # via ipython
 psutil==7.0.0
+    # via ipykernel
 ptyprocess==0.7.0 ; (python_full_version < '3.10' and sys_platform == 'emscripten') or (sys_platform != 'emscripten' and sys_platform != 'win32')
+    # via pexpect
 pure-eval==0.2.3
+    # via stack-data
 pycln==2.5.0
 pycparser==2.22 ; implementation_name == 'pypy'
+    # via cffi
 pygments==2.19.1
+    # via
+    #   ipython
+    #   nbconvert
+    #   pdoc
+    #   rich
 pytest==8.3.4
+    # via pytest-cov
 pytest-cov==6.0.0
 python-dateutil==2.9.0.post0
+    # via jupyter-client
 pywin32==308 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32'
+    # via jupyter-core
 pyyaml==6.0.2
+    # via
+    #   libcst
+    #   pycln
 pyzmq==26.2.1
+    # via
+    #   ipykernel
+    #   jupyter-client
 referencing==0.36.2
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
 rich==13.9.4
+    # via typer
 rpds-py==0.22.3
+    # via
+    #   jsonschema
+    #   referencing
 ruff==0.9.6
 setuptools==75.8.0
+    # via
+    #   coverage-badge
+    #   torch
 shellingham==1.5.4
+    # via typer
 six==1.17.0
+    # via python-dateutil
 soupsieve==2.6
+    # via beautifulsoup4
 stack-data==0.6.3
+    # via ipython
 sympy==1.13.1
+    # via torch
 termcolor==2.5.0
+    # via fire
 tinycss2==1.4.0
+    # via bleach
 tomli==2.2.1 ; python_full_version <= '3.11'
+    # via
+    #   coverage
+    #   mypy
+    #   pytest
 tomlkit==0.13.2
+    # via pycln
 torch==2.6.0
+    # via myproject
 tornado==6.4.2
+    # via
+    #   ipykernel
+    #   jupyter-client
 traitlets==5.14.3
+    # via
+    #   comm
+    #   ipykernel
+    #   ipython
+    #   jupyter-client
+    #   jupyter-core
+    #   matplotlib-inline
+    #   nbclient
+    #   nbconvert
+    #   nbformat
 triton==3.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+    # via torch
 typer==0.15.1
+    # via pycln
 typing-extensions==4.12.2
+    # via
+    #   beautifulsoup4
+    #   ipython
+    #   mistune
+    #   mypy
+    #   referencing
+    #   rich
+    #   torch
+    #   typer
 wcmatch==10.0 ; python_full_version >= '3.11'
+    # via igittigitt
 wcwidth==0.2.13
+    # via prompt-toolkit
 webencodings==0.5.1
+    # via
+    #   bleach
+    #   tinycss2
 zipp==3.21.0 ; python_full_version < '3.10'
+    # via importlib-metadata
