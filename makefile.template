@@ -4,8 +4,12 @@
 #| https://github.com/mivanit/python-project-makefile-template      |
 ##[[VERSION]]##
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
-#| modifications from the original should be denoted with `~~~~~`   |
-#| as this makes it easier to find edits when updating makefile     |
+#|==================================================================|
+#| CUSTOMIZATION:                                                   |
+#| - modify PACKAGE_NAME and other variables in config section      |
+#| - mark custom changes with `~~~~~` for easier template updates   |
+#| - run `make help` to see available targets                       |
+#| - run `make help=TARGET` for detailed info about specific target |
 #|==================================================================|
 
 
@@ -326,14 +330,30 @@ dep-check-torch:
 	@echo "see if torch is installed, and which CUDA version and devices it sees"
 	$(PYTHON) -c "$$SCRIPT_CHECK_TORCH"
 
+# sync dependencies and export to requirements.txt files
+# - syncs all extras and groups with uv (including dev dependencies)
+# - compiles bytecode for faster imports
+# - exports to requirements.txt files per tool.uv-exports.exports config
+# configure via pyproject.toml:[tool.uv-exports]:
+#   [tool.uv-exports]
+#   exports = [
+#     { name = "base", extras = [], groups = [] },  # base package deps only
+#     { name = "dev", extras = [], groups = ["dev"] },  # dev dependencies
+#     { name = "all", extras = ["all"], groups = ["dev"] }  # everything
+#   ]
 .PHONY: dep
 dep:
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups --compile-bytecode
 	mkdir -p $(REQUIREMENTS_DIR)
 	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
-	
 
+
+# verify that requirements.txt files match current dependencies
+# - exports deps to temp directory
+# - diffs temp against existing requirements files
+# - FAILS if any differences found (means you need to run `make dep`)
+# useful in CI to catch when pyproject.toml changed but requirements weren't regenerated
 .PHONY: dep-check
 dep-check:
 	@echo "Checking that exported requirements are up to date"
@@ -364,7 +384,9 @@ dep-clean:
 # checks (formatting/linting, typing, tests)
 # ==================================================
 
-# runs ruff to format the code
+# format code AND auto-fix linting issues
+# performs TWO operations: reformats code, then auto-fixes safe linting issues
+# configure in pyproject.toml:[tool.ruff]
 .PHONY: format
 format:
 	@echo "format the source code"
@@ -383,12 +405,23 @@ typing: clean
 	@echo "running type checks"
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
 
-# generates a report of the mypy output
+# generate summary report of type check errors grouped by file
+# outputs TOML format showing error count per file
+# useful for tracking typing progress across large codebases
 .PHONY: typing-report
 typing-report:
 	@echo "generate a report of the type check output -- errors per file"
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
 
+# run tests with pytest
+# - automatically runs `make clean` first
+# - respects COV and VERBOSE makefile variables
+# - pass custom args: make test PYTEST_OPTIONS="--maxfail=1 -x"
+# makefile variables:
+#   COV=1        # generate coverage reports (default: 1)
+#   VERBOSE=1    # verbose pytest output (default: 0)
+#   PYTEST_OPTIONS="..."  # pass additional pytest arguments
+# pytest config in pyproject.toml:[tool.pytest.ini_options]
 .PHONY: test
 test: clean
 	@echo "running tests"
@@ -439,9 +472,13 @@ docs-combined: docs-md
 	$(PANDOC) -f markdown -t plain $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).txt
 	$(PANDOC) -f markdown -t html $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).html
 
-# generates coverage reports as html and text with `pytest-cov`, and a badge with `coverage-badge`
-# if `.coverage` is not found, will run tests first
-# also removes the `.gitignore` file that `coverage html` creates, since we count that as part of the docs
+# generate coverage reports from test results
+# WARNING: if .coverage file not found, will automatically run `make test` first
+# - generates text report: $(COVERAGE_REPORTS_DIR)/coverage.txt
+# - generates SVG badge: $(COVERAGE_REPORTS_DIR)/coverage.svg
+# - generates HTML report: $(COVERAGE_REPORTS_DIR)/html/
+# - removes .gitignore from html dir (we publish coverage with docs)
+# run tests with: make test COV=1 (COV=1 is default)
 .PHONY: cov
 cov:
 	@echo "generate coverage reports"
@@ -460,10 +497,18 @@ cov:
 docs: cov docs-html docs-combined todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
-# and leaves things defined in `pyproject.toml:tool.makefile.docs.no_clean`
-# (templates, svg, css, make_docs.py script)
-# distinct from `make clean`
+# remove generated documentation files, but preserve resources
+# - removes all docs except those in DOCS_RESOURCES_DIR
+# - preserves files/patterns specified in pyproject.toml config
+# - distinct from `make clean` (which removes temp build files, not docs)
+# configure via pyproject.toml:[tool.makefile.docs]:
+#   [tool.makefile.docs]
+#   output_dir = "docs"  # must match DOCS_DIR in makefile
+#   no_clean = [  # files/patterns to preserve when cleaning
+#     "resources/**",
+#     "*.svg",
+#     "*.css"
+#   ]
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs except resources"
@@ -512,10 +557,13 @@ lmcat:
 # build and publish
 # ==================================================
 
-# verifies that the current branch is $(PUBLISH_BRANCH) and that git is clean
-# used before publishing
+# verify git is ready for publishing
+# REQUIRES:
+# - current branch must be $(PUBLISH_BRANCH)
+# - no uncommitted changes (git status --porcelain must be empty)
+# EXITS with error if either condition fails
 .PHONY: verify-git
-verify-git: 
+verify-git:
 	@echo "checking git status"
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "!!! ERROR !!!"; \
@@ -532,14 +580,25 @@ verify-git:
 	fi; \
 
 
+# build package distribution files
+# creates wheel (.whl) and source distribution (.tar.gz) in dist/
 .PHONY: build
-build: 
+build:
 	@echo "build the package"
 	uv build
 
-# gets the commit log, checks everything, builds, and then publishes with twine
-# will ask the user to confirm the new version number (and this allows for editing the tag info)
-# will also print the contents of $(PYPI_TOKEN_FILE) to the console for the user to copy and paste in when prompted by twine
+# publish package to PyPI and create git tag
+# PREREQUISITES:
+# - must be on $(PUBLISH_BRANCH) branch with clean git status (verified by verify-git)
+# - must have $(PYPI_TOKEN_FILE) with your PyPI token
+# - version in pyproject.toml must be different from $(LAST_VERSION_FILE)
+# PROCESS:
+# 1. runs all checks, builds package
+# 2. prompts for version confirmation (you can edit $(COMMIT_LOG_FILE) at this point)
+# 3. creates git commit updating $(LAST_VERSION_FILE)
+# 4. creates annotated git tag with commit log as description
+# 5. pushes tag to origin
+# 6. uploads to PyPI via twine (you'll paste token from $(PYPI_TOKEN_FILE))
 .PHONY: publish
 publish: gen-commit-log check build verify-git version gen-version-info
 	@echo "run all checks, build, and then publish"
@@ -589,6 +648,10 @@ clean:
 	rm -rf $(TESTS_TEMP_DIR)
 	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
 
+# remove all generated/build files including .venv
+# runs: clean + docs-clean + dep-clean
+# removes .venv, uv.lock, requirements.txt files, generated docs, build artifacts
+# run `make dep` after this to reinstall dependencies
 .PHONY: clean-all
 clean-all: clean docs-clean dep-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
