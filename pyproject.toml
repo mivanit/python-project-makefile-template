@@ -98,6 +98,7 @@
 
 	[tool.ruff.lint]
 		ignore = [
+			"COM812", # ????
 			"F722", # doesn't like jaxtyping
 			"W191", # we like tabs
 			"D400", # missing-trailing-period

@@ -1,5 +1,7 @@
 """CLI tool to get information about Makefile recipes/targets."""
 
+from __future__ import annotations
+
 import argparse
 import difflib
 import fnmatch
@@ -11,18 +13,19 @@ from typing import Dict, List, Optional, Set, Union
 
 
 def _scan_makefile(
-	lines: List[str], target_name: Optional[str] = None,
+	lines: List[str],
+	target_name: Optional[str] = None,
 ) -> Union[Dict[str, int], int]:
 	"""Scan makefile for target definitions, skipping define blocks.
 
 	Args:
-	    lines: Makefile lines
-	    target_name: If provided, return line index for this specific target.
-	                If None, return dict of all targets.
+		lines: Makefile lines
+		target_name: If provided, return line index for this specific target.
+					If None, return dict of all targets.
 
 	Returns:
-	    If target_name is None: dict mapping target names to line indices
-	    If target_name is provided: line index of that target, or -1 if not found
+		If target_name is None: dict mapping target names to line indices
+		If target_name is provided: line index of that target, or -1 if not found
 
 	"""
 	in_define_block: bool = False
@@ -64,6 +67,7 @@ class Colors:
 	"""ANSI color codes"""
 
 	def __init__(self, enabled: bool = True) -> None:
+		"init color codes, or empty strings if `not enabled`"
 		if enabled:
 			self.RESET = "\033[0m"
 			self.BOLD = "\033[1m"
@@ -89,7 +93,7 @@ class MakeRecipe:
 	echo_message: str
 
 	@classmethod
-	def from_makefile(cls, lines: List[str], target: str) -> "MakeRecipe":
+	def from_makefile(cls, lines: List[str], target: str) -> MakeRecipe:
 		"""Parse and create a MakeRecipe from makefile lines for *target*."""
 		i: int = _scan_makefile(lines, target_name=target)
 		if i == -1:
@@ -112,7 +116,7 @@ class MakeRecipe:
 			elif stripped == "":
 				# Track consecutive blank lines
 				blank_count += 1
-				if blank_count >= 2:
+				if blank_count >= 2:  # noqa: PLR2004
 					# Hit 2 blank lines in a row - stop
 					break
 				j -= 1
@@ -274,7 +278,10 @@ def main() -> None:
 				except ValueError:
 					# Find similar targets (fuzzy matching)
 					fuzzy_matches: List[str] = difflib.get_close_matches(
-						tgt, all_targets, n=5, cutoff=0.6,
+						tgt,
+						all_targets,
+						n=5,
+						cutoff=0.6,
 					)
 					# Also find targets that contain the attempted target
 					substring_matches: List[str] = [
