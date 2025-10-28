@@ -1,7 +1,7 @@
 <blockquote>
 <p>docs for <a
 href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
-v0.3.4</p>
+v0.4.0</p>
 </blockquote>
 <h2 id="contents">Contents</h2>
 <h1 id="makefile-template-for-python-projects">Makefile Template for
@@ -17,16 +17,25 @@ dependency management and packaging</li>
 <li><a href="https://docs.pytest.org"><code>pytest</code></a> for
 testing</li>
 <li><a href="https://github.com/python/mypy"><code>mypy</code></a> for
-static type checking</li>
-<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> and <a
-href="https://github.com/hadialqattan/pycln"><code>pycln</code></a> for
+static type checking
+<ul>
+<li>TODO: switch to <a
+href="https://github.com/astral-sh/ty"><code>ty</code></a> once it’s
+more mature</li>
+</ul></li>
+<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> for
 formatting</li>
 <li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation
 generation</li>
 <li><a
 href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a>
-for automation (I know there are better build tools out there and it’s
-overkill, but <code>make</code> is universal)</li>
+for automation
+<ul>
+<li>I know there are better build tools out there and it’s overkill, but
+<code>make</code> is universal. you can think of this as a bunch of
+hacky additions to <code>make</code> to make it a tad more like a modern
+build tool for python projects</li>
+</ul></li>
 <li><a href="https://github.com/git"><code>git</code></a> for version
 control (a spicy take, I know)</li>
 </ul>
@@ -78,8 +87,9 @@ href="https://miv.name/python-project-makefile-template"><code>miv.name/python-p
 or the generated docs for the notebooks at <a
 href="https://miv.name/python-project-makefile-template/notebooks"><code>miv.name/python-project-makefile-template/notebooks</code></a></p>
 <h1 id="makefile">Makefile</h1>
+<h2 id="general-help">General Help</h2>
 <p><code>make help</code> Displays the help message listing all
-available make targets and variables. running just <code>make</code>
+available make targets and variables. Running just <code>make</code>
 will also display this message.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># make targets:</span></span>
@@ -118,6 +128,54 @@ will also display this message.</p>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="st">    PROJ_VERSION = v0.0.6 </span></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">    LAST_VERSION = v0.0.5</span></span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTEST_OPTIONS =  --cov=.</span></span></code></pre></div>
+<h2 id="detailed-help-for-specific-targets">Detailed Help for Specific
+Targets</h2>
+<p>You can get detailed information about specific make targets using
+the <code>help</code> variable:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get detailed info about a single target</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help=test</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">test:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">running</span> tests</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">depends-on:</span> clean</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get info about multiple targets</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make HELP=<span class="st">&quot;test clean&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">test:</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">running</span> tests</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">depends-on:</span> clean</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">clean:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">clean</span> up temporary files</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="ex">comments:</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">cleans</span> up temp files from formatter, type checking, tests, coverage</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">removes</span> all built files</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">removes</span> <span class="va">$(</span><span class="ex">TESTS_TEMP_DIR</span><span class="va">)</span> to remove temporary test files</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Get info about all targets (wildcard expansion)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make h=<span class="pp">*</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make H=--all</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Pattern matching - all targets starting with &quot;dep&quot;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help=<span class="st">&quot;dep*&quot;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="ex">dep-check-torch:</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="ex">see</span> if torch is installed, and which CUDA version and devices it sees</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="ex">dep:</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Exporting</span> dependencies as per <span class="va">$(</span><span class="ex">PYPROJECT</span><span class="va">)</span> section <span class="st">&#39;tool.uv-exports.exports&#39;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="ex">dep-check:</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Checking</span> that exported requirements are up to date</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ex">dep-clean:</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="ex">clean</span> up lock files, .venv, and requirements files</span></code></pre></div>
+<p>All these variations work: - <code>make help=TARGET</code> or
+<code>make HELP=TARGET</code> - <code>make h=TARGET</code> or
+<code>make H=TARGET</code> - <code>make help="TARGET1 TARGET2"</code>
+(multiple targets) - <code>make help=*</code> or
+<code>make h=--all</code> (all targets) - <code>make help="dep*"</code>
+(pattern matching with wildcards) - <code>make HELP="*clean"</code> (any
+target ending in “clean”)</p>
+<p>Pattern matching supports shell-style wildcards: - <code>*</code> -
+matches any characters - <code>?</code> - matches any single character -
+<code>[abc]</code> - matches any character in brackets</p>
 <h1 id="development">Development</h1>
 <p><code>makefile.template</code> is the template file for the makefile,
 which contains everything except python scripts which will be inserted
@@ -128,14 +186,14 @@ into the makefile.</p>
 populate the makefile.</p>
 <p>If developing, modify the <code>makefile.template</code> file or
 scripts in <code>scripts/</code>, and then run</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/assemble_make.py</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/assemble_make.py</span></code></pre></div>
 <h2 id="submodules">Submodules</h2>
 <ul>
 <li><a href="#helloworld"><code>helloworld</code></a></li>
 <li><a href="#other"><code>other</code></a></li>
 </ul>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject.py">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py">View
 Source on GitHub</a></p>
 <h1 id="myproject"><code>myproject</code></h1>
 <h3 id="makefile-template-for-python-projects-1">Makefile Template for
@@ -151,16 +209,25 @@ dependency management and packaging</li>
 <li><a href="https://docs.pytest.org"><code>pytest</code></a> for
 testing</li>
 <li><a href="https://github.com/python/mypy"><code>mypy</code></a> for
-static type checking</li>
-<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> and <a
-href="https://github.com/hadialqattan/pycln"><code>pycln</code></a> for
+static type checking
+<ul>
+<li>TODO: switch to <a
+href="https://github.com/astral-sh/ty"><code>ty</code></a> once it’s
+more mature</li>
+</ul></li>
+<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> for
 formatting</li>
 <li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation
 generation</li>
 <li><a
 href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a>
-for automation (I know there are better build tools out there and it’s
-overkill, but <code>make</code> is universal)</li>
+for automation
+<ul>
+<li>I know there are better build tools out there and it’s overkill, but
+<code>make</code> is universal. you can think of this as a bunch of
+hacky additions to <code>make</code> to make it a tad more like a modern
+build tool for python projects</li>
+</ul></li>
 <li><a href="https://github.com/git"><code>git</code></a> for version
 control (a spicy take, I know)</li>
 </ul>
@@ -212,46 +279,95 @@ href="https://miv.name/python-project-makefile-template"><code>miv.name/python-p
 or the generated docs for the notebooks at <a
 href="https://miv.name/python-project-makefile-template/notebooks"><code>miv.name/python-project-makefile-template/notebooks</code></a></p>
 <h3 id="makefile-1">Makefile</h3>
+<h4 id="general-help-1">General Help</h4>
 <p><code>make help</code> Displays the help message listing all
-available make targets and variables. running just <code>make</code>
+available make targets and variables. Running just <code>make</code>
 will also display this message.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">### make targets:</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> build                build the package</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> check                run format checks, tests, and typing checks</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean                clean up temporary files</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean-all            clean up all temporary files, dep files, venv, and generated docs</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> cov                  generate coverage reports</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep                  Exporting dependencies as per <span class="va">$(</span><span class="ex">PYPROJECT</span><span class="va">)</span> section <span class="st">&#39;tool.uv-exports.exports&#39;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check            Checking that exported requirements are up to date</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check-torch      see if torch is installed, and which CUDA version and devices it sees</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-clean            clean up lock files, .venv, and requirements files</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs                 generate all documentation and coverage reports</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-clean           remove generated docs</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-combined        generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown and convert to other formats</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-html            generate html docs</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-md              generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format               format the source code</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format-check         check if the source code is formatted correctly</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> help</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> info                 <span class="co"># makefile variables</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> info-long            <span class="co"># other variables</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> lmcat                write the lmcat full output to pyproject.toml:<span class="pp">[</span><span class="ss">tool.lmcat.output</span><span class="pp">]</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> lmcat-tree           show in console the lmcat tree view</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> publish              run all checks, build, and then publish</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> setup                install and update via uv</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> test                 running tests</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> todo                 get all TODO<span class="st">&#39;s from the code</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="st">    make typing               running type checks</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="st">    make verify-git           checking git status</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="st">    make version              Current version is $(PROJ_VERSION), last auto-uploaded version is $(LAST_VERSION)</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="st">### makefile variables</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTHON = uv run python</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTHON_VERSION = 3.12.0 </span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="st">    PACKAGE_NAME = myproject</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="st">    PROJ_VERSION = v0.0.6 </span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="st">    LAST_VERSION = v0.0.5</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTEST_OPTIONS =  --cov=.</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">### make targets:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> build                build the package</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> check                run format checks, tests, and typing checks</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean                clean up temporary files</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> clean-all            clean up all temporary files, dep files, venv, and generated docs</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> cov                  generate coverage reports</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep                  Exporting dependencies as per <span class="va">$(</span><span class="ex">PYPROJECT</span><span class="va">)</span> section <span class="st">&#39;tool.uv-exports.exports&#39;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check            Checking that exported requirements are up to date</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-check-torch      see if torch is installed, and which CUDA version and devices it sees</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> dep-clean            clean up lock files, .venv, and requirements files</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs                 generate all documentation and coverage reports</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-clean           remove generated docs</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-combined        generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown and convert to other formats</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-html            generate html docs</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> docs-md              generate combined <span class="er">(</span><span class="ex">single-file</span><span class="kw">)</span> <span class="ex">docs</span> in markdown</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format               format the source code</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> format-check         check if the source code is formatted correctly</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> help</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> info                 <span class="co"># makefile variables</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> info-long            <span class="co"># other variables</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> lmcat                write the lmcat full output to pyproject.toml:<span class="pp">[</span><span class="ss">tool.lmcat.output</span><span class="pp">]</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> lmcat-tree           show in console the lmcat tree view</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> publish              run all checks, build, and then publish</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> setup                install and update via uv</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> test                 running tests</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> todo                 get all TODO<span class="st">&#39;s from the code</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="st">    make typing               running type checks</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="st">    make verify-git           checking git status</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="st">    make version              Current version is $(PROJ_VERSION), last auto-uploaded version is $(LAST_VERSION)</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="st">### makefile variables</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTHON = uv run python</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTHON_VERSION = 3.12.0 </span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="st">    PACKAGE_NAME = myproject</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="st">    PROJ_VERSION = v0.0.6 </span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="st">    LAST_VERSION = v0.0.5</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="st">    PYTEST_OPTIONS =  --cov=.</span></span></code></pre></div>
+<h4 id="detailed-help-for-specific-targets-1">Detailed Help for Specific
+Targets</h4>
+<p>You can get detailed information about specific make targets using
+the <code>help</code> variable:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">### Get detailed info about a single target</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help=test</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">test:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">running</span> tests</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">depends-on:</span> clean</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">### Get info about multiple targets</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make HELP=<span class="st">&quot;test clean&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">test:</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">running</span> tests</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">depends-on:</span> clean</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">clean:</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">clean</span> up temporary files</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="ex">comments:</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">cleans</span> up temp files from formatter, type checking, tests, coverage</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">removes</span> all built files</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">removes</span> <span class="va">$(</span><span class="ex">TESTS_TEMP_DIR</span><span class="va">)</span> to remove temporary test files</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">### Get info about all targets (wildcard expansion)</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make h=<span class="pp">*</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">### or</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make H=--all</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">### Pattern matching - all targets starting with &quot;dep&quot;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make help=<span class="st">&quot;dep*&quot;</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="ex">dep-check-torch:</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="ex">see</span> if torch is installed, and which CUDA version and devices it sees</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="ex">dep:</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Exporting</span> dependencies as per <span class="va">$(</span><span class="ex">PYPROJECT</span><span class="va">)</span> section <span class="st">&#39;tool.uv-exports.exports&#39;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="ex">dep-check:</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Checking</span> that exported requirements are up to date</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="ex">dep-clean:</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="ex">clean</span> up lock files, .venv, and requirements files</span></code></pre></div>
+<p>All these variations work: - <code>make help=TARGET</code> or
+<code>make HELP=TARGET</code> - <code>make h=TARGET</code> or
+<code>make H=TARGET</code> - <code>make help="TARGET1 TARGET2"</code>
+(multiple targets) - <code>make help=*</code> or
+<code>make h=--all</code> (all targets) - <code>make help="dep*"</code>
+(pattern matching with wildcards) - <code>make HELP="*clean"</code> (any
+target ending in “clean”)</p>
+<p>Pattern matching supports shell-style wildcards: - <code>*</code> -
+matches any characters - <code>?</code> - matches any single character -
+<code>[abc]</code> - matches any character in brackets</p>
 <h3 id="development-1">Development</h3>
 <p><code>makefile.template</code> is the template file for the makefile,
 which contains everything except python scripts which will be inserted
@@ -262,14 +378,14 @@ into the makefile.</p>
 populate the makefile.</p>
 <p>If developing, modify the <code>makefile.template</code> file or
 scripts in <code>scripts/</code>, and then run</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/assemble_make.py</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/assemble_make.py</span></code></pre></div>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject.py#L0-L0">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py#L0-L0">View
 Source on GitHub</a></p>
 <blockquote>
 <p>docs for <a
 href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
-v0.3.4</p>
+v0.4.0</p>
 </blockquote>
 <h2 id="contents-1">Contents</h2>
 <p>dummy module</p>
@@ -279,31 +395,31 @@ v0.3.4</p>
 <li><a href="#critical_function"><code>critical_function</code></a></li>
 </ul>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py">View
 Source on GitHub</a></p>
 <h1 id="myproject.helloworld"><code>myproject.helloworld</code></h1>
 <p>dummy module</p>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py#L0-L15">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L0-L15">View
 Source on GitHub</a></p>
 <h3 id="some_function"><code>def some_function</code></h3>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>() <span class="op">-&gt;</span> <span class="va">None</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>() <span class="op">-&gt;</span> <span class="va">None</span></span></code></pre></div>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py#L8-L10">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L8-L10">View
 Source on GitHub</a></p>
 <p>dummy docstring</p>
 <h3 id="critical_function"><code>def critical_function</code></h3>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>() <span class="op">-&gt;</span> <span class="va">None</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>() <span class="op">-&gt;</span> <span class="va">None</span></span></code></pre></div>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py#L14-L16">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L14-L16">View
 Source on GitHub</a></p>
 <p>dummy docstring</p>
 <blockquote>
 <p>docs for <a
 href="https://github.com/mivanit/python-project-makefile-template"><code>myproject</code></a>
-v0.3.4</p>
+v0.4.0</p>
 </blockquote>
 <h2 id="contents-2">Contents</h2>
 <p>a module</p>
@@ -312,17 +428,17 @@ v0.3.4</p>
 <li><a href="#another_function"><code>another_function</code></a></li>
 </ul>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/other.py">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py">View
 Source on GitHub</a></p>
 <h1 id="myproject.other"><code>myproject.other</code></h1>
 <p>a module</p>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/other.py#L0-L6">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py#L0-L6">View
 Source on GitHub</a></p>
 <h3 id="another_function"><code>def another_function</code></h3>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>() <span class="op">-&gt;</span> <span class="va">None</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>() <span class="op">-&gt;</span> <span class="va">None</span></span></code></pre></div>
 <p><a
-href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/other.py#L5-L7">View
+href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py#L5-L7">View
 Source on GitHub</a></p>
 <p>dummy docstring</p>

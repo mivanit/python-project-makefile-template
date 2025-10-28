@@ -1,6 +1,6 @@
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.3.4
+> v0.4.0
 
 ## Contents
 
@@ -17,12 +17,15 @@ Relevant ideological decisions:
   packaging
 - [`pytest`](https://docs.pytest.org) for testing
 - [`mypy`](https://github.com/python/mypy) for static type checking
-- [`ruff`](https://docs.astral.sh/ruff/) and
-  [`pycln`](https://github.com/hadialqattan/pycln) for formatting
+  - TODO: switch to [`ty`](https://github.com/astral-sh/ty) once it’s
+    more mature
+- [`ruff`](https://docs.astral.sh/ruff/) for formatting
 - [`pdoc`](https://pdoc.dev) for documentation generation
 - [`make`](https://en.wikipedia.org/wiki/Make_(software)) for automation
-  (I know there are better build tools out there and it’s overkill, but
-  `make` is universal)
+  - I know there are better build tools out there and it’s overkill, but
+    `make` is universal. you can think of this as a bunch of hacky
+    additions to `make` to make it a tad more like a modern build tool
+    for python projects
 - [`git`](https://github.com/git) for version control (a spicy take, I
   know)
 
@@ -65,8 +68,10 @@ or the generated docs for the notebooks at
 
 # Makefile
 
+## General Help
+
 `make help` Displays the help message listing all available make targets
-and variables. running just `make` will also display this message.
+and variables. Running just `make` will also display this message.
 
 ``` sh
 $ make help
@@ -108,6 +113,58 @@ $ make help
     PYTEST_OPTIONS =  --cov=.
 ```
 
+## Detailed Help for Specific Targets
+
+You can get detailed information about specific make targets using the
+`help` variable:
+
+``` sh
+# Get detailed info about a single target
+$ make help=test
+test:
+  running tests
+  depends-on: clean
+
+# Get info about multiple targets
+$ make HELP="test clean"
+test:
+  running tests
+  depends-on: clean
+clean:
+  clean up temporary files
+  comments:
+    cleans up temp files from formatter, type checking, tests, coverage
+    removes all built files
+    removes $(TESTS_TEMP_DIR) to remove temporary test files
+    ...
+
+# Get info about all targets (wildcard expansion)
+$ make h=*
+# or
+$ make H=--all
+
+# Pattern matching - all targets starting with "dep"
+$ make help="dep*"
+dep-check-torch:
+  see if torch is installed, and which CUDA version and devices it sees
+dep:
+  Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'
+dep-check:
+  Checking that exported requirements are up to date
+dep-clean:
+  clean up lock files, .venv, and requirements files
+```
+
+All these variations work: - `make help=TARGET` or `make HELP=TARGET` -
+`make h=TARGET` or `make H=TARGET` - `make help="TARGET1 TARGET2"`
+(multiple targets) - `make help=*` or `make h=--all` (all targets) -
+`make help="dep*"` (pattern matching with wildcards) -
+`make HELP="*clean"` (any target ending in “clean”)
+
+Pattern matching supports shell-style wildcards: - `*` - matches any
+characters - `?` - matches any single character - `[abc]` - matches any
+character in brackets
+
 # Development
 
 `makefile.template` is the template file for the makefile, which
@@ -131,7 +188,7 @@ python scripts/assemble_make.py
 - [`other`](#other)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py)
 
 # `myproject`
 
@@ -148,12 +205,15 @@ Relevant ideological decisions:
   packaging
 - [`pytest`](https://docs.pytest.org) for testing
 - [`mypy`](https://github.com/python/mypy) for static type checking
-- [`ruff`](https://docs.astral.sh/ruff/) and
-  [`pycln`](https://github.com/hadialqattan/pycln) for formatting
+  - TODO: switch to [`ty`](https://github.com/astral-sh/ty) once it’s
+    more mature
+- [`ruff`](https://docs.astral.sh/ruff/) for formatting
 - [`pdoc`](https://pdoc.dev) for documentation generation
 - [`make`](https://en.wikipedia.org/wiki/Make_(software)) for automation
-  (I know there are better build tools out there and it’s overkill, but
-  `make` is universal)
+  - I know there are better build tools out there and it’s overkill, but
+    `make` is universal. you can think of this as a bunch of hacky
+    additions to `make` to make it a tad more like a modern build tool
+    for python projects
 - [`git`](https://github.com/git) for version control (a spicy take, I
   know)
 
@@ -196,8 +256,10 @@ or the generated docs for the notebooks at
 
 ### Makefile
 
+#### General Help
+
 `make help` Displays the help message listing all available make targets
-and variables. running just `make` will also display this message.
+and variables. Running just `make` will also display this message.
 
 ``` sh
 $ make help
@@ -239,6 +301,58 @@ $ make help
     PYTEST_OPTIONS =  --cov=.
 ```
 
+#### Detailed Help for Specific Targets
+
+You can get detailed information about specific make targets using the
+`help` variable:
+
+``` sh
+### Get detailed info about a single target
+$ make help=test
+test:
+  running tests
+  depends-on: clean
+
+### Get info about multiple targets
+$ make HELP="test clean"
+test:
+  running tests
+  depends-on: clean
+clean:
+  clean up temporary files
+  comments:
+    cleans up temp files from formatter, type checking, tests, coverage
+    removes all built files
+    removes $(TESTS_TEMP_DIR) to remove temporary test files
+    ...
+
+### Get info about all targets (wildcard expansion)
+$ make h=*
+### or
+$ make H=--all
+
+### Pattern matching - all targets starting with "dep"
+$ make help="dep*"
+dep-check-torch:
+  see if torch is installed, and which CUDA version and devices it sees
+dep:
+  Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'
+dep-check:
+  Checking that exported requirements are up to date
+dep-clean:
+  clean up lock files, .venv, and requirements files
+```
+
+All these variations work: - `make help=TARGET` or `make HELP=TARGET` -
+`make h=TARGET` or `make H=TARGET` - `make help="TARGET1 TARGET2"`
+(multiple targets) - `make help=*` or `make h=--all` (all targets) -
+`make help="dep*"` (pattern matching with wildcards) -
+`make HELP="*clean"` (any target ending in “clean”)
+
+Pattern matching supports shell-style wildcards: - `*` - matches any
+characters - `?` - matches any single character - `[abc]` - matches any
+character in brackets
+
 ### Development
 
 `makefile.template` is the template file for the makefile, which
@@ -257,11 +371,11 @@ python scripts/assemble_make.py
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject.py#L0-L0)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py#L0-L0)
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.3.4
+> v0.4.0
 
 ## Contents
 
@@ -273,14 +387,14 @@ dummy module
 - [`critical_function`](#critical_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py)
 
 # `myproject.helloworld`
 
 dummy module
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py#L0-L15)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L0-L15)
 
 ### `def some_function`
 
@@ -289,7 +403,7 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4my
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py#L8-L10)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L8-L10)
 
 dummy docstring
 
@@ -300,13 +414,13 @@ dummy docstring
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/helloworld.py#L14-L16)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L14-L16)
 
 dummy docstring
 
 > docs for
 > [`myproject`](https://github.com/mivanit/python-project-makefile-template)
-> v0.3.4
+> v0.4.0
 
 ## Contents
 
@@ -317,14 +431,14 @@ a module
 - [`another_function`](#another_function)
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/other.py)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py)
 
 # `myproject.other`
 
 a module
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/other.py#L0-L6)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py#L0-L6)
 
 ### `def another_function`
 
@@ -333,6 +447,6 @@ GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4my
 ```
 
 [View Source on
-GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject/other.py#L5-L7)
+GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py#L5-L7)
 
 dummy docstring

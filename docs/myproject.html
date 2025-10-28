@@ -46,7 +46,7 @@
 </script></head>
 <body>
 <div class="package-version">
-    docs for <a href="https://github.com/mivanit/python-project-makefile-template">myproject</a> v0.3.4<br>
+    docs for <a href="https://github.com/mivanit/python-project-makefile-template">myproject</a> v0.4.0<br>
 </div>
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button">
@@ -63,7 +63,11 @@
   <li><a href="#makefile-template-for-python-projects">Makefile Template for Python Projects</a></li>
   <li><a href="#how-to-use-this">How to use this:</a></li>
   <li><a href="#docs">docs</a></li>
-  <li><a href="#makefile">Makefile</a></li>
+  <li><a href="#makefile">Makefile</a>
+  <ul>
+    <li><a href="#general-help">General Help</a></li>
+    <li><a href="#detailed-help-for-specific-targets">Detailed Help for Specific Targets</a></li>
+  </ul></li>
   <li><a href="#development">Development</a></li>
 </ul>
 
@@ -98,7 +102,7 @@
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject.py">View Source on GitHub</a>
+                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py">View Source on GitHub</a>
                     <h1 class="modulename">
 myproject    </h1>
 
@@ -112,10 +116,16 @@ myproject    </h1>
 <li><strong>everything contained in github actions should be minimal, and mostly consist of calling makefile recipes</strong></li>
 <li><a href="https://docs.astral.sh/uv/"><code>uv</code></a> for dependency management and packaging</li>
 <li><a href="https://docs.pytest.org"><code>pytest</code></a> for testing</li>
-<li><a href="https://github.com/python/mypy"><code>mypy</code></a> for static type checking</li>
-<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> and <a href="https://github.com/hadialqattan/pycln"><code>pycln</code></a> for formatting</li>
+<li><a href="https://github.com/python/mypy"><code>mypy</code></a> for static type checking
+<ul>
+<li>TODO: switch to <a href="https://github.com/astral-sh/ty"><code>ty</code></a> once it's more mature</li>
+</ul></li>
+<li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> for formatting</li>
 <li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation generation</li>
-<li><a href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a> for automation (I know there are better build tools out there and it's overkill, but <code>make</code> is universal)</li>
+<li><a href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a> for automation
+<ul>
+<li>I know there are better build tools out there and it's overkill, but <code>make</code> is universal. you can think of this as a bunch of hacky additions to <code>make</code> to make it a tad more like a modern build tool for python projects</li>
+</ul></li>
 <li><a href="https://github.com/git"><code>git</code></a> for version control (a spicy take, I know)</li>
 </ul>
 
@@ -153,7 +163,9 @@ myproject    </h1>
 
 <h1 id="makefile">Makefile</h1>
 
-<p><code>make help</code> Displays the help message listing all available make targets and variables. running just <code>make</code> will also display this message.</p>
+<h2 id="general-help">General Help</h2>
+
+<p><code>make help</code> Displays the help message listing all available make targets and variables. Running just <code>make</code> will also display this message.</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span><span class="nb">help</span>
@@ -196,6 +208,67 @@ myproject    </h1>
 </code></pre>
 </div>
 
+<h2 id="detailed-help-for-specific-targets">Detailed Help for Specific Targets</h2>
+
+<p>You can get detailed information about specific make targets using the <code>help</code> variable:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="c1"># Get detailed info about a single target</span>
+$<span class="w"> </span>make<span class="w"> </span><span class="nv">help</span><span class="o">=</span><span class="nb">test</span>
+test:
+<span class="w">  </span>running<span class="w"> </span>tests
+<span class="w">  </span>depends-on:<span class="w"> </span>clean
+
+<span class="c1"># Get info about multiple targets</span>
+$<span class="w"> </span>make<span class="w"> </span><span class="nv">HELP</span><span class="o">=</span><span class="s2">&quot;test clean&quot;</span>
+test:
+<span class="w">  </span>running<span class="w"> </span>tests
+<span class="w">  </span>depends-on:<span class="w"> </span>clean
+clean:
+<span class="w">  </span>clean<span class="w"> </span>up<span class="w"> </span>temporary<span class="w"> </span>files
+<span class="w">  </span>comments:
+<span class="w">    </span>cleans<span class="w"> </span>up<span class="w"> </span>temp<span class="w"> </span>files<span class="w"> </span>from<span class="w"> </span>formatter,<span class="w"> </span><span class="nb">type</span><span class="w"> </span>checking,<span class="w"> </span>tests,<span class="w"> </span>coverage
+<span class="w">    </span>removes<span class="w"> </span>all<span class="w"> </span>built<span class="w"> </span>files
+<span class="w">    </span>removes<span class="w"> </span><span class="k">$(</span>TESTS_TEMP_DIR<span class="k">)</span><span class="w"> </span>to<span class="w"> </span>remove<span class="w"> </span>temporary<span class="w"> </span><span class="nb">test</span><span class="w"> </span>files
+<span class="w">    </span>...
+
+<span class="c1"># Get info about all targets (wildcard expansion)</span>
+$<span class="w"> </span>make<span class="w"> </span><span class="nv">h</span><span class="o">=</span>*
+<span class="c1"># or</span>
+$<span class="w"> </span>make<span class="w"> </span><span class="nv">H</span><span class="o">=</span>--all
+
+<span class="c1"># Pattern matching - all targets starting with &quot;dep&quot;</span>
+$<span class="w"> </span>make<span class="w"> </span><span class="nv">help</span><span class="o">=</span><span class="s2">&quot;dep*&quot;</span>
+dep-check-torch:
+<span class="w">  </span>see<span class="w"> </span><span class="k">if</span><span class="w"> </span>torch<span class="w"> </span>is<span class="w"> </span>installed,<span class="w"> </span>and<span class="w"> </span>which<span class="w"> </span>CUDA<span class="w"> </span>version<span class="w"> </span>and<span class="w"> </span>devices<span class="w"> </span>it<span class="w"> </span>sees
+dep:
+<span class="w">  </span>Exporting<span class="w"> </span>dependencies<span class="w"> </span>as<span class="w"> </span>per<span class="w"> </span><span class="k">$(</span>PYPROJECT<span class="k">)</span><span class="w"> </span>section<span class="w"> </span><span class="s1">&#39;tool.uv-exports.exports&#39;</span>
+dep-check:
+<span class="w">  </span>Checking<span class="w"> </span>that<span class="w"> </span>exported<span class="w"> </span>requirements<span class="w"> </span>are<span class="w"> </span>up<span class="w"> </span>to<span class="w"> </span>date
+dep-clean:
+<span class="w">  </span>clean<span class="w"> </span>up<span class="w"> </span>lock<span class="w"> </span>files,<span class="w"> </span>.venv,<span class="w"> </span>and<span class="w"> </span>requirements<span class="w"> </span>files
+</code></pre>
+</div>
+
+<p>All these variations work:</p>
+
+<ul>
+<li><code>make help=TARGET</code> or <code>make HELP=TARGET</code></li>
+<li><code>make h=TARGET</code> or <code>make H=TARGET</code></li>
+<li><code>make help="TARGET1 TARGET2"</code> (multiple targets)</li>
+<li><code>make help=*</code> or <code>make h=--all</code> (all targets)</li>
+<li><code>make help="dep*"</code> (pattern matching with wildcards)</li>
+<li><code>make HELP="*clean"</code> (any target ending in "clean")</li>
+</ul>
+
+<p>Pattern matching supports shell-style wildcards:</p>
+
+<ul>
+<li><code>*</code> - matches any characters</li>
+<li><code>?</code> - matches any single character</li>
+<li><code>[abc]</code> - matches any character in brackets</li>
+</ul>
+
 <h1 id="development">Development</h1>
 
 <p><code>makefile.template</code> is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.</p>
@@ -215,7 +288,7 @@ myproject    </h1>
                         <div class="source-button-container">
             <label class="pdoc-button view-source-button" for="mod-myproject-view-source"><span>View Source</span></label>
             <div class="github-button-wrapper">
-                <a class="pdoc-button github-link-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.3.4myproject.py#L0-L0" target="_blank">
+                <a class="pdoc-button github-link-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py#L0-L0" target="_blank">
                     <span>View on GitHub</span>
                 </a>
             </div>

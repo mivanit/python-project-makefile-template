@@ -79,6 +79,24 @@
 
 
 
+## [`README.md`](/README.md)
+
+- switch to [`ty`](https://github.com/astral-sh/ty) once it's more mature  
+  local link: [`/README.md:11`](/README.md#L11) 
+  | view on GitHub: [README.md#L11](https://github.com/mivanit/python-project-makefile-template/blob/main/README.md#L11)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=switch%20to%20%5B%60ty%60%5D%28https%3A%2F%2Fgithub.com%2Fastral-sh%2Fty%29%20once%20it%27s%20more%20mature&body=%23%20source%0A%0A%5B%60README.md%23L11%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2FREADME.md%23L11%29%0A%0A%23%20context%0A%60%60%60markdown%0A-%20%5B%60pytest%60%5D%28https%3A%2F%2Fdocs.pytest.org%29%20for%20testing%0A-%20%5B%60mypy%60%5D%28https%3A%2F%2Fgithub.com%2Fpython%2Fmypy%29%20for%20static%20type%20checking%0A%20%20-%20TODO%3A%20switch%20to%20%5B%60ty%60%5D%28https%3A%2F%2Fgithub.com%2Fastral-sh%2Fty%29%20once%20it%27s%20more%20mature%0A-%20%5B%60ruff%60%5D%28https%3A%2F%2Fdocs.astral.sh%2Fruff%2F%29%20for%20formatting%0A-%20%5B%60pdoc%60%5D%28https%3A%2F%2Fpdoc.dev%29%20for%20documentation%20generation%0A%60%60%60&labels=enhancement)
+
+  ```markdown
+  - [`pytest`](https://docs.pytest.org) for testing
+  - [`mypy`](https://github.com/python/mypy) for static type checking
+    - TODO: switch to [`ty`](https://github.com/astral-sh/ty) once it's more mature
+  - [`ruff`](https://docs.astral.sh/ruff/) for formatting
+  - [`pdoc`](https://pdoc.dev) for documentation generation
+  ```
+
+
+
+
 ## [`scripts/make/docs_clean.py`](/scripts/make/docs_clean.py)
 
 - this is not recursive  
