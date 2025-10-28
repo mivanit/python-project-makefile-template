@@ -470,6 +470,21 @@ docs-clean:
 	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
 
+# get all TODO's from the code
+# configure via pyproject.toml:[tool.makefile.inline-todo]:
+#   [tool.makefile.inline-todo]
+#   search_dir = "."  # directory to search for TODOs
+#   out_file_base = "docs/other/todo-inline"  # output file path (without extension)
+#   context_lines = 2  # lines of context around each TODO
+#   extensions = ["py", "md"]  # file extensions to search
+#   tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG", "DOC"]  # tags to look for
+#   exclude = ["docs/**", ".venv/**", "scripts/get_todos.py"]  # patterns to exclude
+#   branch = "main"  # git branch for URLs
+#   # repo_url = "..."  # repository URL (defaults to [project.urls.{repository,github}])
+#   # template_md = "..."  # custom jinja2 template for markdown output
+#   # template_issue = "..."  # custom format string for issues
+#   # template_html_source = "..."  # custom html template path
+#   tag_label_map = { "BUG" = "bug", "TODO" = "enhancement", "DOC" = "documentation" } # mapping of tags to GitHub issue labels
 .PHONY: todo
 todo:
 	@echo "get all TODO's from the code"
