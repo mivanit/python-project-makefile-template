@@ -1,8 +1,8 @@
 # Stats
 - 23 files
-- 5402 (5.4K) lines
-- 167921 (168K) chars
-- 19545 (20K) `whitespace-split` tokens
+- 5399 (5.4K) lines
+- 167781 (168K) chars
+- 19526 (20K) `whitespace-split` tokens
 
 # File Tree
 
@@ -36,8 +36,8 @@ python-project-makefile-template
 │   └── test_nothing.py             [    2L     42C     5T]
 ├── README.md                       [  151L  7,041C   938T]
 ├── makefile                        [1,964L 62,237C 7,243T]
-├── makefile.template               [  673L 23,912C 3,152T]
-├── pyproject.toml                  [  314L  9,276C 1,191T]
+├── makefile.template               [  671L 23,790C 3,134T]
+├── pyproject.toml                  [  313L  9,258C 1,190T]
 ```
 
 # File Contents
@@ -4780,20 +4780,18 @@ dep-clean:
 # checks (formatting/linting, typing, tests)
 # ==================================================
 
-# runs ruff and pycln to format the code
+# runs ruff to format the code
 .PHONY: format
 format:
 	@echo "format the source code"
 	$(PYTHON) -m ruff format --config $(PYPROJECT) .
 	$(PYTHON) -m ruff check --fix --config $(PYPROJECT) .
-	$(PYTHON) -m pycln --config $(PYPROJECT) --all .
 
-# runs ruff and pycln to check if the code is formatted correctly
+# runs ruff to check if the code is formatted correctly
 .PHONY: format-check
 format-check:
 	@echo "check if the source code is formatted correctly"
 	$(PYTHON) -m ruff check --config $(PYPROJECT) .
-	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
 # runs type checks with mypy
 .PHONY: typing
@@ -5141,7 +5139,6 @@ help:
 	]
 	lint = [
 		# lint
-		"pycln>=2.1.3",
 		"ruff>=0.4.8",
 	]
 

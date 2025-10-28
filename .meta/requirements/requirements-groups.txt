@@ -20,11 +20,10 @@ cffi==1.17.1 ; implementation_name == 'pypy'
     # via pyzmq
 cli-exit-tools==1.2.7 ; python_full_version >= '3.11'
     # via igittigitt
-click==8.1.8
+click==8.1.8 ; python_full_version >= '3.11'
     # via
     #   cli-exit-tools
     #   igittigitt
-    #   typer
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   click
@@ -97,11 +96,7 @@ lib-detect-testenv==2.0.8 ; python_full_version >= '3.11'
     # via
     #   cli-exit-tools
     #   igittigitt
-libcst==1.6.0
-    # via pycln
 lmcat==0.2.0 ; python_full_version >= '3.11'
-markdown-it-py==3.0.0
-    # via rich
 markupsafe==3.0.2
     # via
     #   jinja2
@@ -111,8 +106,6 @@ matplotlib-inline==0.1.7
     # via
     #   ipykernel
     #   ipython
-mdurl==0.1.2
-    # via markdown-it-py
 mistune==3.1.1
     # via nbconvert
 mpmath==1.3.0
@@ -185,8 +178,6 @@ pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.4
     # via jedi
-pathspec==0.12.1
-    # via pycln
 pdoc==15.0.1
 pexpect==4.9.0 ; (python_full_version < '3.10' and sys_platform == 'emscripten') or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via ipython
@@ -202,7 +193,6 @@ ptyprocess==0.7.0 ; (python_full_version < '3.10' and sys_platform == 'emscripte
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
-pycln==2.5.0
 pycparser==2.22 ; implementation_name == 'pypy'
     # via cffi
 pygments==2.19.1
@@ -210,7 +200,6 @@ pygments==2.19.1
     #   ipython
     #   nbconvert
     #   pdoc
-    #   rich
 pytest==8.3.4
     # via pytest-cov
 pytest-cov==6.0.0
@@ -218,10 +207,6 @@ python-dateutil==2.9.0.post0
     # via jupyter-client
 pywin32==308 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32'
     # via jupyter-core
-pyyaml==6.0.2
-    # via
-    #   libcst
-    #   pycln
 pyzmq==26.2.1
     # via
     #   ipykernel
@@ -230,8 +215,6 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-rich==13.9.4
-    # via typer
 rpds-py==0.22.3
     # via
     #   jsonschema
@@ -241,8 +224,6 @@ setuptools==75.8.0
     # via
     #   coverage-badge
     #   torch
-shellingham==1.5.4
-    # via typer
 six==1.17.0
     # via python-dateutil
 soupsieve==2.6
@@ -258,8 +239,6 @@ tomli==2.2.1 ; python_full_version <= '3.11'
     #   coverage
     #   mypy
     #   pytest
-tomlkit==0.13.2
-    # via pycln
 torch==2.6.0
     # via myproject
 tornado==6.4.2
@@ -279,8 +258,6 @@ traitlets==5.14.3
     #   nbformat
 triton==3.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
     # via torch
-typer==0.15.1
-    # via pycln
 typing-extensions==4.12.2
     # via
     #   beautifulsoup4
@@ -288,9 +265,7 @@ typing-extensions==4.12.2
     #   mistune
     #   mypy
     #   referencing
-    #   rich
     #   torch
-    #   typer
 wcmatch==10.0 ; python_full_version >= '3.11'
     # via igittigitt
 wcwidth==0.2.13
