@@ -9,9 +9,19 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, overload
 
 
+@overload
+def _scan_makefile(
+	lines: List[str],
+	target_name: str,
+) -> int: ...
+@overload
+def _scan_makefile(
+	lines: List[str],
+	target_name: None = None,
+) -> Dict[str, int]: ...
 def _scan_makefile(
 	lines: List[str],
 	target_name: Optional[str] = None,
@@ -107,8 +117,9 @@ class MakeRecipe:
 		comments: List[str] = []
 		j: int = i - 1
 		blank_count: int = 0
+		stripped: str
 		while j >= 0:
-			stripped: str = lines[j].lstrip()
+			stripped = lines[j].lstrip()
 			if stripped.startswith("#"):
 				comments.append(stripped[1:].lstrip())
 				blank_count = 0  # Reset blank counter when we hit a comment
@@ -139,8 +150,7 @@ class MakeRecipe:
 		while k < len(lines) and (
 			lines[k].startswith("\t") or lines[k].startswith("    ")
 		):
-			stripped: str = lines[k].lstrip()
-			m = re.match(r"@?echo[ \t]+(.*)", stripped)
+			m = re.match(r"@?echo[ \t]+(.*)", lines[k].lstrip())
 			if m:
 				content: str = m.group(1).strip()
 				if (content.startswith('"') and content.endswith('"')) or (
