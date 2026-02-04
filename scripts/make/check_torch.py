@@ -42,9 +42,9 @@ def get_nvcc_info() -> Dict[str, str]:
 	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
-	assert len(lines) == 5, (  # noqa: PLR2004
-		f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
-	)
+	if len(lines) != 5:  # noqa: PLR2004
+		msg = f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
+		raise ValueError(msg)
 
 	# Compile shared regex for release info.
 	release_regex: re.Pattern = re.compile(

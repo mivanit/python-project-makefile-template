@@ -14,4 +14,4 @@ __pycache__/
 # build
 build/
 dist/
-muutils.egg-info/
+*.egg-info/

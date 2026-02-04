@@ -146,7 +146,7 @@ class Config:
 	def module_name(self) -> str:
 		"""name of the module, which is the package name with '-' replaced by '_'
 
-		HACK: this is kid of fragile
+		HACK: this is kind of fragile
 		"""
 		return self.package_name.replace("-", "_")
 

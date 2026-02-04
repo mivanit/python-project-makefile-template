@@ -63,9 +63,9 @@ def assemble_make() -> None:
 		template_replace: str = TEMPLATE_SYNTAX.format(
 			var=f"SCRIPT_{script_name.upper()}",
 		)
-		assert template_replace in contents, (
-			f"Template syntax not found in {MAKEFILE_TEMPLATE_PATH}:\n{template_replace}"
-		)
+		if template_replace not in contents:
+			msg = f"Template syntax not found in {MAKEFILE_TEMPLATE_PATH}:\n{template_replace}"
+			raise ValueError(msg)
 
 		contents = contents.replace(
 			template_replace,

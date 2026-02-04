@@ -71,10 +71,12 @@ def main(
 	preserved: Set[Path]
 	docs_dir, preserved = read_config(Path(pyproject_path))
 
-	assert docs_dir.is_dir(), f"Docs directory '{docs_dir}' not found"
-	assert docs_dir == Path(docs_dir_cli), (
-		f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
-	)
+	if not docs_dir.is_dir():
+		msg = f"Docs directory '{docs_dir}' not found"
+		raise FileNotFoundError(msg)
+	if docs_dir != Path(docs_dir_cli):
+		msg = f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
+		raise ValueError(msg)
 
 	for x in extra_preserve:
 		preserved.add(Path(x))
