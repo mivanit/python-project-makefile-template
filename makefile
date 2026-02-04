@@ -1250,9 +1250,19 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, overload
 
 
+@overload
+def _scan_makefile(
+	lines: List[str],
+	target_name: str,
+) -> int: ...
+@overload
+def _scan_makefile(
+	lines: List[str],
+	target_name: None = None,
+) -> Dict[str, int]: ...
 def _scan_makefile(
 	lines: List[str],
 	target_name: Optional[str] = None,
@@ -1348,8 +1358,9 @@ class MakeRecipe:
 		comments: List[str] = []
 		j: int = i - 1
 		blank_count: int = 0
+		stripped: str
 		while j >= 0:
-			stripped: str = lines[j].lstrip()
+			stripped = lines[j].lstrip()
 			if stripped.startswith("#"):
 				comments.append(stripped[1:].lstrip())
 				blank_count = 0  # Reset blank counter when we hit a comment
@@ -1380,8 +1391,7 @@ class MakeRecipe:
 		while k < len(lines) and (
 			lines[k].startswith("\t") or lines[k].startswith("    ")
 		):
-			stripped: str = lines[k].lstrip()
-			m = re.match(r"@?echo[ \t]+(.*)", stripped)
+			m = re.match(r"@?echo[ \t]+(.*)", lines[k].lstrip())
 			if m:
 				content: str = m.group(1).strip()
 				if (content.startswith('"') and content.endswith('"')) or (
@@ -1721,7 +1731,7 @@ format-check:
 
 # runs type checks with mypy
 .PHONY: typing
-typing: clean
+typing:
 	@echo "running type checks"
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
 
@@ -1734,7 +1744,6 @@ typing-report:
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
 
 # run tests with pytest
-# - automatically runs `make clean` first
 # - respects COV and VERBOSE makefile variables
 # - pass custom args: make test PYTEST_OPTIONS="--maxfail=1 -x"
 # makefile variables:
@@ -1743,12 +1752,12 @@ typing-report:
 #   PYTEST_OPTIONS="..."  # pass additional pytest arguments
 # pytest config in pyproject.toml:[tool.pytest.ini_options]
 .PHONY: test
-test: clean
+test:
 	@echo "running tests"
 	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
 
 .PHONY: check
-check: clean format-check test typing
+check: format-check test typing
 	@echo "run format checks, tests, and typing checks"
 
 
@@ -1780,18 +1789,6 @@ docs-md:
 	mkdir $(DOCS_DIR)/combined -p
 	$(PYTHON) $(MAKE_DOCS_SCRIPT_PATH) --combined
 
-# after running docs-md, this will convert the combined markdown file to other formats:
-# gfm (github-flavored markdown), plain text, and html
-# requires pandoc in path, pointed to by $(PANDOC)
-# pdf output would be nice but requires other deps
-.PHONY: docs-combined
-docs-combined: docs-md
-	@echo "generate combined (single-file) docs in markdown and convert to other formats"
-	@echo "requires pandoc in path"
-	$(PANDOC) -f markdown -t gfm $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME)_gfm.md
-	$(PANDOC) -f markdown -t plain $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).txt
-	$(PANDOC) -f markdown -t html $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).html
-
 # generate coverage reports from test results
 # WARNING: if .coverage file not found, will automatically run `make test` first
 # - generates text report: $(COVERAGE_REPORTS_DIR)/coverage.txt
@@ -1814,7 +1811,7 @@ cov:
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo lmcat
+docs: cov docs-html docs-md todo lmcat
 	@echo "generate all documentation and coverage reports"
 
 # remove generated documentation files, but preserve resources
