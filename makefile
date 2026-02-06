@@ -676,8 +676,9 @@ help:
 	else \
 		$(MAKE) --no-print-directory help-targets info; \
 		echo ""; \
-		echo "To get detailed info about specific make targets, use:"; \
+		echo "To get detailed info about specific make targets or variables, use:"; \
 		echo "  make help=TARGET    or    make HELP=\"TARGET1 TARGET2\""; \
+		echo "  make help=VARIABLE  - shows variable values (case-insensitive)"; \
 		echo "  make H=*            or    make h=--all"; \
 	fi
 
