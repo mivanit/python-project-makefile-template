@@ -25,6 +25,7 @@
 # configuration & variables
 # ==================================================
 
+
 # !!! MODIFY AT LEAST THIS PART TO SUIT YOUR PROJECT !!!
 # it assumes that the source is in a directory named the same as the package name
 # this also gets passed to some other places
@@ -108,6 +109,7 @@ PYTHON_VERSION := NULL
 # reading command line options
 # ==================================================
 
+
 # for formatting or something, we might want to run python without uv
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
 RUN_GLOBAL ?= 0
@@ -139,6 +141,7 @@ PYTEST_OPTIONS ?=
 
 # set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file
 COV ?= 1
+
 # set to `1` to run pytest with `--verbose`
 VERBOSE ?= 0
 
@@ -153,6 +156,7 @@ endif
 # ==================================================
 # default target (help)
 # ==================================================
+
 
 # first/default target is help
 .PHONY: default
@@ -172,6 +176,7 @@ default: help
 # python scripts we want to use inside the makefile
 # when developing, these are populated by `scripts/assemble_make.py`
 # ==================================================
+
 
 # create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
 define SCRIPT_EXPORT_REQUIREMENTS
@@ -256,6 +261,7 @@ export SCRIPT_RECIPE_INFO
 # we do this in a separate target because it takes a bit of time
 # ==================================================
 
+
 # this recipe is weird. we need it because:
 # - a one liner for getting the version with toml is unwieldy, and using regex is fragile
 # - using $$SCRIPT_GET_VERSION within $(shell ...) doesn't work because of escaping issues
@@ -317,6 +323,7 @@ version: gen-commit-log
 # ==================================================
 # dependencies and setup
 # ==================================================
+
 
 .PHONY: setup
 setup: dep-check
@@ -384,6 +391,7 @@ dep-clean:
 # checks (formatting/linting, typing, tests)
 # ==================================================
 
+
 # format code AND auto-fix linting issues
 # performs TWO operations: reformats code, then auto-fixes safe linting issues
 # configure in pyproject.toml:[tool.ruff]
@@ -442,6 +450,7 @@ check: format-check test typing
 # ==================================================
 # coverage & docs
 # ==================================================
+
 
 # generates a whole tree of documentation in html format.
 # see `$(MAKE_DOCS_SCRIPT_PATH)` and the templates in `$(DOCS_RESOURCES_DIR)/templates/html/` for more info
@@ -544,6 +553,7 @@ lmcat:
 # build and publish
 # ==================================================
 
+
 # verify git is ready for publishing
 # REQUIRES:
 # - current branch must be $(PUBLISH_BRANCH)
@@ -580,59 +590,56 @@ build:
 # - must have $(PYPI_TOKEN_FILE) with your PyPI token
 # - version in pyproject.toml must be different from $(LAST_VERSION_FILE)
 # PROCESS:
-# 1. runs all checks, builds package
+# 1. runs checks, validates version, builds package, verifies git clean
 # 2. prompts for version confirmation (you can edit $(COMMIT_LOG_FILE) at this point)
 # 3. creates git commit updating $(LAST_VERSION_FILE)
 # 4. creates annotated git tag with commit log as description
 # 5. pushes tag to origin
-# 6. uploads to PyPI via twine (you'll paste token from $(PYPI_TOKEN_FILE))
+# 6. uploads to PyPI via twine
 .PHONY: publish
-publish: gen-commit-log check build verify-git version gen-version-info
-	@echo "run all checks, build, and then publish"
+publish: check version build verify-git
+	@echo "Ready to publish $(PROJ_VERSION) to PyPI"
+	@echo "Now would be the time to edit $(COMMIT_LOG_FILE) for the tag description"
 
-	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
-	@echo "Now would also be the time to edit $(COMMIT_LOG_FILE), as that will be used as the tag description"
-	@read -p "Confirm: " NEW_VERSION; \
-	if [ "$$NEW_VERSION" = "$(PROJ_VERSION)" ]; then \
-		echo "Version confirmed. Proceeding with publish."; \
-	else \
-		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(PROJ_VERSION)"; \
+	@read -p "Enter version to confirm: " NEW_VERSION && \
+	if [ "$$NEW_VERSION" != "$(PROJ_VERSION)" ]; then \
+		echo "Version mismatch: got $$NEW_VERSION, expected $(PROJ_VERSION)"; \
 		exit 1; \
-	fi
+	fi && \
+	echo "Version confirmed."
 
-	@echo "pypi username: __token__"
-	@echo "pypi token from '$(PYPI_TOKEN_FILE)' :"
-	echo $$(cat $(PYPI_TOKEN_FILE))
+	@test -f "$(PYPI_TOKEN_FILE)" || { echo "ERROR: Token file not found at $(PYPI_TOKEN_FILE)"; exit 1; }
 
-	echo "Uploading!"; \
-	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE); \
-	git add $(LAST_VERSION_FILE); \
-	git commit -m "Auto update to $(PROJ_VERSION)"; \
-	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE); \
-	git push origin $(PROJ_VERSION); \
-	twine upload dist/* --verbose
+	@echo "Committing and tagging..."
+	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE) && \
+	git add $(LAST_VERSION_FILE) && \
+	git commit -m "Auto update to $(PROJ_VERSION)" && \
+	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE) && \
+	git push origin $(PROJ_VERSION)
+
+	@echo "Uploading to PyPI..."
+	TWINE_USERNAME=__token__ TWINE_PASSWORD="$$(cat $(PYPI_TOKEN_FILE))" $(PYTHON) -m twine upload dist/* --verbose
+
+	@echo "Published $(PROJ_VERSION) successfully!"
 
 # ==================================================
 # cleanup of temp files
 # ==================================================
 
-# cleans up temp files from formatter, type checking, tests, coverage
-# removes all built files
-# removes $(TESTS_TEMP_DIR) to remove temporary test files
-# recursively removes all `__pycache__` directories and `*.pyc` or `*.pyo` files
-# distinct from `make docs-clean`, which only removes generated documentation files
+
+# cleans up temporary files:
+# - caches: .mypy_cache, .ruff_cache, .pytest_cache, .coverage
+# - build artifacts: dist/, build/, *.egg-info
+# - test temp files: $(TESTS_TEMP_DIR)
+# - __pycache__ directories and *.pyc/*.pyo files in $(PACKAGE_NAME), $(TESTS_DIR), $(DOCS_DIR)
+# uses `-` prefix on find commands to continue even if directories don't exist
+# distinct from `make docs-clean`, which removes generated documentation
 .PHONY: clean
 clean:
 	@echo "clean up temporary files"
-	rm -rf .mypy_cache
-	rm -rf .ruff_cache
-	rm -rf .pytest_cache
-	rm -rf .coverage
-	rm -rf dist
-	rm -rf build
-	rm -rf $(PACKAGE_NAME).egg-info
-	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
+	rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage dist build $(PACKAGE_NAME).egg-info $(TESTS_TEMP_DIR)
+	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type d -name '__pycache__' -exec rm -rf {} +
+	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type f -name '*.py[co]' -delete
 
 # remove all generated/build files including .venv
 # runs: clean + docs-clean + dep-clean
@@ -654,6 +661,7 @@ clean-all: clean docs-clean dep-clean
 # ==================================================
 # smart help command
 # ==================================================
+
 
 # listing targets is from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
