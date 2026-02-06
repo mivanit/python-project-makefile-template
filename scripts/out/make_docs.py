@@ -1,11 +1,14 @@
-"""python project makefile template -- docs generation script
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: 0.4.0
+# license: https://creativecommons.org/licenses/by-sa/4.0/
 
-originally by Michael Ivanitskiy (mivanits@umich.edu)
-https://github.com/mivanit/python-project-makefile-template
-version: 0.4.0
-license: https://creativecommons.org/licenses/by-sa/4.0/
-modifications from the original should be denoted with `~~~~~`
-as this makes it easier to find edits when updating
+"""Generate HTML and markdown documentation using pdoc.
+
+Reads configuration from [tool.makefile.docs] in pyproject.toml.
+Supports combined single-file markdown output and notebook conversion.
+
+Usage: python make_docs.py [--serve] [--warn-all] [--combined]
 """
 
 from __future__ import annotations

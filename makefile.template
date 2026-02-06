@@ -55,11 +55,11 @@ PYPROJECT := pyproject.toml
 META_DIR := .meta
 
 # scripts download configuration
-# override SCRIPTS_VERSION to download a specific version (e.g., make self-download-scripts SCRIPTS_VERSION=v0.5.0)
+# override SCRIPTS_VERSION to download a specific version (e.g., make self-setup-scripts SCRIPTS_VERSION=v0.5.0)
 SCRIPTS_DIR := $(META_DIR)/scripts
 SCRIPTS_VERSION ?= main
 SCRIPTS_REPO := mivanit/python-project-makefile-template
-SCRIPTS_URL_BASE := https://raw.githubusercontent.com/$(SCRIPTS_REPO)/$(SCRIPTS_VERSION)/scripts/make
+SCRIPTS_URL_BASE := https://raw.githubusercontent.com/$(SCRIPTS_REPO)/$(SCRIPTS_VERSION)/scripts/out
 
 # requirements.txt files for base package, all extras, dev, and all
 REQUIREMENTS_DIR := $(META_DIR)/requirements
@@ -99,7 +99,7 @@ COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 DOCS_RESOURCES_DIR := $(DOCS_DIR)/resources
 
 # location of the make docs script
-MAKE_DOCS_SCRIPT_PATH := $(DOCS_RESOURCES_DIR)/make_docs.py
+MAKE_DOCS_SCRIPT_PATH := $(SCRIPTS_DIR)/make_docs.py
 
 # version vars - extracted automatically from `pyproject.toml`, `$(LAST_VERSION_FILE)`, and $(PYTHON)
 # --------------------------------------------------
@@ -183,14 +183,14 @@ default: help
 # downloading scripts from github
 # ==================================================
 
-# list of scripts to download when running `make self-download-scripts`. these are the helper scripts that the makefile uses for various tasks (e.g., getting version info, generating docs, etc.)
-SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean mypy_report recipe_info
+# list of scripts to download when running `make self-setup-scripts`. these are the helper scripts that the makefile uses for various tasks (e.g., getting version info, generating docs, etc.)
+SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean mypy_report recipe_info make_docs
 
 # download makefile helper scripts from GitHub
 # uses curl to fetch scripts from the template repository
-# override version: make self-download-scripts SCRIPTS_VERSION=v0.5.0
-.PHONY: self-download-scripts
-self-download-scripts:
+# override version: make self-setup-scripts SCRIPTS_VERSION=v0.5.0
+.PHONY: self-setup-scripts
+self-setup-scripts:
 	@echo "downloading makefile scripts (version: $(SCRIPTS_VERSION))"
 	@mkdir -p $(SCRIPTS_DIR)
 	@for script in $(SCRIPTS_LIST); do \
@@ -278,9 +278,10 @@ version: gen-commit-log
 
 
 .PHONY: setup
-setup: dep-check
-	@echo "install and update via uv"
-	@echo "To activate the virtual environment, run one of:"
+setup: self-setup-scripts dep-check
+	@echo "download scripts and sync dependencies"
+	@echo ""
+	@echo "setup complete! To activate the virtual environment, run one of:"
 	@echo "  source .venv/bin/activate"
 	@echo "  source .venv/Scripts/activate"
 

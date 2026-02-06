@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: ##[[VERSION]]##
+# version: 0.4.0
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Clean up docs directory based on pyproject.toml configuration.

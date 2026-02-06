@@ -181,7 +181,6 @@
 [tool.lmcat]
 	output = "docs/other/lmcat.txt" # changing this might mean it wont be accessible from the docs
 	ignore_patterns = [
-		"!docs/resources/make_docs.py",
 		"docs/**",
 		".venv/**",
 		".git/**",
