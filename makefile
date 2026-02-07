@@ -86,9 +86,6 @@ PYTHON_BASE := python
 # where the commit log will be stored
 COMMIT_LOG_FILE := $(LOCAL_DIR)/.commit_log
 
-# pandoc commands (for docs)
-PANDOC ?= pandoc
-
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
@@ -142,23 +139,8 @@ endif
 # options we might want to pass to pytest
 # --------------------------------------------------
 
-# base options for pytest, will be appended to if `COV` or `VERBOSE` are 1.
-# user can also set this when running make to add more options
+# base options for pytest, user can set this when running make to add more options
 PYTEST_OPTIONS ?=
-
-# set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file
-COV ?= 1
-
-# set to `1` to run pytest with `--verbose`
-VERBOSE ?= 0
-
-ifeq ($(VERBOSE),1)
-	PYTEST_OPTIONS += --verbose
-endif
-
-ifeq ($(COV),1)
-	PYTEST_OPTIONS += --cov=.
-endif
 
 # ==================================================
 # default target (help)
@@ -375,12 +357,8 @@ typing-report:
 	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) $(SCRIPTS_DIR)/mypy_report.py --mode toml
 
 # run tests with pytest
-# - respects COV and VERBOSE makefile variables
-# - pass custom args: make test PYTEST_OPTIONS="--maxfail=1 -x"
-# makefile variables:
-#   COV=1        # generate coverage reports (default: 1)
-#   VERBOSE=1    # verbose pytest output (default: 0)
-#   PYTEST_OPTIONS="..."  # pass additional pytest arguments
+# you can pass custom args. for example:
+# make test PYTEST_OPTIONS="--maxfail=1 -x"
 # pytest config in pyproject.toml:[tool.pytest.ini_options]
 .PHONY: test
 test:
@@ -414,7 +392,6 @@ docs-html:
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `$(DOCS_RESOURCES_DIR)/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
-# docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
@@ -427,13 +404,12 @@ docs-md:
 # - generates SVG badge: $(COVERAGE_REPORTS_DIR)/coverage.svg
 # - generates HTML report: $(COVERAGE_REPORTS_DIR)/html/
 # - removes .gitignore from html dir (we publish coverage with docs)
-# run tests with: make test COV=1 (COV=1 is default)
 .PHONY: cov
 cov:
 	@echo "generate coverage reports"
 	@if [ ! -f .coverage ]; then \
 		echo ".coverage not found, running tests first..."; \
-		$(MAKE) test; \
+		$(MAKE) test PYTEST_OPTIONS="$(PYTEST_OPTIONS) --cov=." ; \
 	fi
 	mkdir $(COVERAGE_REPORTS_DIR) -p
 	$(PYTHON) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
@@ -652,9 +628,6 @@ info-long: info
 	@echo "    LAST_VERSION_FILE = $(LAST_VERSION_FILE)"
 	@echo "    PYTHON_BASE = $(PYTHON_BASE)"
 	@echo "    COMMIT_LOG_FILE = $(COMMIT_LOG_FILE)"
-	@echo "    PANDOC = $(PANDOC)"
-	@echo "    COV = $(COV)"
-	@echo "    VERBOSE = $(VERBOSE)"
 	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
 	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
 
