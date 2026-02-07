@@ -645,7 +645,7 @@ help:
 	@$(eval HELP_ARG := $(or $(HELP),$(help),$(H),$(h)))
 	@$(eval HELP_EXPANDED := $(if $(filter *,$(HELP_ARG)),--all,$(HELP_ARG)))
 	@if [ -n "$(HELP_EXPANDED)" ]; then \
-		$(PYTHON) $(SCRIPTS_DIR)/recipe_info.py -f makefile $(HELP_EXPANDED); \
+		$(PYTHON_BASE) $(SCRIPTS_DIR)/recipe_info.py -f makefile $(HELP_EXPANDED); \
 	else \
 		$(MAKE) --no-print-directory help-targets info; \
 		echo ""; \

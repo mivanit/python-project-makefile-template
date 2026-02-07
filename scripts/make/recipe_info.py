@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import fnmatch
+import os
 import re
 import subprocess
 import sys
@@ -94,7 +95,8 @@ def _scan_makefile_variables(lines: List[str]) -> Dict[str, int]:
 	"""
 	in_define_block: bool = False
 	# Match: VARNAME := value, VARNAME ?= value, VARNAME += value, VARNAME = value
-	var_rx: re.Pattern = re.compile(r"^([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
+	# Allow leading whitespace to match variables inside ifeq/endif blocks
+	var_rx: re.Pattern = re.compile(r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
 	variables: Dict[str, int] = {}
 
 	for i, line in enumerate(lines):
@@ -127,29 +129,42 @@ def _get_all_computed_values(makefile_path: str) -> Dict[str, str]:
 	Runs `make -p` once and parses all variable values.
 	Prints warnings to stderr on failure (does not silently hide errors).
 	"""
+	cmd: list[str] = [
+		"make",
+		"--file", makefile_path,
+		"--print-data-base",
+		"--question",
+		"--no-builtin-rules",
+		"--no-builtin-variables",
+	]
+	# Clear make-related env vars to avoid nested make issues (job server hangs)
+	# Must explicitly set to empty string, not just remove from dict
+	env: dict[str, str] = os.environ.copy()
+	env["MAKEFLAGS"] = ""
+	env["MAKELEVEL"] = ""
+	env["MFLAGS"] = ""
 	try:
 		result = subprocess.run(
-			["make", "-f", makefile_path, "-n", "-p", "--no-builtin-rules"],
+			cmd,
+			stdin=subprocess.DEVNULL,  # Don't inherit stdin from make
 			capture_output=True,
 			text=True,
-			timeout=10,
+			timeout=5,
+			env=env,
+			start_new_session=True,  # Detach from parent process group
 		)
 	except subprocess.TimeoutExpired:
 		print(
-			"Warning: 'make -p' timed out, showing raw values only", file=sys.stderr
+			f"Warning: '{' '.join(cmd)}' timed out, showing raw values only",
+			file=sys.stderr,
 		)
 		return {}
 	except FileNotFoundError:
 		print("Warning: 'make' not found, showing raw values only", file=sys.stderr)
 		return {}
 
-	if result.returncode != 0:
-		print(
-			f"Warning: 'make -p' failed (exit {result.returncode}), "
-			"showing raw values only",
-			file=sys.stderr,
-		)
-		return {}
+	# Note: -q returns non-zero if targets are out of date, which is fine
+	# We only care about the printed database, not the exit code
 
 	computed: Dict[str, str] = {}
 	for line in result.stdout.splitlines():
@@ -312,8 +327,8 @@ class MakeVariable:
 		"""Parse and create a MakeVariable from makefile lines."""
 		line: str = lines[var_line_idx]
 
-		# Parse the variable definition line
-		var_rx: re.Pattern = re.compile(r"^([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
+		# Parse the variable definition line (allow leading whitespace for ifeq blocks)
+		var_rx: re.Pattern = re.compile(r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
 		match = var_rx.match(line)
 		if not match:
 			err_msg: str = f"variable '{var_name}' not found at line {var_line_idx}"
