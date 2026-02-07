@@ -19,7 +19,6 @@ import difflib
 import fnmatch
 import os
 import re
-import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -121,68 +120,6 @@ def _scan_makefile_variables(lines: List[str]) -> Dict[str, int]:
 				variables[var_name] = i
 
 	return variables
-
-
-def _get_all_computed_values(makefile_path: str) -> Dict[str, str]:
-	"""Get all computed variable values from Make's database.
-
-	Runs `make -p` once and parses all variable values.
-	Prints warnings to stderr on failure (does not silently hide errors).
-	"""
-	cmd: list[str] = [
-		"make",
-		"--file",
-		makefile_path,
-		"--print-data-base",
-		"--question",
-		"--no-builtin-rules",
-		"--no-builtin-variables",
-	]
-	# Clear make-related env vars to avoid nested make issues (job server hangs)
-	# Must explicitly set to empty string, not just remove from dict
-	env: dict[str, str] = os.environ.copy()
-	env["MAKEFLAGS"] = ""
-	env["MAKELEVEL"] = ""
-	env["MFLAGS"] = ""
-	try:
-		result = subprocess.run(  # noqa: S603
-			cmd,
-			stdin=subprocess.DEVNULL,  # Don't inherit stdin from make
-			capture_output=True,
-			text=True,
-			timeout=5,
-			check=False,
-			env=env,
-			start_new_session=True,  # Detach from parent process group
-		)
-	except subprocess.TimeoutExpired:
-		print(
-			f"Warning: '{' '.join(cmd)}' timed out, showing raw values only",
-			file=sys.stderr,
-		)
-		return {}
-	except FileNotFoundError:
-		print("Warning: 'make' not found, showing raw values only", file=sys.stderr)
-		return {}
-
-	# Note: -q returns non-zero if targets are out of date, which is fine
-	# We only care about the printed database, not the exit code
-
-	computed: Dict[str, str] = {}
-	for line in result.stdout.splitlines():
-		# Match lines like "VARNAME = value" (Make's output format)
-		# Skip lines starting with tab (recipe lines) or # (comments)
-		if line.startswith(("\t", "#")):
-			continue
-		if " = " in line:
-			parts = line.split(" = ", 1)
-			if len(parts) == 2:  # noqa: PLR2004
-				var_name = parts[0].strip()
-				# Only capture uppercase variables (user-defined)
-				if var_name and var_name[0].isupper():
-					computed[var_name] = parts[1]
-
-	return computed
 
 
 class Colors:
@@ -314,7 +251,6 @@ class MakeVariable:
 
 	name: str
 	raw_value: str  # as written in makefile, e.g., "$(shell git describe)"
-	computed_value: str  # expanded by make, e.g., "v1.2.3"
 	operator: Literal["=", ":=", "?=", "+="]
 	comments: List[str]  # comments above the definition
 
@@ -324,7 +260,6 @@ class MakeVariable:
 		lines: List[str],
 		var_name: str,
 		var_line_idx: int,
-		computed_values: Dict[str, str],
 	) -> MakeVariable:
 		"""Parse and create a MakeVariable from makefile lines."""
 		line: str = lines[var_line_idx]
@@ -340,9 +275,6 @@ class MakeVariable:
 
 		operator: Literal["=", ":=", "?=", "+="] = match.group(2)  # type: ignore[assignment]
 		raw_value: str = match.group(3)
-
-		# Get computed value from the pre-built dict
-		computed_value: str = computed_values.get(var_name, raw_value)
 
 		# Collect contiguous comment block above (same logic as MakeRecipe)
 		comments: List[str] = []
@@ -366,7 +298,6 @@ class MakeVariable:
 		return cls(
 			name=var_name,
 			raw_value=raw_value,
-			computed_value=computed_value,
 			operator=operator,
 			comments=comments,
 		)
@@ -381,17 +312,16 @@ class MakeVariable:
 			f"{c.BOLD}{c.CYAN}{self.name}{c.RESET} {c.WHITE}{self.operator}{c.RESET}"
 		)
 
-		# Computed value in yellow (the main info users want)
-		output.append(f"  {c.YELLOW}{self.computed_value}{c.RESET}")
-
-		# Raw value in white if different from computed
-		if self.raw_value != self.computed_value:
-			output.append(f"  {c.WHITE}(raw: {self.raw_value}){c.RESET}")
+		# Raw value in yellow
+		output.append(f"  {c.YELLOW}{self.raw_value}{c.RESET}")
 
 		# Comments in green (same style as targets)
 		if self.comments:
 			output.append(f"  {c.RED}comments:{c.RESET}")
 			output.extend(f"    {c.GREEN}{line}{c.RESET}" for line in self.comments)
+
+		# Hint for computed values
+		output.append(f"  {c.WHITE}(run 'make info-long' for computed values){c.RESET}")
 
 		return output
 
@@ -474,9 +404,6 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 	all_targets: List[str] = find_all_targets(lines)
 	all_variables: Dict[str, int] = find_all_variables(lines)
 
-	# Get computed variable values (run make -p once)
-	computed_values: Dict[str, str] = _get_all_computed_values(args.file)
-
 	recipes: List[MakeRecipe] = []
 	variables: List[MakeVariable] = []
 
@@ -507,7 +434,6 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 							lines=lines,
 							var_name=var_name,
 							var_line_idx=all_variables[var_name],
-							computed_values=computed_values,
 						)
 						for var_name in matched_vars
 					]
@@ -539,7 +465,6 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 								lines=lines,
 								var_name=var_name,
 								var_line_idx=var_line_idx,
-								computed_values=computed_values,
 							)
 						)
 						found_variable = True
