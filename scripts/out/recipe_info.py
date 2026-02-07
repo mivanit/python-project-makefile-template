@@ -17,11 +17,13 @@ from __future__ import annotations
 import argparse
 import difflib
 import fnmatch
+import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union, overload
+from typing import Dict, List, Literal, Optional, Set, Union, overload
 
 
 @overload
@@ -85,6 +87,102 @@ def _scan_makefile(
 	return targets
 
 
+def _scan_makefile_variables(lines: List[str]) -> Dict[str, int]:
+	"""Scan makefile for variable definitions, skipping define blocks.
+
+	Returns dict mapping variable names to line indices.
+	Only matches variables that start with uppercase letter or underscore.
+	"""
+	in_define_block: bool = False
+	# Match: VARNAME := value, VARNAME ?= value, VARNAME += value, VARNAME = value
+	# Allow leading whitespace to match variables inside ifeq/endif blocks
+	var_rx: re.Pattern = re.compile(r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
+	variables: Dict[str, int] = {}
+
+	for i, line in enumerate(lines):
+		# Track if we're inside a define block
+		if line.startswith("define "):
+			in_define_block = True
+			continue
+		if line.startswith("endef"):
+			in_define_block = False
+			continue
+
+		# Skip lines inside define blocks
+		if in_define_block:
+			continue
+
+		# Match variable definitions
+		match = var_rx.match(line)
+		if match:
+			var_name: str = match.group(1)
+			# Only store the first definition (in case of multiple assignments)
+			if var_name not in variables:
+				variables[var_name] = i
+
+	return variables
+
+
+def _get_all_computed_values(makefile_path: str) -> Dict[str, str]:
+	"""Get all computed variable values from Make's database.
+
+	Runs `make -p` once and parses all variable values.
+	Prints warnings to stderr on failure (does not silently hide errors).
+	"""
+	cmd: list[str] = [
+		"make",
+		"--file", makefile_path,
+		"--print-data-base",
+		"--question",
+		"--no-builtin-rules",
+		"--no-builtin-variables",
+	]
+	# Clear make-related env vars to avoid nested make issues (job server hangs)
+	# Must explicitly set to empty string, not just remove from dict
+	env: dict[str, str] = os.environ.copy()
+	env["MAKEFLAGS"] = ""
+	env["MAKELEVEL"] = ""
+	env["MFLAGS"] = ""
+	try:
+		result = subprocess.run(
+			cmd,
+			stdin=subprocess.DEVNULL,  # Don't inherit stdin from make
+			capture_output=True,
+			text=True,
+			timeout=5,
+			env=env,
+			start_new_session=True,  # Detach from parent process group
+		)
+	except subprocess.TimeoutExpired:
+		print(
+			f"Warning: '{' '.join(cmd)}' timed out, showing raw values only",
+			file=sys.stderr,
+		)
+		return {}
+	except FileNotFoundError:
+		print("Warning: 'make' not found, showing raw values only", file=sys.stderr)
+		return {}
+
+	# Note: -q returns non-zero if targets are out of date, which is fine
+	# We only care about the printed database, not the exit code
+
+	computed: Dict[str, str] = {}
+	for line in result.stdout.splitlines():
+		# Match lines like "VARNAME = value" (Make's output format)
+		# Skip lines starting with tab (recipe lines) or # (comments)
+		if line.startswith(("\t", "#")):
+			continue
+		if " = " in line:
+			parts = line.split(" = ", 1)
+			if len(parts) == 2:
+				var_name = parts[0].strip()
+				# Only capture uppercase variables (user-defined)
+				if var_name and var_name[0].isupper():
+					computed[var_name] = parts[1]
+
+	return computed
+
+
 class Colors:
 	"""ANSI color codes"""
 
@@ -98,11 +196,12 @@ class Colors:
 			self.YELLOW = "\033[33m"
 			self.BLUE = "\033[34m"
 			self.MAGENTA = "\033[35m"
+			self.CYAN = "\033[36m"
 			self.WHITE = "\033[37m"
 		else:
 			self.RESET = self.BOLD = ""
 			self.RED = self.GREEN = self.YELLOW = ""
-			self.BLUE = self.MAGENTA = self.WHITE = ""
+			self.BLUE = self.MAGENTA = self.CYAN = self.WHITE = ""
 
 
 @dataclass
@@ -207,6 +306,100 @@ class MakeRecipe:
 		return output
 
 
+@dataclass
+class MakeVariable:
+	"""Information about a Makefile variable."""
+
+	name: str
+	raw_value: str  # as written in makefile, e.g., "$(shell git describe)"
+	computed_value: str  # expanded by make, e.g., "v1.2.3"
+	operator: Literal["=", ":=", "?=", "+="]
+	comments: List[str]  # comments above the definition
+
+	@classmethod
+	def from_makefile(
+		cls,
+		lines: List[str],
+		var_name: str,
+		var_line_idx: int,
+		computed_values: Dict[str, str],
+	) -> MakeVariable:
+		"""Parse and create a MakeVariable from makefile lines."""
+		line: str = lines[var_line_idx]
+
+		# Parse the variable definition line (allow leading whitespace for ifeq blocks)
+		var_rx: re.Pattern = re.compile(r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
+		match = var_rx.match(line)
+		if not match:
+			err_msg: str = f"variable '{var_name}' not found at line {var_line_idx}"
+			raise ValueError(err_msg)
+
+		operator: Literal["=", ":=", "?=", "+="] = match.group(2)  # type: ignore[assignment]
+		raw_value: str = match.group(3)
+
+		# Get computed value from the pre-built dict
+		computed_value: str = computed_values.get(var_name, raw_value)
+
+		# Collect contiguous comment block above (same logic as MakeRecipe)
+		comments: List[str] = []
+		j: int = var_line_idx - 1
+		blank_count: int = 0
+		while j >= 0:
+			stripped: str = lines[j].lstrip()
+			if stripped.startswith("#"):
+				comments.append(stripped[1:].lstrip())
+				blank_count = 0
+				j -= 1
+			elif stripped == "":
+				blank_count += 1
+				if blank_count >= 2:  # noqa: PLR2004
+					break
+				j -= 1
+			else:
+				break
+		comments.reverse()
+
+		return cls(
+			name=var_name,
+			raw_value=raw_value,
+			computed_value=computed_value,
+			operator=operator,
+			comments=comments,
+		)
+
+	def describe(self, color: bool = True) -> List[str]:
+		"""Return a list of description lines for this variable."""
+		output: List[str] = []
+		c: Colors = Colors(enabled=color)
+
+		# Variable name in bold cyan, operator in white
+		output.append(
+			f"{c.BOLD}{c.CYAN}{self.name}{c.RESET} {c.WHITE}{self.operator}{c.RESET}"
+		)
+
+		# Computed value in yellow (the main info users want)
+		output.append(f"  {c.YELLOW}{self.computed_value}{c.RESET}")
+
+		# Raw value in white if different from computed
+		if self.raw_value != self.computed_value:
+			output.append(f"  {c.WHITE}(raw: {self.raw_value}){c.RESET}")
+
+		# Comments in green (same style as targets)
+		if self.comments:
+			output.append(f"  {c.RED}comments:{c.RESET}")
+			output.extend(f"    {c.GREEN}{line}{c.RESET}" for line in self.comments)
+
+		return output
+
+
+def find_all_variables(lines: List[str]) -> Dict[str, int]:
+	"""Find all variable definitions in the makefile.
+
+	Returns dict mapping variable names to line indices.
+	"""
+	return _scan_makefile_variables(lines)
+
+
 def find_all_targets(lines: List[str]) -> List[str]:
 	"""Find all .PHONY target names in the makefile."""
 	# First, get all .PHONY declarations
@@ -246,7 +439,7 @@ def main() -> None:
 	"""CLI entry point."""
 	parser: argparse.ArgumentParser = argparse.ArgumentParser(
 		"recipe_info",
-		description="Get detailed information about Makefile recipes/targets",
+		description="Get detailed information about Makefile recipes/targets and variables",
 	)
 	parser.add_argument(
 		"-f",
@@ -265,56 +458,99 @@ def main() -> None:
 		action="store_true",
 		help="Disable colored output (color is enabled by default)",
 	)
-	parser.add_argument("targets", nargs="*", help="Target names")
+	parser.add_argument(
+		"targets", nargs="*", help="Target or variable names (case-insensitive)"
+	)
 	args: argparse.Namespace = parser.parse_args()
 
 	lines: List[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
+	c: Colors = Colors(enabled=not args.no_color)
 
-	# Get recipes to describe
+	# Get all targets and variables upfront
+	all_targets: List[str] = find_all_targets(lines)
+	all_variables: Dict[str, int] = find_all_variables(lines)
+
+	# Get computed variable values (run make -p once)
+	computed_values: Dict[str, str] = _get_all_computed_values(args.file)
+
+	recipes: List[MakeRecipe] = []
+	variables: List[MakeVariable] = []
+
 	if args.all:
-		recipes: List[MakeRecipe] = get_all_recipes(lines)
+		recipes = get_all_recipes(lines)
 	elif args.targets:
-		recipes = []
-		all_targets: List[str] = find_all_targets(lines)
-		c: Colors = Colors(enabled=not args.no_color)
-		for tgt in args.targets:
-			# Check if target contains wildcard characters
-			if any(char in tgt for char in ["*", "?", "["]):
-				# Pattern matching mode
+		for query in args.targets:
+			has_wildcard: bool = any(char in query for char in ["*", "?", "["])
+
+			if has_wildcard:
+				# Pattern matching mode for targets
 				matched_targets: List[str] = [
-					t for t in all_targets if fnmatch.fnmatch(t, tgt)
+					t for t in all_targets if fnmatch.fnmatch(t, query)
 				]
-				if matched_targets:
-					for matched in matched_targets:
-						recipes.append(MakeRecipe.from_makefile(lines, matched))
-				else:
+				for matched in matched_targets:
+					recipes.append(MakeRecipe.from_makefile(lines, matched))
+
+				# Pattern matching for variables (case-insensitive)
+				matched_vars: List[str] = [
+					v
+					for v in all_variables
+					if fnmatch.fnmatch(v.lower(), query.lower())
+				]
+				for var_name in matched_vars:
+					variables.append(
+						MakeVariable.from_makefile(
+							lines, var_name, all_variables[var_name], computed_values
+						)
+					)
+
+				if not matched_targets and not matched_vars:
 					print(
-						f"Error: no targets match pattern '{c.RED}{tgt}{c.RESET}'",
+						f"Error: no targets or variables match pattern "
+						f"'{c.RED}{query}{c.RESET}'",
 						file=sys.stderr,
 					)
 					sys.exit(1)
 			else:
-				# Exact target lookup
-				try:
-					recipes.append(MakeRecipe.from_makefile(lines, tgt))
-				except ValueError:
-					# Find similar targets (fuzzy matching)
+				# Exact/case-insensitive lookup
+				found_target: bool = False
+				found_variable: bool = False
+
+				# Check for exact target match
+				if query in all_targets:
+					recipes.append(MakeRecipe.from_makefile(lines, query))
+					found_target = True
+
+				# Check for case-insensitive variable match
+				query_upper: str = query.upper()
+				for var_name in all_variables:
+					if var_name.upper() == query_upper:
+						variables.append(
+							MakeVariable.from_makefile(
+								lines, var_name, all_variables[var_name], computed_values
+							)
+						)
+						found_variable = True
+						break
+
+				if not found_target and not found_variable:
+					# Find similar targets and variables (fuzzy matching)
+					all_names: List[str] = all_targets + list(all_variables.keys())
 					fuzzy_matches: List[str] = difflib.get_close_matches(
-						tgt,
-						all_targets,
+						query,
+						all_names,
 						n=5,
-						cutoff=0.6,
+						cutoff=0.5,
 					)
-					# Also find targets that contain the attempted target
+					# Also find names that contain the query
 					substring_matches: List[str] = [
-						t for t in all_targets if tgt in t and t not in fuzzy_matches
+						n
+						for n in all_names
+						if query.lower() in n.lower() and n not in fuzzy_matches
 					]
-					# Combine and deduplicate while preserving order
-					matches: List[str] = fuzzy_matches + substring_matches
-					matches = matches[:5]  # Limit to 5 suggestions
+					matches: List[str] = (fuzzy_matches + substring_matches)[:5]
 
 					print(
-						f"Error: target '{c.RED}{tgt}{c.RESET}' not found in makefile",
+						f"Error: '{c.RED}{query}{c.RESET}' not found as target or variable",
 						file=sys.stderr,
 					)
 					if matches:
@@ -323,17 +559,27 @@ def main() -> None:
 						)
 						print(f"Did you mean: {suggestions}?", file=sys.stderr)
 					sys.exit(1)
-	else:
-		recipes = []
 
-	if not recipes:
-		parser.error("Provide target names or use --all flag")
+	if not recipes and not variables:
+		parser.error("Provide target/variable names or use --all flag")
 
-	# Print descriptions (color is True by default, unless --no-color is passed)
-	descriptions: List[str] = [
-		line for recipe in recipes for line in recipe.describe(color=not args.no_color)
-	]
-	print("\n".join(descriptions).replace("\n\n", f"\n{'-' * 40}\n"))
+	# Print descriptions
+	use_color: bool = not args.no_color
+	output_lines: List[str] = []
+
+	# Targets first
+	for recipe in recipes:
+		output_lines.extend(recipe.describe(color=use_color))
+
+	# Separator if we have both
+	if recipes and variables:
+		output_lines.append("-" * 40)
+
+	# Variables
+	for var in variables:
+		output_lines.extend(var.describe(color=use_color))
+
+	print("\n".join(output_lines).replace("\n\n", f"\n{'-' * 40}\n"))
 
 
 if __name__ == "__main__":

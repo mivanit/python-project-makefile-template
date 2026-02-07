@@ -1,4 +1,12 @@
-"cli to convert markdown files to HTML using pdoc's markdown2"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: 0.4.0
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""CLI to convert markdown files to HTML using pdoc's markdown2.
+
+Usage: python pdoc_markdown2_cli.py <input.md> <output.html> [--safe-mode escape|replace]
+"""
 
 from __future__ import annotations
 

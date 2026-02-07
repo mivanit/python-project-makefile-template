@@ -1,4 +1,12 @@
-"pretty print a commit log amd wrote it to a file"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: 0.4.0
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Generate a formatted commit log and write it to a file.
+
+Usage: python get_commit_log.py <last_version> <output_file>
+"""
 
 from __future__ import annotations
 

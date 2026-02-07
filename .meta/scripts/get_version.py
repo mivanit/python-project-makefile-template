@@ -1,4 +1,13 @@
-"write the current version of the project to a file"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: 0.4.0
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Extract version from pyproject.toml and print to stdout.
+
+Usage: python get_version.py <pyproject_path>
+Prints 'v<version>' on success, 'NULL' on failure.
+"""
 
 from __future__ import annotations
 

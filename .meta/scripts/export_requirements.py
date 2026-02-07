@@ -1,4 +1,15 @@
-"export to requirements.txt files based on pyproject.toml configuration"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: 0.4.0
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Export dependencies to requirements.txt files based on pyproject.toml configuration.
+
+Reads [tool.makefile.uv-exports] from pyproject.toml and generates uv export
+commands for each configured export. Output is shell commands printed to stdout.
+
+Usage: python export_requirements.py <pyproject_path> <output_dir>
+"""
 
 from __future__ import annotations
 

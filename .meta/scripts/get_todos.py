@@ -1,4 +1,13 @@
-"read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: 0.4.0
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Scrape TODO/FIXME/etc comments from source files and generate reports.
+
+Reads configuration from [tool.makefile.inline-todo] in pyproject.toml.
+Outputs markdown, jsonl, and html reports with links to source and GitHub issues.
+"""
 
 from __future__ import annotations
 
