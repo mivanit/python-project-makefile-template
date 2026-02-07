@@ -260,7 +260,7 @@ def increment_markdown_headings(markdown_text: str) -> str:
 	return heading_pattern.sub(replace_heading, markdown_text)
 
 
-def format_signature(sig: inspect.Signature, colon: bool) -> str:
+def format_signature(sig: inspect.Signature, colon: bool) -> Markup:
 	"""Format a function signature for Markdown. Returns a single-line Markdown string."""
 	# First get a list with all params as strings.
 	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore
@@ -286,7 +286,7 @@ def format_signature(sig: inspect.Signature, colon: bool) -> str:
 		anno += ":"
 
 	# Construct the full signature
-	return f"`(`{params_str}`{anno}`"
+	return Markup(f"`(`{params_str}`{anno}`")  # noqa: S704
 
 
 def markup_safe(sig: inspect.Signature) -> str:
