@@ -183,6 +183,20 @@
 			"scripts/make/get_todos.py" = ["W291"]
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# basedpyright config
+[tool.basedpyright]
+	exclude = [
+		".meta/scripts",
+		"scripts/out",
+	]
+
+# ty config
+[tool.ty.src]
+	exclude = [
+		".meta/scripts",
+		"scripts/out",
+	]
+
 # `make lmcat` depends on the lmcat and can be configured here
 [tool.lmcat]
 	output = "docs/other/lmcat.txt" # changing this might mean it wont be accessible from the docs
