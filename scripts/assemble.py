@@ -6,7 +6,7 @@
 
 Reads version from pyproject.toml and replaces ##[[VERSION]]## placeholders in:
 - makefile.template -> makefile
-- scripts/make/*.py -> scripts/out/*.py
+- scripts/make/*.py -> scripts/out/*.py, .meta/scripts/*.py
 """
 
 from __future__ import annotations
@@ -33,6 +33,9 @@ SCRIPTS_MAKE_DIR: Path = SCRIPTS_DIR / "make"
 SCRIPTS_OUT_DIR: Path = SCRIPTS_DIR / "out"
 "path to assembled scripts (with version replaced)"
 
+META_SCRIPTS_DIR: Path = Path(".meta") / "scripts"
+"path to meta scripts (used by makefile)"
+
 TEMPLATE_SYNTAX: str = "##[[{var}]]##"
 "template syntax in the makefile and script templates"
 
@@ -55,8 +58,9 @@ def assemble_make() -> None:
 
 
 def assemble_scripts() -> None:
-	"read template scripts from scripts/make/, replace version, write to scripts/out/"
+	"read template scripts from scripts/make/, replace version, write to scripts/out/ and .meta/scripts/"
 	SCRIPTS_OUT_DIR.mkdir(exist_ok=True)
+	META_SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
 	for script_path in SCRIPTS_MAKE_DIR.glob("*.py"):
 		contents: str = script_path.read_text()
 		contents = contents.replace(
@@ -64,6 +68,7 @@ def assemble_scripts() -> None:
 			VERSION,
 		)
 		(SCRIPTS_OUT_DIR / script_path.name).write_text(contents)
+		(META_SCRIPTS_DIR / script_path.name).write_text(contents)
 
 
 if __name__ == "__main__":
