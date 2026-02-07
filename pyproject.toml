@@ -257,7 +257,7 @@
 		# # all groups and extras
 		{ name = "all", filename="requirements.txt", groups = true, extras=true },
 		# # all groups and extras, a different way
-		{ name = "all-alt", groups = true, options = ["--all-extras"] },
+		{ name = "allalt", groups = true, options = ["--all-extras"] },
 	]
 
 # configures `make todo`
