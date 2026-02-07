@@ -23,7 +23,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Set, Union, overload
+from typing import Dict, List, Literal, Set, Union, overload
 
 
 @overload
@@ -38,7 +38,7 @@ def _scan_makefile(
 ) -> Dict[str, int]: ...
 def _scan_makefile(
 	lines: List[str],
-	target_name: Optional[str] = None,
+	target_name: str | None = None,
 ) -> Union[Dict[str, int], int]:
 	"""Scan makefile for target definitions, skipping define blocks.
 
@@ -145,12 +145,13 @@ def _get_all_computed_values(makefile_path: str) -> Dict[str, str]:
 	env["MAKELEVEL"] = ""
 	env["MFLAGS"] = ""
 	try:
-		result = subprocess.run(
+		result = subprocess.run(  # noqa: S603
 			cmd,
 			stdin=subprocess.DEVNULL,  # Don't inherit stdin from make
 			capture_output=True,
 			text=True,
 			timeout=5,
+			check=False,
 			env=env,
 			start_new_session=True,  # Detach from parent process group
 		)
@@ -175,7 +176,7 @@ def _get_all_computed_values(makefile_path: str) -> Dict[str, str]:
 			continue
 		if " = " in line:
 			parts = line.split(" = ", 1)
-			if len(parts) == 2:
+			if len(parts) == 2:  # noqa: PLR2004
 				var_name = parts[0].strip()
 				# Only capture uppercase variables (user-defined)
 				if var_name and var_name[0].isupper():
@@ -438,7 +439,7 @@ def describe_target(makefile_path: Path, target: str) -> None:
 		print(line)
 
 
-def main() -> None:
+def main() -> None:  # noqa: PLR0912, PLR0915, C901
 	"""CLI entry point."""
 	parser: argparse.ArgumentParser = argparse.ArgumentParser(
 		"recipe_info",
@@ -499,12 +500,18 @@ def main() -> None:
 					for v in all_variables
 					if fnmatch.fnmatch(v.lower(), query.lower())
 				]
-				for var_name in matched_vars:
-					variables.append(
+
+				variables.extend(
+					[
 						MakeVariable.from_makefile(
-							lines, var_name, all_variables[var_name], computed_values
+							lines=lines,
+							var_name=var_name,
+							var_line_idx=all_variables[var_name],
+							computed_values=computed_values,
 						)
-					)
+						for var_name in matched_vars
+					]
+				)
 
 				if not matched_targets and not matched_vars:
 					print(
@@ -525,14 +532,14 @@ def main() -> None:
 
 				# Check for case-insensitive variable match
 				query_upper: str = query.upper()
-				for var_name in all_variables:
+				for var_name, var_line_idx in all_variables.items():
 					if var_name.upper() == query_upper:
 						variables.append(
 							MakeVariable.from_makefile(
-								lines,
-								var_name,
-								all_variables[var_name],
-								computed_values,
+								lines=lines,
+								var_name=var_name,
+								var_line_idx=var_line_idx,
+								computed_values=computed_values,
 							)
 						)
 						found_variable = True

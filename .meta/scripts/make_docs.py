@@ -21,7 +21,7 @@ import warnings
 from dataclasses import asdict, dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 try:
 	# python 3.11+
@@ -96,7 +96,7 @@ def deep_get(
 	path: str,
 	default: Any = None,  # noqa: ANN401
 	sep: str = ".",
-	warn_msg_on_default: Optional[str] = None,
+	warn_msg_on_default: str | None = None,
 ) -> Any:  # noqa: ANN401
 	"Get a value from a nested dictionary"
 	output: Any = reduce(
@@ -292,7 +292,8 @@ def format_signature(sig: inspect.Signature, colon: bool) -> str:
 def markup_safe(sig: inspect.Signature) -> str:
 	"mark some text as safe, no escaping needed"
 	output: str = str(sig)
-	return Markup(output)
+	# the user is marking it as safe, not our problem
+	return Markup(output)  # noqa: S704
 
 
 def use_markdown_format() -> None:
@@ -318,8 +319,8 @@ def use_markdown_format() -> None:
 def convert_notebooks() -> None:
 	"""Convert Jupyter notebooks to HTML files"""
 	try:
-		import nbconvert
-		import nbformat
+		import nbconvert  # noqa: PLC0415
+		import nbformat  # noqa: PLC0415
 	except ImportError as e:
 		err_msg: str = 'nbformat and nbconvert are required to convert notebooks to HTML, add "nbconvert>=7.16.4" to dev/docs deps'
 		raise ImportError(err_msg) from e

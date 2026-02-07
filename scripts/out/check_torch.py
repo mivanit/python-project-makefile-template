@@ -14,7 +14,7 @@ import os
 import re
 import subprocess
 import sys
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 
 def print_info_dict(
@@ -75,7 +75,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	info: Dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: Optional[re.Match] = pattern.search(lines[line_index])
+		match: re.Match | None = pattern.search(lines[line_index])
 		if not match:
 			err_msg: str = (
 				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
@@ -94,7 +94,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 	info: Dict[str, Any] = {}
 
 	try:
-		import torch
+		import torch  # type: ignore[import-not-found] # noqa: PLC0415
 	except ImportError as e:
 		info["torch.__version__"] = "not available"
 		exceptions.append(e)
