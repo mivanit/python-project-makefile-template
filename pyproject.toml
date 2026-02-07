@@ -94,7 +94,11 @@
 
 # ruff config
 [tool.ruff]
-	exclude = ["__pycache__"]
+	exclude = [
+		"__pycache__",
+		".meta/scripts",
+		"scripts/out",
+	]
 
 	[tool.ruff.format]
 		indent-style = "tab"
@@ -189,6 +193,7 @@
 		".meta/**",
 		"uv.lock",
 		"LICENSE",
+		"scripts/out/",
 	]
 
 # for configuring this tool (makefile, make_docs.py)

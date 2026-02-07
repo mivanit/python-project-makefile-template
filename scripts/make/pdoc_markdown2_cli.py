@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Optional
 
 from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
 
@@ -20,7 +19,7 @@ from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
 def convert_file(
 	input_path: Path,
 	output_path: Path,
-	safe_mode: Optional[_safe_mode] = None,
+	safe_mode: _safe_mode | None = None,
 	encoding: str = "utf-8",
 ) -> None:
 	"""Convert a markdown file to HTML"""

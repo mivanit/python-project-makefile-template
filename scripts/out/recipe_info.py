@@ -131,7 +131,8 @@ def _get_all_computed_values(makefile_path: str) -> Dict[str, str]:
 	"""
 	cmd: list[str] = [
 		"make",
-		"--file", makefile_path,
+		"--file",
+		makefile_path,
 		"--print-data-base",
 		"--question",
 		"--no-builtin-rules",
@@ -328,7 +329,9 @@ class MakeVariable:
 		line: str = lines[var_line_idx]
 
 		# Parse the variable definition line (allow leading whitespace for ifeq blocks)
-		var_rx: re.Pattern = re.compile(r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
+		var_rx: re.Pattern = re.compile(
+			r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$"
+		)
 		match = var_rx.match(line)
 		if not match:
 			err_msg: str = f"variable '{var_name}' not found at line {var_line_idx}"
@@ -526,7 +529,10 @@ def main() -> None:
 					if var_name.upper() == query_upper:
 						variables.append(
 							MakeVariable.from_makefile(
-								lines, var_name, all_variables[var_name], computed_values
+								lines,
+								var_name,
+								all_variables[var_name],
+								computed_values,
 							)
 						)
 						found_variable = True

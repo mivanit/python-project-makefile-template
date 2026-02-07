@@ -383,8 +383,7 @@ def main(config_file: Path) -> None:
 
 	# write raw to jsonl
 	with open(cfg.out_file_base.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
-		for itm in all_items:
-			f.write(json.dumps(itm.serialize()) + "\n")
+		f.writelines(json.dumps(itm.serialize()) + "\n" for itm in all_items)
 
 	# group, render
 	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(

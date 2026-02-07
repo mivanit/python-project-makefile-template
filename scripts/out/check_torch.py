@@ -37,7 +37,7 @@ def get_nvcc_info() -> Dict[str, str]:
 	"get info about cuda from nvcc --version"
 	# Run the nvcc command.
 	try:
-		result: subprocess.CompletedProcess[str] = subprocess.run(  # noqa: S603
+		result: subprocess.CompletedProcess[str] = subprocess.run(
 			["nvcc", "--version"],  # noqa: S607
 			check=True,
 			capture_output=True,
