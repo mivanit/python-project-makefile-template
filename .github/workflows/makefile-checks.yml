@@ -76,7 +76,7 @@ jobs:
       - run: make format-check
       - run: make format 
       - run: make typing
-      - run: make typing-report
+      - run: make typing-summary
 
       # Build commands
       - run: make build
