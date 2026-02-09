@@ -10,14 +10,14 @@ Usage:
 
 Examples:
     # Generic badge
-    python generate_badge.py --label "version" --value "1.2.3" -o version.svg
-    python generate_badge.py --label "license" --value "MIT" --color blue -o license.svg
+    python generate_badge.py --label "version" --value "1.2.3"
+    python generate_badge.py --label "license" --value "MIT" --color blue
 
-    # Coverage badge (reads from .coverage sqlite db)
-    python generate_badge.py --coverage .coverage -o coverage.svg
+    # Coverage badge (reads from coverage.txt report)
+    python generate_badge.py --coverage coverage.txt
 
     # Tests badge (parses pytest output)
-    python generate_badge.py --pytest-results .pytest_results.txt -o tests.svg
+    python generate_badge.py --pytest-results .pytest_results.txt
 
 """
 
@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import sqlite3
 import sys
 from pathlib import Path
 
@@ -112,100 +111,18 @@ def generate_badge_svg(label: str, value: str, color: str) -> str:
 
 	svg = f"""<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="20">
-    <linearGradient id="b" x2="0" y2="100%">
-        <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
-        <stop offset="1" stop-opacity=".1"/>
-    </linearGradient>
-    <mask id="a">
-        <rect width="{total_width}" height="20" rx="3" fill="#fff"/>
-    </mask>
-    <g mask="url(#a)">
-        <path fill="#555" d="M0 0h{label_width}v20H0z"/>
-        <path fill="{color}" d="M{label_width} 0h{value_width}v20H{label_width}z"/>
-        <path fill="url(#b)" d="M0 0h{total_width}v20H0z"/>
+    <clipPath id="r"><rect width="{total_width}" height="20" rx="3"/></clipPath>
+    <g clip-path="url(#r)">
+        <rect width="{label_width}" height="20" fill="#555"/>
+        <rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>
     </g>
     <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
-        <text x="{label_x}" y="15" fill="#010101" fill-opacity=".3">{label}</text>
         <text x="{label_x}" y="14">{label}</text>
-        <text x="{value_x}" y="15" fill="#010101" fill-opacity=".3">{value}</text>
         <text x="{value_x}" y="14">{value}</text>
     </g>
 </svg>
 """
 	return svg
-
-
-def read_coverage_from_db(coverage_path: Path) -> float:
-	"""Read coverage percentage from .coverage sqlite database.
-
-	Args:
-	    coverage_path: Path to .coverage file
-
-	Returns:
-	    Coverage percentage (0-100)
-
-	"""
-	conn = sqlite3.connect(coverage_path)
-	cursor = conn.cursor()
-
-	# Get total lines and covered lines from the database
-	try:
-		# coverage.py stores arc data, we need to calculate from file table
-		cursor.execute("SELECT nums_and_args FROM meta")
-		# The coverage percentage is usually calculated from the line data
-		# Let's try a simpler approach - read from the file table if it exists
-
-		# Try to get summary from the coverage data
-		cursor.execute("SELECT COUNT(*) FROM file")
-		file_count = cursor.fetchone()[0]
-
-		if file_count == 0:
-			conn.close()
-			return 0.0
-
-		# Get line counts from line_bits table
-		cursor.execute("""
-            SELECT
-                file.path,
-                length(line_bits.numbits) as total_lines
-            FROM file
-            LEFT JOIN line_bits ON file.id = line_bits.file_id
-        """)
-
-		total_statements = 0
-		covered_statements = 0
-
-		# Actually, the coverage database structure varies by version
-		# Let's use the coverage module directly if available
-		conn.close()
-
-		# Fall back to using coverage module
-		try:
-			from coverage import Coverage
-
-			cov = Coverage(data_file=str(coverage_path))
-			cov.load()
-			report_data = cov.get_data()
-
-			for filename in report_data.measured_files():
-				analysis = cov._analyze(filename)
-				total_statements += len(analysis.statements)
-				covered_statements += len(analysis.statements) - len(analysis.missing)
-
-			if total_statements == 0:
-				return 0.0
-
-			return (covered_statements / total_statements) * 100
-
-		except ImportError:
-			# If coverage module not available, try parsing coverage.txt
-			raise RuntimeError(
-				"coverage module not available, cannot read .coverage database directly"
-			)
-
-	except sqlite3.OperationalError:
-		conn.close()
-		raise RuntimeError(f"Could not read coverage data from {coverage_path}")
 
 
 def read_coverage_from_txt(coverage_path: Path) -> float:
@@ -305,14 +222,6 @@ def main() -> int:
 		epilog=__doc__,
 	)
 
-	# Output
-	parser.add_argument(
-		"-o",
-		"--output",
-		type=Path,
-		help="Output SVG file path (default: stdout)",
-	)
-
 	# Generic mode
 	parser.add_argument(
 		"--label",
@@ -336,7 +245,7 @@ def main() -> int:
 		"--coverage",
 		type=Path,
 		metavar="PATH",
-		help="Path to .coverage file or coverage.txt report",
+		help="Path to coverage.txt report",
 	)
 
 	# Tests mode
@@ -360,11 +269,7 @@ def main() -> int:
 				)
 				return 1
 
-			if coverage_path.suffix == ".txt" or coverage_path.name == "coverage.txt":
-				percent = read_coverage_from_txt(coverage_path)
-			else:
-				percent = read_coverage_from_db(coverage_path)
-
+			percent = read_coverage_from_txt(coverage_path)
 			label = "coverage"
 			value = f"{percent:.0f}%"
 			color = get_coverage_color(percent)
@@ -401,13 +306,7 @@ def main() -> int:
 			return 1
 
 		svg = generate_badge_svg(label, value, color)
-
-		if args.output:
-			args.output.parent.mkdir(parents=True, exist_ok=True)
-			args.output.write_text(svg)
-			print(f"Badge written to {args.output}")
-		else:
-			print(svg)
+		print(svg)
 
 		return 0
 
