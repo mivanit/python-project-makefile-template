@@ -142,6 +142,19 @@ endif
 # base options for pytest, user can set this when running make to add more options
 PYTEST_OPTIONS ?=
 
+# type checker configuration
+# --------------------------------------------------
+
+# which type checkers to run (comma-separated)
+# available: mypy,basedpyright,ty
+TYPE_CHECKERS ?= mypy,basedpyright,ty
+
+# directory to store type checker outputs
+TYPE_ERRORS_DIR := $(META_DIR)/.type-errors
+
+# typing summary output file
+TYPING_SUMMARY_FILE := $(META_DIR)/typing-summary.toml
+
 # ==================================================
 # default target (help)
 # ==================================================
@@ -166,7 +179,7 @@ default: help
 # ==================================================
 
 # list of scripts to download when running `make self-setup-scripts`. these are the helper scripts that the makefile uses for various tasks (e.g., getting version info, generating docs, etc.)
-SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean mypy_report recipe_info make_docs
+SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean typing_breakdown recipe_info make_docs
 
 # download makefile helper scripts from GitHub
 # uses curl to fetch scripts from the template repository
@@ -342,19 +355,36 @@ format-check:
 	@echo "check if the source code is formatted correctly"
 	$(PYTHON) -m ruff check --config $(PYPROJECT) .
 
-# runs type checks with mypy
+# runs type checks with configured checkers
+# set TYPE_CHECKERS to customize which checkers run (e.g., TYPE_CHECKERS=mypy,basedpyright)
+# set TYPING_OUTPUT_DIR to save outputs to files (used by typing-summary)
+# returns exit code 1 if any checker fails
 .PHONY: typing
 typing:
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+	@div="--------------------------------------------------"; \
+	failed=0; \
+	for c in $$(echo "$(TYPE_CHECKERS)" | tr ',' ' '); do \
+		printf "\033[36m$$div\n[$$c]\n$$div\033[0m\n"; \
+		$(PYTHON) -m $$c $(TYPECHECK_ARGS) . $(if $(TYPING_OUTPUT_DIR),> $(TYPING_OUTPUT_DIR)/$$c.txt 2>&1) || failed=1; \
+	done; \
+	if [ $$failed -eq 1 ]; then \
+		printf "\033[31m$$div\nnot all type checks passed\n$$div\033[0m\n"; \
+		exit 1; \
+	else \
+		printf "\033[32m$$div\nall type checks passed\n$$div\033[0m\n"; \
+	fi
 
-# generate summary report of type check errors grouped by file
-# outputs TOML format showing error count per file
-# useful for tracking typing progress across large codebases
-.PHONY: typing-report
-typing-report:
-	@echo "generate a report of the type check output -- errors per file"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) $(SCRIPTS_DIR)/mypy_report.py --mode toml
+# save type check outputs and generate detailed breakdown
+# outputs are saved to $(TYPE_ERRORS_DIR)/*.txt
+# summary is generated to $(TYPING_SUMMARY_FILE)
+.PHONY: typing-summary
+typing-summary:
+	@echo "running type checks and saving to $(TYPE_ERRORS_DIR)/"
+	@mkdir -p $(TYPE_ERRORS_DIR)
+	-@$(MAKE) --no-print-directory typing TYPING_OUTPUT_DIR=$(TYPE_ERRORS_DIR)
+	@echo "generating typing summary..."
+	$(PYTHON) $(SCRIPTS_DIR)/typing_breakdown.py --error-dir $(TYPE_ERRORS_DIR) --output $(TYPING_SUMMARY_FILE) --checkers $(TYPE_CHECKERS)
 
 # run tests with pytest
 # you can pass custom args. for example:
@@ -566,7 +596,7 @@ publish: check version build verify-git
 .PHONY: clean
 clean:
 	@echo "clean up temporary files"
-	rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage dist build $(PACKAGE_NAME).egg-info $(TESTS_TEMP_DIR)
+	rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage dist build $(PACKAGE_NAME).egg-info $(TESTS_TEMP_DIR) $(TYPE_ERRORS_DIR)
 	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type d -name '__pycache__' -exec rm -rf {} +
 	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type f -name '*.py[co]' -delete
 
@@ -630,6 +660,7 @@ info-long: info
 	@echo "    COMMIT_LOG_FILE = $(COMMIT_LOG_FILE)"
 	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
 	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
+	@echo "    TYPE_CHECKERS = $(TYPE_CHECKERS)"
 
 # Smart help command: shows general help, or detailed info about specific targets
 # Usage:
