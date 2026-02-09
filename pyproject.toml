@@ -86,11 +86,15 @@
 
 # mypy config
 [tool.mypy]
+	files = ["scripts/make"]
 	exclude = [
 		".*/__pycache__/.*",
 		"docs/.*",
 		"scripts/out/.*",
 		".meta/scripts/.*",
+		".venv/.*",
+		".mypy_cache/.*",
+		".ruff_cache/.*",
 	]
 
 
@@ -187,16 +191,26 @@
 
 # basedpyright config
 [tool.basedpyright]
+	include = ["scripts/make"]
 	exclude = [
 		".meta/scripts",
 		"scripts/out",
+		".venv",
+		"docs",
+		".mypy_cache",
+		".ruff_cache",
 	]
 
 # ty config
 [tool.ty.src]
+	include = ["scripts/make"]
 	exclude = [
 		".meta/scripts",
 		"scripts/out",
+		".venv",
+		"docs",
+		".mypy_cache",
+		".ruff_cache",
 	]
 
 # `make lmcat` depends on the lmcat and can be configured here

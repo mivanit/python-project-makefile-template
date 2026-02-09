@@ -149,6 +149,9 @@ PYTEST_OPTIONS ?=
 # available: mypy,basedpyright,ty
 TYPE_CHECKERS ?= mypy,basedpyright,ty
 
+# path to type check (empty = use config from pyproject.toml)
+TYPECHECK_PATH ?=
+
 # directory to store type checker outputs
 TYPE_ERRORS_DIR := $(META_DIR)/.type-errors
 
@@ -365,8 +368,9 @@ typing:
 	@div="--------------------------------------------------"; \
 	failed=0; \
 	for c in $$(echo "$(TYPE_CHECKERS)" | tr ',' ' '); do \
+		case "$$c" in ty) subcmd="check";; *) subcmd="";; esac; \
 		printf "\033[36m$$div\n[$$c]\n$$div\033[0m\n"; \
-		$(PYTHON) -m $$c $(TYPECHECK_ARGS) . $(if $(TYPING_OUTPUT_DIR),> $(TYPING_OUTPUT_DIR)/$$c.txt 2>&1) || failed=1; \
+		$(PYTHON) -m $$c $$subcmd $(TYPECHECK_ARGS) $(TYPECHECK_PATH) $(if $(TYPING_OUTPUT_DIR),> $(TYPING_OUTPUT_DIR)/$$c.txt 2>&1) || failed=1; \
 	done; \
 	if [ $$failed -eq 1 ]; then \
 		printf "\033[31m$$div\nnot all type checks passed\n$$div\033[0m\n"; \
@@ -660,6 +664,7 @@ info-long: info
 	@echo "    COMMIT_LOG_FILE = $(COMMIT_LOG_FILE)"
 	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
 	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
+	@echo "    TYPECHECK_PATH = $(TYPECHECK_PATH)"
 	@echo "    TYPE_CHECKERS = $(TYPE_CHECKERS)"
 
 # Smart help command: shows general help, or detailed info about specific targets
