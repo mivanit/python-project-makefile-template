@@ -176,7 +176,7 @@ class MakeRecipe:
 			elif stripped == "":
 				# Track consecutive blank lines
 				blank_count += 1
-				if blank_count >= 2:  # noqa: PLR2004
+				if blank_count >= 2:
 					# Hit 2 blank lines in a row - stop
 					break
 				j -= 1
@@ -287,7 +287,7 @@ class MakeVariable:
 				j -= 1
 			elif stripped == "":
 				blank_count += 1
-				if blank_count >= 2:  # noqa: PLR2004
+				if blank_count >= 2:
 					break
 				j -= 1
 			else:

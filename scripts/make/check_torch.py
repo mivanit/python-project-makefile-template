@@ -43,14 +43,14 @@ def get_nvcc_info() -> Dict[str, str]:
 			capture_output=True,
 			text=True,
 		)
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		return {"Failed to run 'nvcc --version'": str(e)}
 
 	output: str = result.stdout
 	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
-	if len(lines) != 5:  # noqa: PLR2004
+	if len(lines) != 5:
 		msg = f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
 		raise ValueError(msg)
 
@@ -137,7 +137,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 
 						info[f"device cuda:{current_device}"] = current_device_info
 
-					except Exception as e:  # noqa: PERF203,BLE001
+					except Exception as e:  # noqa: PERF203
 						exceptions.append(e)
 			else:
 				err_msg_nodevice: str = (
@@ -151,7 +151,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 			)
 			raise ValueError(err_msg_nocuda)  # noqa: TRY301
 
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		exceptions.append(e)
 
 	return exceptions, info
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 		{
 			"python executable path: sys.executable": str(sys.executable),
 			"sys.platform": sys.platform,
-			"current working directory: os.getcwd()": os.getcwd(),  # noqa: PTH109
+			"current working directory: os.getcwd()": os.getcwd(),
 			"Host name: os.name": os.name,
 			"CPU count: os.cpu_count()": str(os.cpu_count()),
 		},

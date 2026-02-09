@@ -30,10 +30,10 @@ def strip_cwd(path: str) -> str:
 	"""Strip the current working directory from a file path to make it relative.
 
 	Args:
-	    path: File path (absolute or relative)
+		path: File path (absolute or relative)
 
 	Returns:
-	    Relative path with CWD stripped, or original path if not under CWD
+		Relative path with CWD stripped, or original path if not under CWD
 
 	"""
 	cwd: str = os.getcwd()

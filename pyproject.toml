@@ -166,6 +166,16 @@
 		# select = ["ICN001"]
 
 		[tool.ruff.lint.per-file-ignores]
+			"scripts/make/*" = [
+				"PLR2004",  # magic values (coverage thresholds are self-documenting)
+				"RET504",   # unnecessary assignment before return
+				"TRY003",   # long exception messages
+				"TRY300",   # return in else block
+				"BLE001",   # blind exception catch (appropriate for CLI main())
+				"D103",     # missing docstring in main()
+				"PTH109",   # os.getcwd() vs Path.cwd()
+				"PTH100",   # os.path.abspath() vs Path.resolve()
+			]
 			"tests/*" = [
 				# dont need docstrings in test functions or modules
 				"D103", 

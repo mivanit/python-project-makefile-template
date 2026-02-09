@@ -173,7 +173,7 @@ class Config:
 					repo_url = urls["repository"]
 				if "github" in urls:
 					repo_url = urls["github"]
-			except Exception as e:  # noqa: BLE001
+			except Exception as e:
 				warnings.warn(
 					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
 				)
@@ -410,7 +410,7 @@ def main(config_file: Path) -> None:
 			html_rendered,
 			encoding="utf-8",
 		)
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
