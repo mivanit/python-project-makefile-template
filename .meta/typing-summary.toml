@@ -1,5 +1,5 @@
 # mypy: Success: no issues found in 11 source files
-# basedpyright: 69 errors, 493 warnings, 0 notes
+# basedpyright: 69 errors, 477 warnings, 0 notes
 # ty: Found 24 diagnostics
 
 [type_errors.mypy]
@@ -32,21 +32,21 @@ total_errors = 69
 "scripts/make/pdoc_markdown2_cli.py" = 1
 
 [type_warnings.basedpyright]
-total_warnings = 493
+total_warnings = 477
 
 [type_warnings.basedpyright.by_type]
 "reportDeprecated" = 169
-"reportAny" = 91
+"reportAny" = 80
 "reportUnknownArgumentType" = 55
 "reportUnknownMemberType" = 52
 "reportUnknownVariableType" = 38
-"reportUnusedCallResult" = 28
+"reportUnusedCallResult" = 24
 "reportExplicitAny" = 17
 "reportUnknownParameterType" = 10
 "reportUnannotatedClassAttribute" = 9
 "reportUnknownLambdaType" = 8
 "reportUnnecessaryIsInstance" = 8
-"reportPrivateUsage" = 5
+"reportPrivateUsage" = 4
 "reportUnreachable" = 1
 "reportMissingParameterType" = 1
 "reportImplicitStringConcatenation" = 1
@@ -56,10 +56,10 @@ total_warnings = 493
 "scripts/make/make_docs.py" = 87
 "scripts/make/recipe_info.py" = 86
 "scripts/make/export_requirements.py" = 64
-"scripts/make/generate_badge.py" = 41
 "scripts/make/check_torch.py" = 40
 "scripts/make/typing_breakdown.py" = 32
 "scripts/make/docs_clean.py" = 25
+"scripts/make/generate_badge.py" = 25
 "scripts/make/pdoc_markdown2_cli.py" = 20
 "scripts/make/get_commit_log.py" = 4
 "scripts/make/get_version.py" = 3
