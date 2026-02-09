@@ -12,6 +12,7 @@ attrs==25.4.0
     #   referencing
 backports-tarfile==1.2.0 ; python_full_version < '3.12' and platform_machine != 'ppc64le' and platform_machine != 's390x'
     # via jaraco-context
+basedpyright==1.37.4
 beautifulsoup4==4.14.3
     # via nbconvert
 bleach==6.2.0 ; python_full_version < '3.10'
@@ -218,6 +219,8 @@ networkx==3.6.1 ; python_full_version >= '3.11'
     # via torch
 nh3==0.3.2
     # via readme-renderer
+nodejs-wheel-binaries==24.13.0
+    # via basedpyright
 numpy==2.0.2 ; python_full_version < '3.10'
     # via myproject
 numpy==2.2.6 ; python_full_version == '3.10.*'
@@ -362,7 +365,7 @@ secretstorage==3.3.3 ; python_full_version < '3.10' and platform_machine != 'ppc
     # via keyring
 secretstorage==3.5.0 ; python_full_version >= '3.10' and platform_machine != 'ppc64le' and platform_machine != 's390x' and sys_platform == 'linux'
     # via keyring
-setuptools==81.0.0
+setuptools==82.0.0
     # via
     #   coverage-badge
     #   torch
@@ -405,6 +408,7 @@ triton==3.4.0 ; python_full_version < '3.10' and platform_machine == 'x86_64' an
 triton==3.6.0 ; python_full_version >= '3.10' and platform_machine == 'x86_64' and sys_platform == 'linux'
     # via torch
 twine==6.2.0
+ty==0.0.15
 typing-extensions==4.15.0
     # via
     #   beautifulsoup4
