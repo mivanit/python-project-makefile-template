@@ -130,7 +130,7 @@ nvidia-nvtx-cu12==12.8.90 ; platform_machine == 'x86_64' and sys_platform == 'li
     # via torch
 packaging==26.0
     # via ipykernel
-parso==0.8.5
+parso==0.8.6
     # via jedi
 pexpect==4.9.0 ; (python_full_version < '3.10' and sys_platform == 'emscripten') or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via ipython

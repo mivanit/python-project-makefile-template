@@ -46,7 +46,7 @@ comm==0.2.3
     # via ipykernel
 coverage==7.10.7 ; python_full_version < '3.10'
     # via pytest-cov
-coverage==7.13.3 ; python_full_version >= '3.10'
+coverage==7.13.4 ; python_full_version >= '3.10'
     # via pytest-cov
 cryptography==46.0.4 ; platform_machine != 'ppc64le' and platform_machine != 's390x' and sys_platform == 'linux'
     # via secretstorage
@@ -271,7 +271,7 @@ packaging==26.0
     #   twine
 pandocfilters==1.5.1
     # via nbconvert
-parso==0.8.5
+parso==0.8.6
     # via jedi
 pathspec==1.0.4
     # via mypy
