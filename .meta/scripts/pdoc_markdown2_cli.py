@@ -12,14 +12,17 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from typing import Any
 
-from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
+from pdoc.markdown2 import (  # type: ignore[import-untyped,import-not-found] # pyright: ignore[reportMissingImports]
+	Markdown,  # pyright: ignore[reportUnknownVariableType]
+)
 
 
 def convert_file(
 	input_path: Path,
 	output_path: Path,
-	safe_mode: _safe_mode | None = None,
+	safe_mode: str | None = None,
 	encoding: str = "utf-8",
 ) -> None:
 	"""Convert a markdown file to HTML"""
@@ -27,14 +30,14 @@ def convert_file(
 	text: str = input_path.read_text(encoding=encoding)
 
 	# Convert to HTML using markdown2
-	markdown: Markdown = Markdown(
+	markdown: Any = Markdown(  # pyright: ignore[reportUnknownVariableType]
 		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
 		safe_mode=safe_mode,
 	)
-	html: str = markdown.convert(text)
+	html: str = str(markdown.convert(text))  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
 
 	# Write HTML output
-	output_path.write_text(str(html), encoding=encoding)
+	output_path.write_text(html, encoding=encoding)
 
 
 def main() -> None:

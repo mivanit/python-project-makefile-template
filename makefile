@@ -146,8 +146,8 @@ PYTEST_OPTIONS ?=
 # --------------------------------------------------
 
 # which type checkers to run (comma-separated)
-# available: ty,mypy,basedpyright
-TYPE_CHECKERS ?= ty,mypy,basedpyright
+# available: mypy,basedpyright,ty
+TYPE_CHECKERS ?= mypy,basedpyright,ty
 
 # path to type check (empty = use config from pyproject.toml)
 TYPECHECK_PATH ?=

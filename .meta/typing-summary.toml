@@ -1,6 +1,6 @@
 # mypy: Success: no issues found in 11 source files
-# basedpyright: 69 errors, 477 warnings, 0 notes
-# ty: Found 24 diagnostics
+# basedpyright: 0 errors, 2 warnings, 0 notes
+# ty: All checks passed!
 
 [type_errors.mypy]
 total_errors = 0
@@ -10,70 +10,25 @@ total_errors = 0
 [type_errors.mypy.by_file]
 
 [type_errors.basedpyright]
-total_errors = 69
+total_errors = 0
 
 [type_errors.basedpyright.by_type]
-"reportMissingTypeArgument" = 20
-"reportUnboundVariable" = 12
-"reportConstantRedefinition" = 11
-"reportAttributeAccessIssue" = 11
-"reportArgumentType" = 8
-"reportMissingImports" = 6
-"reportAssignmentType" = 1
 
 [type_errors.basedpyright.by_file]
-"scripts/make/make_docs.py" = 37
-"scripts/make/recipe_info.py" = 14
-"scripts/make/export_requirements.py" = 6
-"scripts/make/get_todos.py" = 4
-"scripts/make/check_torch.py" = 3
-"scripts/make/docs_clean.py" = 2
-"scripts/make/get_version.py" = 2
-"scripts/make/pdoc_markdown2_cli.py" = 1
 
 [type_warnings.basedpyright]
-total_warnings = 477
+total_warnings = 2
 
 [type_warnings.basedpyright.by_type]
-"reportDeprecated" = 169
-"reportAny" = 80
-"reportUnknownArgumentType" = 55
-"reportUnknownMemberType" = 52
-"reportUnknownVariableType" = 38
-"reportUnusedCallResult" = 24
-"reportExplicitAny" = 17
-"reportUnknownParameterType" = 10
-"reportUnannotatedClassAttribute" = 9
-"reportUnknownLambdaType" = 8
-"reportUnnecessaryIsInstance" = 8
-"reportPrivateUsage" = 4
-"reportUnreachable" = 1
-"reportMissingParameterType" = 1
-"reportImplicitStringConcatenation" = 1
+"reportUnknownMemberType" = 1
+"reportUnnecessaryTypeIgnoreComment" = 1
 
 [type_warnings.basedpyright.by_file]
-"scripts/make/get_todos.py" = 91
-"scripts/make/make_docs.py" = 87
-"scripts/make/recipe_info.py" = 86
-"scripts/make/export_requirements.py" = 64
-"scripts/make/check_torch.py" = 40
-"scripts/make/typing_breakdown.py" = 32
-"scripts/make/docs_clean.py" = 25
-"scripts/make/generate_badge.py" = 25
-"scripts/make/pdoc_markdown2_cli.py" = 20
-"scripts/make/get_commit_log.py" = 4
-"scripts/make/get_version.py" = 3
+"scripts/make/make_docs.py" = 2
 
 [type_errors.ty]
-total_errors = 24
+total_errors = 0
 
 [type_errors.ty.by_type]
-"unresolved-reference" = 12
-"unused-type-ignore-comment" = 8
-"possibly-missing-attribute" = 2
-"invalid-argument-type" = 1
-"invalid-assignment" = 1
 
 [type_errors.ty.by_file]
-"scripts/make/make_docs.py" = 22
-"scripts/make/check_torch.py" = 2

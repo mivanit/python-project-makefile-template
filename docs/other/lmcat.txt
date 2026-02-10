@@ -389,7 +389,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 def print_info_dict(
-	info: Dict[str, Union[Any, Dict[str, Any]]],
+	info: dict[str, Union[Any, dict[str, Any]]],
 	indent: str = "  ",
 	level: int = 1,
 ) -> None:
@@ -404,7 +404,7 @@ def print_info_dict(
 			print(f"{indent_str}{key:<{longest_key_len}} = {value}")
 
 
-def get_nvcc_info() -> Dict[str, str]:
+def get_nvcc_info() -> dict[str, str]:
 	"get info about cuda from nvcc --version"
 	# Run the nvcc command.
 	try:
@@ -418,7 +418,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		return {"Failed to run 'nvcc --version'": str(e)}
 
 	output: str = result.stdout
-	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
+	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
 	assert len(lines) == 5, (  # noqa: PLR2004
@@ -432,7 +432,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: Dict[str, Tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -444,7 +444,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		"build": (4, re.compile(r"Build (.+)"), 1, str.strip),
 	}
 
-	info: Dict[str, str] = {}
+	info: dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
 		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
@@ -459,10 +459,10 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
+def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 	"get info about pytorch and cuda devices"
-	exceptions: List[Exception] = []
-	info: Dict[str, Any] = {}
+	exceptions: list[Exception] = []
+	info: dict[str, Any] = {}
 
 	try:
 		import torch
@@ -485,7 +485,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: Dict[str, Union[str, int]] = {}
+						current_device_info: dict[str, Union[str, int]] = {}
 
 						dev_prop = torch.cuda.get_device_properties(
 							torch.device(f"cuda:{current_device}"),
@@ -540,7 +540,7 @@ if __name__ == "__main__":
 		},
 	)
 
-	nvcc_info: Dict[str, Any] = get_nvcc_info()
+	nvcc_info: dict[str, Any] = get_nvcc_info()
 	print("nvcc:")
 	print_info_dict(nvcc_info)
 
@@ -592,7 +592,7 @@ def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	with pyproject_path.open("rb") as f:
 		config = tomllib.load(f)
 
-	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
+	preserved: list[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
 	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
 
 	# Convert to absolute paths and validate
@@ -674,8 +674,8 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  #
 
 def export_configuration(
 	export: dict,
-	all_groups: List[str],
-	all_extras: List[str],
+	all_groups: list[str],
+	all_extras: list[str],
 	export_opts: dict,
 	output_dir: Path,
 ) -> None:
@@ -690,16 +690,16 @@ def export_configuration(
 
 	# get other options with default fallbacks
 	filename: str = export.get("filename") or f"requirements-{name}.txt"
-	groups: Union[List[str], bool, None] = export.get("groups")
-	extras: Union[List[str], bool] = export.get("extras", [])
-	options: List[str] = export.get("options", [])
+	groups: Union[list[str], bool, None] = export.get("groups")
+	extras: Union[list[str], bool] = export.get("extras", [])
+	options: list[str] = export.get("options", [])
 
 	# init command
-	cmd: List[str] = ["uv", "export", *export_opts.get("args", [])]
+	cmd: list[str] = ["uv", "export", *export_opts.get("args", [])]
 
 	# handle groups
 	if groups is not None:
-		groups_list: List[str] = []
+		groups_list: list[str] = []
 		if isinstance(groups, bool):
 			if groups:
 				groups_list = all_groups.copy()
@@ -713,7 +713,7 @@ def export_configuration(
 				cmd.extend(["--no-group", group])
 
 	# handle extras
-	extras_list: List[str] = []
+	extras_list: list[str] = []
 	if isinstance(extras, bool):
 		if extras:
 			extras_list = all_extras.copy()
@@ -741,8 +741,8 @@ def main(
 		pyproject_data: dict = tomllib.load(f)
 
 	# all available groups
-	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-	all_extras: List[str] = list(
+	all_groups: list[str] = list(pyproject_data.get("dependency-groups", {}).keys())
+	all_extras: list[str] = list(
 		deep_get(pyproject_data, "project.optional-dependencies", {}).keys(),
 	)
 
@@ -750,7 +750,7 @@ def main(
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
 
 	# what are we exporting?
-	exports: List[Dict[str, Any]] = export_opts.get("exports", [])
+	exports: list[dict[str, Any]] = export_opts.get("exports", [])
 	if not exports:
 		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 
@@ -794,13 +794,13 @@ def main(
 		sys.exit(1)
 
 	try:
-		log_cmd: List[str] = [
+		log_cmd: list[str] = [
 			"git",
 			"log",
 			f"{last_version}..HEAD",
 			"--pretty=format:- %s (%h)",
 		]
-		commits: List[str] = (
+		commits: list[str] = (
 			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")  # noqa: S603
 		)
 		with open(commit_log_file, "w") as f:
@@ -885,7 +885,7 @@ _TEMPLATE_MD_TABLE: str = """\
 {% endfor %}
 """
 
-TEMPLATES_MD: Dict[str, str] = dict(
+TEMPLATES_MD: dict[str, str] = dict(
 	standard=_TEMPLATE_MD_LIST,
 	table=_TEMPLATE_MD_TABLE,
 )
@@ -908,15 +908,15 @@ class Config:
 
 	search_dir: Path = Path()
 	out_file_base: Path = Path("docs/todo-inline")
-	tags: List[str] = field(
+	tags: list[str] = field(
 		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"],
 	)
-	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
-	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
+	extensions: list[str] = field(default_factory=lambda: ["py", "md"])
+	exclude: list[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	valid_post_tag: Union[str, List[str]] = " \t:<>|[](){{}}"
-	valid_pre_tag: Union[str, List[str]] = " \t:<>|[](){{}}#"
-	tag_label_map: Dict[str, str] = field(
+	valid_post_tag: Union[str, list[str]] = " \t:<>|[](){{}}"
+	valid_pre_tag: Union[str, list[str]] = " \t:<>|[](){{}}#"
+	tag_label_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
 			"TODO": "enhancement",
@@ -925,7 +925,7 @@ class Config:
 			"HACK": "enhancement",
 		},
 	)
-	extension_lang_map: Dict[str, str] = field(
+	extension_lang_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"py": "python",
 			"md": "markdown",
@@ -973,12 +973,12 @@ class Config:
 		if config_file.is_file():
 			# read file and load if present
 			with config_file.open("rb") as f:
-				data: Dict[str, Any] = tomllib.load(f)
+				data: dict[str, Any] = tomllib.load(f)
 
 			# try to get the repo url
 			repo_url: str = "UNKNOWN"
 			try:
-				urls: Dict[str, str] = {
+				urls: dict[str, str] = {
 					k.lower(): v for k, v in data["project"]["urls"].items()
 				}
 				if "repository" in urls:
@@ -991,7 +991,7 @@ class Config:
 				)
 
 			# load the inline-todo config if present
-			data_inline_todo: Dict[str, Any] = deep_get(
+			data_inline_todo: dict[str, Any] = deep_get(
 				d=data,
 				path=TOOL_PATH,
 				default={},
@@ -1041,7 +1041,7 @@ class TodoItem:
 	content: str
 	context: str = ""
 
-	def serialize(self) -> Dict[str, Union[str, int]]:
+	def serialize(self) -> dict[str, Union[str, int]]:
 		"serialize to a dict we can dump to json"
 		return {
 			**asdict(self),
@@ -1094,7 +1094,7 @@ class TodoItem:
 		# labels
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
 		# assemble url
-		query: Dict[str, str] = dict(title=title, body=body, labels=label)
+		query: dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
 
@@ -1108,12 +1108,12 @@ class TodoItem:
 def scrape_file(
 	file_path: Path,
 	cfg: Config,
-) -> List[TodoItem]:
+) -> list[TodoItem]:
 	"""Scrapes a file for lines containing any of the specified tags"""
-	items: List[TodoItem] = []
+	items: list[TodoItem] = []
 	if not file_path.is_file():
 		return items
-	lines: List[str] = file_path.read_text(encoding="utf-8").splitlines(True)
+	lines: list[str] = file_path.read_text(encoding="utf-8").splitlines(True)
 
 	# over all lines
 	for i, line in enumerate(lines):
@@ -1147,11 +1147,11 @@ def scrape_file(
 
 def collect_files(
 	search_dir: Path,
-	extensions: List[str],
-	exclude: List[str],
-) -> List[Path]:
+	extensions: list[str],
+	exclude: list[str],
+) -> list[Path]:
 	"""Recursively collects all files with specified extensions, excluding matches via globs"""
-	results: List[Path] = []
+	results: list[Path] = []
 	for ext in extensions:
 		results.extend(search_dir.rglob(f"*.{ext}"))
 
@@ -1163,10 +1163,10 @@ def collect_files(
 
 
 def group_items_by_tag_and_file(
-	items: List[TodoItem],
-) -> Dict[str, Dict[str, List[TodoItem]]]:
+	items: list[TodoItem],
+) -> dict[str, dict[str, list[TodoItem]]]:
 	"""Groups items by tag, then by file"""
-	grouped: Dict[str, Dict[str, List[TodoItem]]] = {}
+	grouped: dict[str, dict[str, list[TodoItem]]] = {}
 	for itm in items:
 		grouped.setdefault(itm.tag, {}).setdefault(itm.file, []).append(itm)
 	for tag_dict in grouped.values():
@@ -1183,8 +1183,8 @@ def main(config_file: Path) -> None:
 	CFG = cfg
 
 	# get data
-	files: List[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
-	all_items: List[TodoItem] = []
+	files: list[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
+	all_items: list[TodoItem] = []
 	n_files: int = len(files)
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
@@ -1199,7 +1199,7 @@ def main(config_file: Path) -> None:
 			f.write(json.dumps(itm.serialize()) + "\n")
 
 	# group, render
-	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
+	grouped: dict[str, dict[str, list[TodoItem]]] = group_items_by_tag_and_file(
 		all_items,
 	)
 
@@ -1282,10 +1282,10 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 
-def parse_mypy_output(lines: List[str]) -> Dict[str, int]:
+def parse_mypy_output(lines: list[str]) -> dict[str, int]:
 	"given mypy output, turn it into a dict of `filename: error_count`"
 	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
-	counts: Dict[str, int] = {}
+	counts: dict[str, int] = {}
 	for line in lines:
 		m = pattern.match(line)
 		if m:
@@ -1300,9 +1300,9 @@ def main() -> None:
 	parser: argparse.ArgumentParser = argparse.ArgumentParser()
 	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
 	args: argparse.Namespace = parser.parse_args()
-	lines: List[str] = sys.stdin.read().splitlines()
-	error_dict: Dict[str, int] = parse_mypy_output(lines)
-	sorted_errors: List[Tuple[str, int]] = sorted(
+	lines: list[str] = sys.stdin.read().splitlines()
+	error_dict: dict[str, int] = parse_mypy_output(lines)
+	sorted_errors: list[tuple[str, int]] = sorted(
 		error_dict.items(),
 		key=lambda x: x[1],
 	)
@@ -1405,7 +1405,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Union
 
 
-def _scan_makefile(lines: List[str], target_name: Optional[str] = None) -> Union[Dict[str, int], int]:
+def _scan_makefile(lines: list[str], target_name: Optional[str] = None) -> Union[dict[str, int], int]:
     """Scan makefile for target definitions, skipping define blocks.
 
     Args:
@@ -1419,7 +1419,7 @@ def _scan_makefile(lines: List[str], target_name: Optional[str] = None) -> Union
     """
     in_define_block: bool = False
     target_rx: re.Pattern = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
-    targets: Dict[str, int] = {}
+    targets: dict[str, int] = {}
 
     for i, line in enumerate(lines):
         # Track if we're inside a define block (embedded scripts)
@@ -1475,12 +1475,12 @@ class MakeRecipe:
     """Information about a Makefile recipe/target."""
 
     target: str
-    comments: List[str]
-    dependencies: List[str]
+    comments: list[str]
+    dependencies: list[str]
     echo_message: str
 
     @classmethod
-    def from_makefile(cls, lines: List[str], target: str) -> "MakeRecipe":
+    def from_makefile(cls, lines: list[str], target: str) -> "MakeRecipe":
         """Parse and create a MakeRecipe from makefile lines for *target*."""
         i: int = _scan_makefile(lines, target_name=target)
         if i == -1:
@@ -1491,7 +1491,7 @@ class MakeRecipe:
 
         # contiguous comment block immediately above
         # (skip backward past .PHONY declarations and blank lines)
-        comments: List[str] = []
+        comments: list[str] = []
         j: int = i - 1
         blank_count: int = 0
         while j >= 0:
@@ -1518,7 +1518,7 @@ class MakeRecipe:
 
         # prerequisites
         deps_str: str = line.split(":", 1)[1].strip()
-        deps: List[str] = deps_str.split() if deps_str else []
+        deps: list[str] = deps_str.split() if deps_str else []
 
         # first echo in the recipe
         echo_msg: str = ""
@@ -1543,9 +1543,9 @@ class MakeRecipe:
             echo_message=echo_msg,
         )
 
-    def describe(self, color: bool = False) -> List[str]:
+    def describe(self, color: bool = False) -> list[str]:
         """Return a list of description lines for this recipe."""
-        output: List[str] = []
+        output: list[str] = []
         c: Colors = Colors(enabled=color)
 
         # Target name (bold blue) with colon in white
@@ -1568,7 +1568,7 @@ class MakeRecipe:
         return output
 
 
-def find_all_targets(lines: List[str]) -> List[str]:
+def find_all_targets(lines: list[str]) -> list[str]:
     """Find all .PHONY target names in the makefile."""
     # First, get all .PHONY declarations
     phony_targets: Set[str] = set()
@@ -1580,23 +1580,23 @@ def find_all_targets(lines: List[str]) -> List[str]:
         match = phony_pattern.match(line)
         if match:
             # Get all targets from this .PHONY line (space-separated)
-            target_names: List[str] = match.group(1).split()
+            target_names: list[str] = match.group(1).split()
             phony_targets.update(target_names)
 
     # Now scan for actual target definitions and filter to .PHONY ones
-    all_target_defs: Dict[str, int] = _scan_makefile(lines)
+    all_target_defs: dict[str, int] = _scan_makefile(lines)
     return [tgt for tgt in all_target_defs if tgt in phony_targets]
 
 
-def get_all_recipes(lines: List[str]) -> List[MakeRecipe]:
+def get_all_recipes(lines: list[str]) -> list[MakeRecipe]:
     """Get MakeRecipe objects for all .PHONY targets in the makefile."""
-    targets: List[str] = find_all_targets(lines)
+    targets: list[str] = find_all_targets(lines)
     return [MakeRecipe.from_makefile(lines, target) for target in targets]
 
 
 def describe_target(makefile_path: Path, target: str) -> None:
     """Emit the description for *target*."""
-    lines: List[str] = makefile_path.read_text(encoding="utf-8").splitlines()
+    lines: list[str] = makefile_path.read_text(encoding="utf-8").splitlines()
     recipe: MakeRecipe = MakeRecipe.from_makefile(lines, target)
 
     for line in recipe.describe():
@@ -1629,20 +1629,20 @@ def main() -> None:
     parser.add_argument("targets", nargs="*", help="Target names")
     args: argparse.Namespace = parser.parse_args()
 
-    lines: List[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
+    lines: list[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
 
     # Get recipes to describe
     if args.all:
-        recipes: List[MakeRecipe] = get_all_recipes(lines)
+        recipes: list[MakeRecipe] = get_all_recipes(lines)
     elif args.targets:
         recipes = []
-        all_targets: List[str] = find_all_targets(lines)
+        all_targets: list[str] = find_all_targets(lines)
         c: Colors = Colors(enabled=not args.no_color)
         for tgt in args.targets:
             # Check if target contains wildcard characters
             if any(char in tgt for char in ['*', '?', '[']):
                 # Pattern matching mode
-                matched_targets: List[str] = [t for t in all_targets if fnmatch.fnmatch(t, tgt)]
+                matched_targets: list[str] = [t for t in all_targets if fnmatch.fnmatch(t, tgt)]
                 if matched_targets:
                     for matched in matched_targets:
                         recipes.append(MakeRecipe.from_makefile(lines, matched))
@@ -1655,11 +1655,11 @@ def main() -> None:
                     recipes.append(MakeRecipe.from_makefile(lines, tgt))
                 except ValueError: # noqa: PERF203
                     # Find similar targets (fuzzy matching)
-                    fuzzy_matches: List[str] = difflib.get_close_matches(tgt, all_targets, n=5, cutoff=0.6)
+                    fuzzy_matches: list[str] = difflib.get_close_matches(tgt, all_targets, n=5, cutoff=0.6)
                     # Also find targets that contain the attempted target
-                    substring_matches: List[str] = [t for t in all_targets if tgt in t and t not in fuzzy_matches]
+                    substring_matches: list[str] = [t for t in all_targets if tgt in t and t not in fuzzy_matches]
                     # Combine and deduplicate while preserving order
-                    matches: List[str] = fuzzy_matches + substring_matches
+                    matches: list[str] = fuzzy_matches + substring_matches
                     matches = matches[:5]  # Limit to 5 suggestions
 
                     print(f"Error: target '{c.RED}{tgt}{c.RESET}' not found in makefile", file=sys.stderr)
@@ -1674,7 +1674,7 @@ def main() -> None:
         parser.error("Provide target names or use --all flag")
 
     # Print descriptions (color is True by default, unless --no-color is passed)
-    descriptions: List[str] = [
+    descriptions: list[str] = [
         line for recipe in recipes for line in recipe.describe(color=not args.no_color)
     ]
     print("\n".join(descriptions).replace("\n\n", f"\n{'-' * 40}\n"))
@@ -1726,9 +1726,9 @@ with open("pyproject.toml", "rb") as f_pyproject:
 	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
 
 
-def read_scripts(scripts_dir: Path = SCRIPTS_MAKE_DIR) -> Dict[str, str]:
+def read_scripts(scripts_dir: Path = SCRIPTS_MAKE_DIR) -> dict[str, str]:
 	"read script contents into a dict"
-	scripts: Dict[str, str] = {}
+	scripts: dict[str, str] = {}
 	for script in scripts_dir.iterdir():
 		if script.is_file() and script.suffix == ".py":
 			script_text: str = script.read_text()
@@ -1741,7 +1741,7 @@ def read_scripts(scripts_dir: Path = SCRIPTS_MAKE_DIR) -> Dict[str, str]:
 def assemble_make() -> None:
 	"assemble the makefile"
 	contents: str = MAKEFILE_TEMPLATE_PATH.read_text()
-	scripts: Dict[str, str] = read_scripts()
+	scripts: dict[str, str] = read_scripts()
 
 	# inline each script
 	for script_name, script_contents in scripts.items():
@@ -1838,7 +1838,7 @@ from markupsafe import Markup
 CONFIG_PATH: Path = Path("pyproject.toml")
 TOOL_PATH: str = "tool.makefile.docs"
 
-HTML_TO_MD_MAP: Dict[str, str] = {
+HTML_TO_MD_MAP: dict[str, str] = {
 	"&gt;": ">",
 	"&lt;": "<",
 	"&amp;": "&",
@@ -1916,9 +1916,9 @@ class Config:
 	# under tool_path
 	output_dir_str: str = "docs"
 	markdown_headings_increment: int = 2
-	warnings_ignore: List[str] = field(default_factory=list)
+	warnings_ignore: list[str] = field(default_factory=list)
 	notebooks_enabled: bool = False
-	notebooks_descriptions: Dict[str, str] = field(default_factory=dict)
+	notebooks_descriptions: dict[str, str] = field(default_factory=dict)
 	notebooks_source_path_str: str = "notebooks"
 	notebooks_output_path_relative_str: str = "notebooks"
 	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
@@ -1957,7 +1957,7 @@ class Config:
 
 CONFIG: Config
 
-_CFG_PATHS: Dict[str, str] = dict(
+_CFG_PATHS: dict[str, str] = dict(
 	package_name="project.name",
 	package_repo_url="project.urls.Repository",
 	package_version="project.version",
@@ -2114,8 +2114,8 @@ def convert_notebooks() -> None:
 	CONFIG.notebooks_output_path.mkdir(parents=True, exist_ok=True)
 
 	# read in the notebook metadata
-	notebook_names: List[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
-	notebooks: List[Dict[str, str]] = [
+	notebook_names: list[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
+	notebooks: list[dict[str, str]] = [
 		dict(
 			ipynb=notebook.name,
 			html=notebook.with_suffix(".html").name,
@@ -2176,12 +2176,12 @@ def pdoc_combined(*modules, output_file: Path) -> None:  # noqa: ANN002
 
 	"""
 	# Extract all modules and submodules
-	all_modules: Dict[str, pdoc.doc.Module] = {}
+	all_modules: dict[str, pdoc.doc.Module] = {}
 	for module_name in pdoc.extract.walk_specs(modules):
 		all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
 
 	# Generate HTML content for each module
-	module_contents: List[str] = []
+	module_contents: list[str] = []
 	for module in all_modules.values():
 		module_html = pdoc.render.html_module(module, all_modules)
 		module_contents.append(module_html)
@@ -2651,8 +2651,8 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  #
 
 def export_configuration(
 	export: dict,
-	all_groups: List[str],
-	all_extras: List[str],
+	all_groups: list[str],
+	all_extras: list[str],
 	export_opts: dict,
 	output_dir: Path,
 ) -> None:
@@ -2667,16 +2667,16 @@ def export_configuration(
 
 	# get other options with default fallbacks
 	filename: str = export.get("filename") or f"requirements-{name}.txt"
-	groups: Union[List[str], bool, None] = export.get("groups")
-	extras: Union[List[str], bool] = export.get("extras", [])
-	options: List[str] = export.get("options", [])
+	groups: Union[list[str], bool, None] = export.get("groups")
+	extras: Union[list[str], bool] = export.get("extras", [])
+	options: list[str] = export.get("options", [])
 
 	# init command
-	cmd: List[str] = ["uv", "export", *export_opts.get("args", [])]
+	cmd: list[str] = ["uv", "export", *export_opts.get("args", [])]
 
 	# handle groups
 	if groups is not None:
-		groups_list: List[str] = []
+		groups_list: list[str] = []
 		if isinstance(groups, bool):
 			if groups:
 				groups_list = all_groups.copy()
@@ -2690,7 +2690,7 @@ def export_configuration(
 				cmd.extend(["--no-group", group])
 
 	# handle extras
-	extras_list: List[str] = []
+	extras_list: list[str] = []
 	if isinstance(extras, bool):
 		if extras:
 			extras_list = all_extras.copy()
@@ -2718,8 +2718,8 @@ def main(
 		pyproject_data: dict = tomllib.load(f)
 
 	# all available groups
-	all_groups: List[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-	all_extras: List[str] = list(
+	all_groups: list[str] = list(pyproject_data.get("dependency-groups", {}).keys())
+	all_extras: list[str] = list(
 		deep_get(pyproject_data, "project.optional-dependencies", {}).keys(),
 	)
 
@@ -2727,7 +2727,7 @@ def main(
 	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
 
 	# what are we exporting?
-	exports: List[Dict[str, Any]] = export_opts.get("exports", [])
+	exports: list[dict[str, Any]] = export_opts.get("exports", [])
 	if not exports:
 		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
 
@@ -2808,13 +2808,13 @@ def main(
 		sys.exit(1)
 
 	try:
-		log_cmd: List[str] = [
+		log_cmd: list[str] = [
 			"git",
 			"log",
 			f"{last_version}..HEAD",
 			"--pretty=format:- %s (%h)",
 		]
-		commits: List[str] = (
+		commits: list[str] = (
 			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")  # noqa: S603
 		)
 		with open(commit_log_file, "w") as f:
@@ -2851,7 +2851,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 def print_info_dict(
-	info: Dict[str, Union[Any, Dict[str, Any]]],
+	info: dict[str, Union[Any, dict[str, Any]]],
 	indent: str = "  ",
 	level: int = 1,
 ) -> None:
@@ -2866,7 +2866,7 @@ def print_info_dict(
 			print(f"{indent_str}{key:<{longest_key_len}} = {value}")
 
 
-def get_nvcc_info() -> Dict[str, str]:
+def get_nvcc_info() -> dict[str, str]:
 	"get info about cuda from nvcc --version"
 	# Run the nvcc command.
 	try:
@@ -2880,7 +2880,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		return {"Failed to run 'nvcc --version'": str(e)}
 
 	output: str = result.stdout
-	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
+	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
 	assert len(lines) == 5, (  # noqa: PLR2004
@@ -2894,7 +2894,7 @@ def get_nvcc_info() -> Dict[str, str]:
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: Dict[str, Tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -2906,7 +2906,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		"build": (4, re.compile(r"Build (.+)"), 1, str.strip),
 	}
 
-	info: Dict[str, str] = {}
+	info: dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
 		match: Optional[re.Match] = pattern.search(lines[line_index])
 		if not match:
@@ -2921,10 +2921,10 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
+def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 	"get info about pytorch and cuda devices"
-	exceptions: List[Exception] = []
-	info: Dict[str, Any] = {}
+	exceptions: list[Exception] = []
+	info: dict[str, Any] = {}
 
 	try:
 		import torch
@@ -2947,7 +2947,7 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: Dict[str, Union[str, int]] = {}
+						current_device_info: dict[str, Union[str, int]] = {}
 
 						dev_prop = torch.cuda.get_device_properties(
 							torch.device(f"cuda:{current_device}"),
@@ -3002,7 +3002,7 @@ if __name__ == "__main__":
 		},
 	)
 
-	nvcc_info: Dict[str, Any] = get_nvcc_info()
+	nvcc_info: dict[str, Any] = get_nvcc_info()
 	print("nvcc:")
 	print_info_dict(nvcc_info)
 
@@ -3090,7 +3090,7 @@ _TEMPLATE_MD_TABLE: str = """\
 {% endfor %}
 """
 
-TEMPLATES_MD: Dict[str, str] = dict(
+TEMPLATES_MD: dict[str, str] = dict(
 	standard=_TEMPLATE_MD_LIST,
 	table=_TEMPLATE_MD_TABLE,
 )
@@ -3113,15 +3113,15 @@ class Config:
 
 	search_dir: Path = Path()
 	out_file_base: Path = Path("docs/todo-inline")
-	tags: List[str] = field(
+	tags: list[str] = field(
 		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"],
 	)
-	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
-	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
+	extensions: list[str] = field(default_factory=lambda: ["py", "md"])
+	exclude: list[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	valid_post_tag: Union[str, List[str]] = " \t:<>|[](){{}}"
-	valid_pre_tag: Union[str, List[str]] = " \t:<>|[](){{}}#"
-	tag_label_map: Dict[str, str] = field(
+	valid_post_tag: Union[str, list[str]] = " \t:<>|[](){{}}"
+	valid_pre_tag: Union[str, list[str]] = " \t:<>|[](){{}}#"
+	tag_label_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
 			"TODO": "enhancement",
@@ -3130,7 +3130,7 @@ class Config:
 			"HACK": "enhancement",
 		},
 	)
-	extension_lang_map: Dict[str, str] = field(
+	extension_lang_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"py": "python",
 			"md": "markdown",
@@ -3178,12 +3178,12 @@ class Config:
 		if config_file.is_file():
 			# read file and load if present
 			with config_file.open("rb") as f:
-				data: Dict[str, Any] = tomllib.load(f)
+				data: dict[str, Any] = tomllib.load(f)
 
 			# try to get the repo url
 			repo_url: str = "UNKNOWN"
 			try:
-				urls: Dict[str, str] = {
+				urls: dict[str, str] = {
 					k.lower(): v for k, v in data["project"]["urls"].items()
 				}
 				if "repository" in urls:
@@ -3196,7 +3196,7 @@ class Config:
 				)
 
 			# load the inline-todo config if present
-			data_inline_todo: Dict[str, Any] = deep_get(
+			data_inline_todo: dict[str, Any] = deep_get(
 				d=data,
 				path=TOOL_PATH,
 				default={},
@@ -3246,7 +3246,7 @@ class TodoItem:
 	content: str
 	context: str = ""
 
-	def serialize(self) -> Dict[str, Union[str, int]]:
+	def serialize(self) -> dict[str, Union[str, int]]:
 		"serialize to a dict we can dump to json"
 		return {
 			**asdict(self),
@@ -3299,7 +3299,7 @@ class TodoItem:
 		# labels
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
 		# assemble url
-		query: Dict[str, str] = dict(title=title, body=body, labels=label)
+		query: dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
 
@@ -3313,12 +3313,12 @@ class TodoItem:
 def scrape_file(
 	file_path: Path,
 	cfg: Config,
-) -> List[TodoItem]:
+) -> list[TodoItem]:
 	"""Scrapes a file for lines containing any of the specified tags"""
-	items: List[TodoItem] = []
+	items: list[TodoItem] = []
 	if not file_path.is_file():
 		return items
-	lines: List[str] = file_path.read_text(encoding="utf-8").splitlines(True)
+	lines: list[str] = file_path.read_text(encoding="utf-8").splitlines(True)
 
 	# over all lines
 	for i, line in enumerate(lines):
@@ -3352,11 +3352,11 @@ def scrape_file(
 
 def collect_files(
 	search_dir: Path,
-	extensions: List[str],
-	exclude: List[str],
-) -> List[Path]:
+	extensions: list[str],
+	exclude: list[str],
+) -> list[Path]:
 	"""Recursively collects all files with specified extensions, excluding matches via globs"""
-	results: List[Path] = []
+	results: list[Path] = []
 	for ext in extensions:
 		results.extend(search_dir.rglob(f"*.{ext}"))
 
@@ -3368,10 +3368,10 @@ def collect_files(
 
 
 def group_items_by_tag_and_file(
-	items: List[TodoItem],
-) -> Dict[str, Dict[str, List[TodoItem]]]:
+	items: list[TodoItem],
+) -> dict[str, dict[str, list[TodoItem]]]:
 	"""Groups items by tag, then by file"""
-	grouped: Dict[str, Dict[str, List[TodoItem]]] = {}
+	grouped: dict[str, dict[str, list[TodoItem]]] = {}
 	for itm in items:
 		grouped.setdefault(itm.tag, {}).setdefault(itm.file, []).append(itm)
 	for tag_dict in grouped.values():
@@ -3388,8 +3388,8 @@ def main(config_file: Path) -> None:
 	CFG = cfg
 
 	# get data
-	files: List[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
-	all_items: List[TodoItem] = []
+	files: list[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
+	all_items: list[TodoItem] = []
 	n_files: int = len(files)
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
@@ -3404,7 +3404,7 @@ def main(config_file: Path) -> None:
 			f.write(json.dumps(itm.serialize()) + "\n")
 
 	# group, render
-	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
+	grouped: dict[str, dict[str, list[TodoItem]]] = group_items_by_tag_and_file(
 		all_items,
 	)
 
@@ -3563,7 +3563,7 @@ def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	with pyproject_path.open("rb") as f:
 		config = tomllib.load(f)
 
-	preserved: List[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
+	preserved: list[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
 	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
 
 	# Convert to absolute paths and validate
@@ -3633,10 +3633,10 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 
-def parse_mypy_output(lines: List[str]) -> Dict[str, int]:
+def parse_mypy_output(lines: list[str]) -> dict[str, int]:
 	"given mypy output, turn it into a dict of `filename: error_count`"
 	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
-	counts: Dict[str, int] = {}
+	counts: dict[str, int] = {}
 	for line in lines:
 		m = pattern.match(line)
 		if m:
@@ -3651,9 +3651,9 @@ def main() -> None:
 	parser: argparse.ArgumentParser = argparse.ArgumentParser()
 	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
 	args: argparse.Namespace = parser.parse_args()
-	lines: List[str] = sys.stdin.read().splitlines()
-	error_dict: Dict[str, int] = parse_mypy_output(lines)
-	sorted_errors: List[Tuple[str, int]] = sorted(
+	lines: list[str] = sys.stdin.read().splitlines()
+	error_dict: dict[str, int] = parse_mypy_output(lines)
+	sorted_errors: list[tuple[str, int]] = sorted(
 		error_dict.items(),
 		key=lambda x: x[1],
 	)
@@ -3696,7 +3696,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Union
 
 
-def _scan_makefile(lines: List[str], target_name: Optional[str] = None) -> Union[Dict[str, int], int]:
+def _scan_makefile(lines: list[str], target_name: Optional[str] = None) -> Union[dict[str, int], int]:
     """Scan makefile for target definitions, skipping define blocks.
 
     Args:
@@ -3710,7 +3710,7 @@ def _scan_makefile(lines: List[str], target_name: Optional[str] = None) -> Union
     """
     in_define_block: bool = False
     target_rx: re.Pattern = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
-    targets: Dict[str, int] = {}
+    targets: dict[str, int] = {}
 
     for i, line in enumerate(lines):
         # Track if we're inside a define block (embedded scripts)
@@ -3766,12 +3766,12 @@ class MakeRecipe:
     """Information about a Makefile recipe/target."""
 
     target: str
-    comments: List[str]
-    dependencies: List[str]
+    comments: list[str]
+    dependencies: list[str]
     echo_message: str
 
     @classmethod
-    def from_makefile(cls, lines: List[str], target: str) -> "MakeRecipe":
+    def from_makefile(cls, lines: list[str], target: str) -> "MakeRecipe":
         """Parse and create a MakeRecipe from makefile lines for *target*."""
         i: int = _scan_makefile(lines, target_name=target)
         if i == -1:
@@ -3782,7 +3782,7 @@ class MakeRecipe:
 
         # contiguous comment block immediately above
         # (skip backward past .PHONY declarations and blank lines)
-        comments: List[str] = []
+        comments: list[str] = []
         j: int = i - 1
         blank_count: int = 0
         while j >= 0:
@@ -3809,7 +3809,7 @@ class MakeRecipe:
 
         # prerequisites
         deps_str: str = line.split(":", 1)[1].strip()
-        deps: List[str] = deps_str.split() if deps_str else []
+        deps: list[str] = deps_str.split() if deps_str else []
 
         # first echo in the recipe
         echo_msg: str = ""
@@ -3834,9 +3834,9 @@ class MakeRecipe:
             echo_message=echo_msg,
         )
 
-    def describe(self, color: bool = False) -> List[str]:
+    def describe(self, color: bool = False) -> list[str]:
         """Return a list of description lines for this recipe."""
-        output: List[str] = []
+        output: list[str] = []
         c: Colors = Colors(enabled=color)
 
         # Target name (bold blue) with colon in white
@@ -3859,7 +3859,7 @@ class MakeRecipe:
         return output
 
 
-def find_all_targets(lines: List[str]) -> List[str]:
+def find_all_targets(lines: list[str]) -> list[str]:
     """Find all .PHONY target names in the makefile."""
     # First, get all .PHONY declarations
     phony_targets: Set[str] = set()
@@ -3871,23 +3871,23 @@ def find_all_targets(lines: List[str]) -> List[str]:
         match = phony_pattern.match(line)
         if match:
             # Get all targets from this .PHONY line (space-separated)
-            target_names: List[str] = match.group(1).split()
+            target_names: list[str] = match.group(1).split()
             phony_targets.update(target_names)
 
     # Now scan for actual target definitions and filter to .PHONY ones
-    all_target_defs: Dict[str, int] = _scan_makefile(lines)
+    all_target_defs: dict[str, int] = _scan_makefile(lines)
     return [tgt for tgt in all_target_defs if tgt in phony_targets]
 
 
-def get_all_recipes(lines: List[str]) -> List[MakeRecipe]:
+def get_all_recipes(lines: list[str]) -> list[MakeRecipe]:
     """Get MakeRecipe objects for all .PHONY targets in the makefile."""
-    targets: List[str] = find_all_targets(lines)
+    targets: list[str] = find_all_targets(lines)
     return [MakeRecipe.from_makefile(lines, target) for target in targets]
 
 
 def describe_target(makefile_path: Path, target: str) -> None:
     """Emit the description for *target*."""
-    lines: List[str] = makefile_path.read_text(encoding="utf-8").splitlines()
+    lines: list[str] = makefile_path.read_text(encoding="utf-8").splitlines()
     recipe: MakeRecipe = MakeRecipe.from_makefile(lines, target)
 
     for line in recipe.describe():
@@ -3920,20 +3920,20 @@ def main() -> None:
     parser.add_argument("targets", nargs="*", help="Target names")
     args: argparse.Namespace = parser.parse_args()
 
-    lines: List[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
+    lines: list[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
 
     # Get recipes to describe
     if args.all:
-        recipes: List[MakeRecipe] = get_all_recipes(lines)
+        recipes: list[MakeRecipe] = get_all_recipes(lines)
     elif args.targets:
         recipes = []
-        all_targets: List[str] = find_all_targets(lines)
+        all_targets: list[str] = find_all_targets(lines)
         c: Colors = Colors(enabled=not args.no_color)
         for tgt in args.targets:
             # Check if target contains wildcard characters
             if any(char in tgt for char in ['*', '?', '[']):
                 # Pattern matching mode
-                matched_targets: List[str] = [t for t in all_targets if fnmatch.fnmatch(t, tgt)]
+                matched_targets: list[str] = [t for t in all_targets if fnmatch.fnmatch(t, tgt)]
                 if matched_targets:
                     for matched in matched_targets:
                         recipes.append(MakeRecipe.from_makefile(lines, matched))
@@ -3946,11 +3946,11 @@ def main() -> None:
                     recipes.append(MakeRecipe.from_makefile(lines, tgt))
                 except ValueError: # noqa: PERF203
                     # Find similar targets (fuzzy matching)
-                    fuzzy_matches: List[str] = difflib.get_close_matches(tgt, all_targets, n=5, cutoff=0.6)
+                    fuzzy_matches: list[str] = difflib.get_close_matches(tgt, all_targets, n=5, cutoff=0.6)
                     # Also find targets that contain the attempted target
-                    substring_matches: List[str] = [t for t in all_targets if tgt in t and t not in fuzzy_matches]
+                    substring_matches: list[str] = [t for t in all_targets if tgt in t and t not in fuzzy_matches]
                     # Combine and deduplicate while preserving order
-                    matches: List[str] = fuzzy_matches + substring_matches
+                    matches: list[str] = fuzzy_matches + substring_matches
                     matches = matches[:5]  # Limit to 5 suggestions
 
                     print(f"Error: target '{c.RED}{tgt}{c.RESET}' not found in makefile", file=sys.stderr)
@@ -3965,7 +3965,7 @@ def main() -> None:
         parser.error("Provide target names or use --all flag")
 
     # Print descriptions (color is True by default, unless --no-color is passed)
-    descriptions: List[str] = [
+    descriptions: list[str] = [
         line for recipe in recipes for line in recipe.describe(color=not args.no_color)
     ]
     print("\n".join(descriptions).replace("\n\n", f"\n{'-' * 40}\n"))

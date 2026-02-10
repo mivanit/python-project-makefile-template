@@ -12,19 +12,20 @@ Prints 'v<version>' on success, 'NULL' on failure.
 from __future__ import annotations
 
 import sys
+from typing import Any, cast
 
 try:
 	try:
 		import tomllib  # type: ignore[import-not-found]
 	except ImportError:
-		import tomli as tomllib  # type: ignore
+		import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 
 	pyproject_path: str = sys.argv[1].strip()
 
 	with open(pyproject_path, "rb") as f:
-		pyproject_data: dict = tomllib.load(f)
+		pyproject_data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 	print("v" + pyproject_data["project"]["version"], end="")
-except Exception:  # noqa: BLE001
+except Exception:
 	print("NULL", end="")
 	sys.exit(1)

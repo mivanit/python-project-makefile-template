@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from typing import List
 
 
 def main(
@@ -26,17 +25,17 @@ def main(
 		sys.exit(1)
 
 	try:
-		log_cmd: List[str] = [
+		log_cmd: list[str] = [
 			"git",
 			"log",
 			f"{last_version}..HEAD",
 			"--pretty=format:- %s (%h)",
 		]
-		commits: List[str] = (
+		commits: list[str] = (
 			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")  # noqa: S603
 		)
 		with open(commit_log_file, "w") as f:
-			f.write("\n".join(reversed(commits)))
+			_ = f.write("\n".join(reversed(commits)))
 	except subprocess.CalledProcessError as e:
 		print(f"Error: {e}", file=sys.stderr)
 		sys.exit(1)

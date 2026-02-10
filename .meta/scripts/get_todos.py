@@ -20,19 +20,24 @@ import warnings
 from dataclasses import asdict, dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, cast
 
 from jinja2 import Template
 
 try:
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
-	import tomli as tomllib  # type: ignore
+	import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
+def deep_get(
+	d: dict[str, Any],
+	path: str,
+	default: Any = None,  # noqa: ANN401
+	sep: str = ".",
+) -> Any:  # noqa: ANN401
 	"get a value from a nested dictionary"
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
@@ -73,7 +78,7 @@ _TEMPLATE_MD_TABLE: str = """\
 {% endfor %}
 """
 
-TEMPLATES_MD: Dict[str, str] = dict(
+TEMPLATES_MD: dict[str, str] = dict(
 	standard=_TEMPLATE_MD_LIST,
 	table=_TEMPLATE_MD_TABLE,
 )
@@ -96,15 +101,15 @@ class Config:
 
 	search_dir: Path = Path()
 	out_file_base: Path = Path("docs/todo-inline")
-	tags: List[str] = field(
+	tags: list[str] = field(
 		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"],
 	)
-	extensions: List[str] = field(default_factory=lambda: ["py", "md"])
-	exclude: List[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
+	extensions: list[str] = field(default_factory=lambda: ["py", "md"])
+	exclude: list[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	valid_post_tag: Union[str, List[str]] = " \t:<>|[](){{}}"
-	valid_pre_tag: Union[str, List[str]] = " \t:<>|[](){{}}#"
-	tag_label_map: Dict[str, str] = field(
+	valid_post_tag: str | list[str] = " \t:<>|[](){{}}"
+	valid_pre_tag: str | list[str] = " \t:<>|[](){{}}#"
+	tag_label_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
 			"TODO": "enhancement",
@@ -113,7 +118,7 @@ class Config:
 			"HACK": "enhancement",
 		},
 	)
-	extension_lang_map: Dict[str, str] = field(
+	extension_lang_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"py": "python",
 			"md": "markdown",
@@ -161,25 +166,25 @@ class Config:
 		if config_file.is_file():
 			# read file and load if present
 			with config_file.open("rb") as f:
-				data: Dict[str, Any] = tomllib.load(f)
+				data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 			# try to get the repo url
 			repo_url: str = "UNKNOWN"
 			try:
-				urls: Dict[str, str] = {
+				urls: dict[str, str] = {
 					k.lower(): v for k, v in data["project"]["urls"].items()
 				}
 				if "repository" in urls:
 					repo_url = urls["repository"]
 				if "github" in urls:
 					repo_url = urls["github"]
-			except Exception as e:  # noqa: BLE001
+			except Exception as e:
 				warnings.warn(
 					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
 				)
 
 			# load the inline-todo config if present
-			data_inline_todo: Dict[str, Any] = deep_get(
+			data_inline_todo: dict[str, Any] = deep_get(
 				d=data,
 				path=TOOL_PATH,
 				default={},
@@ -196,7 +201,7 @@ class Config:
 		return output
 
 	@classmethod
-	def load(cls, data: dict) -> Config:
+	def load(cls, data: dict[str, Any]) -> Config:
 		"load from a dictionary, converting to `Path` as needed"
 		# process variables that should be paths
 		data = {
@@ -229,7 +234,7 @@ class TodoItem:
 	content: str
 	context: str = ""
 
-	def serialize(self) -> Dict[str, Union[str, int]]:
+	def serialize(self) -> dict[str, str | int]:
 		"serialize to a dict we can dump to json"
 		return {
 			**asdict(self),
@@ -282,7 +287,7 @@ class TodoItem:
 		# labels
 		label: str = CFG.tag_label_map.get(self.tag, self.tag)
 		# assemble url
-		query: Dict[str, str] = dict(title=title, body=body, labels=label)
+		query: dict[str, str] = dict(title=title, body=body, labels=label)
 		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
 		return f"{CFG.repo_url}/issues/new?{query_string}"
 
@@ -296,12 +301,12 @@ class TodoItem:
 def scrape_file(
 	file_path: Path,
 	cfg: Config,
-) -> List[TodoItem]:
+) -> list[TodoItem]:
 	"""Scrapes a file for lines containing any of the specified tags"""
-	items: List[TodoItem] = []
+	items: list[TodoItem] = []
 	if not file_path.is_file():
 		return items
-	lines: List[str] = file_path.read_text(encoding="utf-8").splitlines(True)
+	lines: list[str] = file_path.read_text(encoding="utf-8").splitlines(True)
 
 	# over all lines
 	for i, line in enumerate(lines):
@@ -335,11 +340,11 @@ def scrape_file(
 
 def collect_files(
 	search_dir: Path,
-	extensions: List[str],
-	exclude: List[str],
-) -> List[Path]:
+	extensions: list[str],
+	exclude: list[str],
+) -> list[Path]:
 	"""Recursively collects all files with specified extensions, excluding matches via globs"""
-	results: List[Path] = []
+	results: list[Path] = []
 	for ext in extensions:
 		results.extend(search_dir.rglob(f"*.{ext}"))
 
@@ -351,10 +356,10 @@ def collect_files(
 
 
 def group_items_by_tag_and_file(
-	items: List[TodoItem],
-) -> Dict[str, Dict[str, List[TodoItem]]]:
+	items: list[TodoItem],
+) -> dict[str, dict[str, list[TodoItem]]]:
 	"""Groups items by tag, then by file"""
-	grouped: Dict[str, Dict[str, List[TodoItem]]] = {}
+	grouped: dict[str, dict[str, list[TodoItem]]] = {}
 	for itm in items:
 		grouped.setdefault(itm.tag, {}).setdefault(itm.file, []).append(itm)
 	for tag_dict in grouped.values():
@@ -368,11 +373,11 @@ def main(config_file: Path) -> None:
 	global CFG  # noqa: PLW0603
 	# read configuration
 	cfg: Config = Config.read(config_file)
-	CFG = cfg
+	CFG = cfg  # pyright: ignore[reportConstantRedefinition]
 
 	# get data
-	files: List[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
-	all_items: List[TodoItem] = []
+	files: list[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
+	all_items: list[TodoItem] = []
 	n_files: int = len(files)
 	for i, fpath in enumerate(files):
 		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
@@ -386,7 +391,7 @@ def main(config_file: Path) -> None:
 		f.writelines(json.dumps(itm.serialize()) + "\n" for itm in all_items)
 
 	# group, render
-	grouped: Dict[str, Dict[str, List[TodoItem]]] = group_items_by_tag_and_file(
+	grouped: dict[str, dict[str, list[TodoItem]]] = group_items_by_tag_and_file(
 		all_items,
 	)
 
@@ -398,7 +403,7 @@ def main(config_file: Path) -> None:
 				cfg.out_file_base.stem + f"-{template_key}",
 			).with_suffix(".md"),
 		)
-		template_out_path.write_text(rendered, encoding="utf-8")
+		_ = template_out_path.write_text(rendered, encoding="utf-8")
 
 	# write html output
 	try:
@@ -406,11 +411,11 @@ def main(config_file: Path) -> None:
 			"//{{DATA}}//",
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
-		cfg.out_file_base.with_suffix(".html").write_text(
+		_ = cfg.out_file_base.with_suffix(".html").write_text(
 			html_rendered,
 			encoding="utf-8",
 		)
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
@@ -420,11 +425,12 @@ def main(config_file: Path) -> None:
 if __name__ == "__main__":
 	# parse args
 	parser: argparse.ArgumentParser = argparse.ArgumentParser("inline_todo")
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--config-file",
 		default="pyproject.toml",
 		help="Path to the TOML config, will look under [tool.inline-todo].",
 	)
 	args: argparse.Namespace = parser.parse_args()
+	config_file: str = args.config_file
 	# call main
-	main(Path(args.config_file))
+	main(Path(config_file))

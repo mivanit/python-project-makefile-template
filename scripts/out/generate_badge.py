@@ -91,12 +91,12 @@ def generate_badge_svg(label: str, value: str, color: str) -> str:
 	"""Generate a GitHub-style flat badge SVG.
 
 	Args:
-	    label: Left side text (e.g., "coverage", "tests")
-	    value: Right side text (e.g., "85%", "42 passed")
-	    color: Hex color for the value background (with or without #)
+		label: Left side text (e.g., "coverage", "tests")
+		value: Right side text (e.g., "85%", "42 passed")
+		color: Hex color for the value background (with or without #)
 
 	Returns:
-	    SVG string
+		SVG string
 
 	"""
 	if not color.startswith("#"):
@@ -129,10 +129,10 @@ def read_coverage_from_txt(coverage_path: Path) -> float:
 	"""Read coverage percentage from coverage.txt report.
 
 	Args:
-	    coverage_path: Path to coverage.txt file
+		coverage_path: Path to coverage.txt file
 
 	Returns:
-	    Coverage percentage (0-100)
+		Coverage percentage (0-100)
 
 	"""
 	content = coverage_path.read_text()
@@ -147,17 +147,18 @@ def read_coverage_from_txt(coverage_path: Path) -> float:
 	if match:
 		return float(match.group(1))
 
-	raise RuntimeError(f"Could not parse coverage percentage from {coverage_path}")
+	msg = f"Could not parse coverage percentage from {coverage_path}"
+	raise RuntimeError(msg)
 
 
 def parse_pytest_results(results_path: Path) -> tuple[int, int, int]:
 	"""Parse pytest output to get test counts.
 
 	Args:
-	    results_path: Path to file containing pytest output
+		results_path: Path to file containing pytest output
 
 	Returns:
-	    Tuple of (passed, failed, total)
+		Tuple of (passed, failed, total)
 
 	"""
 	content = results_path.read_text()
@@ -202,10 +203,10 @@ def resolve_color(color_input: str) -> str:
 	"""Resolve color name or hex code to hex value.
 
 	Args:
-	    color_input: Color name (e.g., "green") or hex code (e.g., "#4c1" or "4c1")
+		color_input: Color name (e.g., "green") or hex code (e.g., "#4c1" or "4c1")
 
 	Returns:
-	    Hex color code with #
+		Hex color code with #
 
 	"""
 	if color_input in COLORS:
@@ -223,17 +224,17 @@ def main() -> int:
 	)
 
 	# Generic mode
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--label",
 		type=str,
 		help="Badge label (left side text)",
 	)
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--value",
 		type=str,
 		help="Badge value (right side text)",
 	)
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--color",
 		type=str,
 		default="gray",
@@ -241,7 +242,7 @@ def main() -> int:
 	)
 
 	# Coverage mode
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--coverage",
 		type=Path,
 		metavar="PATH",
@@ -249,7 +250,7 @@ def main() -> int:
 	)
 
 	# Tests mode
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--pytest-results",
 		type=Path,
 		metavar="PATH",
@@ -303,7 +304,7 @@ def main() -> int:
 			parser.error(
 				"Must specify either --coverage, --pytest-results, or both --label and --value"
 			)
-			return 1
+			return 1  # pyright: ignore[reportUnreachable]
 
 		svg = generate_badge_svg(label, value, color)
 		print(svg)

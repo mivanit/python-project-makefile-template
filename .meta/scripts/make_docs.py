@@ -21,13 +21,13 @@ import warnings
 from dataclasses import asdict, dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, cast
 
 try:
 	# python 3.11+
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
-	import tomli as tomllib  # type: ignore
+	import tomli as tomllib  # type: ignore  # pyright: ignore[reportMissingImports]
 
 import jinja2
 import pdoc  # type: ignore[import-not-found]
@@ -52,7 +52,7 @@ from markupsafe import Markup
 CONFIG_PATH: Path = Path("pyproject.toml")
 TOOL_PATH: str = "tool.makefile.docs"
 
-HTML_TO_MD_MAP: Dict[str, str] = {
+HTML_TO_MD_MAP: dict[str, str] = {
 	"&gt;": ">",
 	"&lt;": "<",
 	"&amp;": "&",
@@ -61,8 +61,8 @@ HTML_TO_MD_MAP: Dict[str, str] = {
 	"&apos;": "'",
 }
 
-pdoc.render_helpers.markdown_extensions["alerts"] = True  # type: ignore[assignment]
-pdoc.render_helpers.markdown_extensions["admonitions"] = True  # type: ignore[assignment]
+pdoc.render_helpers.markdown_extensions["alerts"] = True  # type: ignore[assignment]  # pyright: ignore[reportArgumentType]
+pdoc.render_helpers.markdown_extensions["admonitions"] = True  # type: ignore[assignment]  # pyright: ignore[reportArgumentType]
 
 
 _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
@@ -92,7 +92,7 @@ _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
 
 
 def deep_get(
-	d: dict,
+	d: dict[str, Any],
 	path: str,
 	default: Any = None,  # noqa: ANN401
 	sep: str = ".",
@@ -130,9 +130,9 @@ class Config:
 	# under tool_path
 	output_dir_str: str = "docs"
 	markdown_headings_increment: int = 2
-	warnings_ignore: List[str] = field(default_factory=list)
+	warnings_ignore: list[str] = field(default_factory=list)
 	notebooks_enabled: bool = False
-	notebooks_descriptions: Dict[str, str] = field(default_factory=dict)
+	notebooks_descriptions: dict[str, str] = field(default_factory=dict)
 	notebooks_source_path_str: str = "notebooks"
 	notebooks_output_path_relative_str: str = "notebooks"
 	notebooks_index_template: str = _CONFIG_NOTEBOOKS_INDEX_TEMPLATE
@@ -171,7 +171,7 @@ class Config:
 
 CONFIG: Config
 
-_CFG_PATHS: Dict[str, str] = dict(
+_CFG_PATHS: dict[str, str] = dict(
 	package_name="project.name",
 	package_repo_url="project.urls.Repository",
 	package_version="project.version",
@@ -186,7 +186,7 @@ _CFG_PATHS: Dict[str, str] = dict(
 )
 
 
-def set_global_config() -> None:
+def set_global_config() -> Config:
 	"""set global var `CONFIG` from pyproject.toml"""
 	global CONFIG  # noqa: PLW0603
 
@@ -194,10 +194,10 @@ def set_global_config() -> None:
 	cfg_default: Config = Config()
 
 	with CONFIG_PATH.open("rb") as f:
-		pyproject_data = tomllib.load(f)
+		pyproject_data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 	# apply the mapping from toml path to attribute
-	cfg_partial: dict = {
+	cfg_partial: dict[str, Any] = {
 		key: deep_get(
 			d=pyproject_data,
 			path=path,
@@ -210,13 +210,15 @@ def set_global_config() -> None:
 	}
 
 	# set the global var
-	CONFIG = Config(**cfg_partial)
+	CONFIG = Config(**cfg_partial)  # pyright: ignore[reportConstantRedefinition]
 
 	# add the package meta to the pdoc globals
-	pdoc.render.env.globals["package_version"] = CONFIG.package_version
-	pdoc.render.env.globals["package_name"] = CONFIG.package_name
-	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url
-	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url
+	pdoc.render.env.globals["package_version"] = CONFIG.package_version  # pyright: ignore[reportArgumentType]
+	pdoc.render.env.globals["package_name"] = CONFIG.package_name  # pyright: ignore[reportArgumentType]
+	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url  # pyright: ignore[reportArgumentType]
+	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url  # pyright: ignore[reportArgumentType]
+
+	return CONFIG
 
 
 """
@@ -232,7 +234,7 @@ def set_global_config() -> None:
 # ============================================================
 
 
-def replace_heading(match: re.Match) -> str:
+def replace_heading(match: re.Match[str]) -> str:
 	"replace a matched heading with an incremented version"
 	current_level: int = len(match.group(1))
 	new_level: int = min(
@@ -254,7 +256,7 @@ def increment_markdown_headings(markdown_text: str) -> str:
 		The Markdown text with incremented heading levels.
 	"""
 	# Regular expression to match Markdown headings
-	heading_pattern: re.Pattern = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
+	heading_pattern: re.Pattern[str] = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
 
 	# Replace all headings with incremented versions
 	return heading_pattern.sub(replace_heading, markdown_text)
@@ -263,8 +265,8 @@ def increment_markdown_headings(markdown_text: str) -> str:
 def format_signature(sig: inspect.Signature, colon: bool) -> Markup:
 	"""Format a function signature for Markdown. Returns a single-line Markdown string."""
 	# First get a list with all params as strings.
-	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore
-	return_annot = pdoc.doc._PrettySignature._return_annotation_str(sig)  # type: ignore
+	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore  # pyright: ignore[reportArgumentType,reportPrivateUsage]
+	return_annot = pdoc.doc._PrettySignature._return_annotation_str(sig)  # type: ignore  # pyright: ignore[reportArgumentType,reportPrivateUsage]
 
 	def _format_param(param: str) -> str:
 		"""Format a parameter for Markdown, including potential links."""
@@ -298,7 +300,7 @@ def markup_safe(sig: inspect.Signature) -> str:
 
 def use_markdown_format() -> None:
 	"set some functions to output markdown format"
-	pdoc.render_helpers.format_signature = format_signature
+	pdoc.render_helpers.format_signature = format_signature  # type: ignore[invalid-assignment]
 	pdoc.render.env.filters["markup_safe"] = markup_safe
 	pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
 
@@ -329,8 +331,8 @@ def convert_notebooks() -> None:
 	CONFIG.notebooks_output_path.mkdir(parents=True, exist_ok=True)
 
 	# read in the notebook metadata
-	notebook_names: List[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
-	notebooks: List[Dict[str, str]] = [
+	notebook_names: list[Path] = list(CONFIG.notebooks_source_path.glob("*.ipynb"))
+	notebooks: list[dict[str, str]] = [
 		dict(
 			ipynb=notebook.name,
 			html=notebook.with_suffix(".html").name,
@@ -353,8 +355,11 @@ def convert_notebooks() -> None:
 			CONFIG.notebooks_output_path / notebook.with_suffix(".html").name
 		)
 		with open(notebook, "r") as f_in:
-			nb: nbformat.NotebookNode = nbformat.read(f_in, as_version=4)
-			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()
+			nb: nbformat.NotebookNode = cast(
+				"nbformat.NotebookNode",
+				nbformat.read(f_in, as_version=4),  # pyright: ignore[reportUnknownMemberType]
+			)
+			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()  # ty: ignore[possibly-missing-attribute]
 			body: str
 			body, _ = html_exporter.from_notebook_node(nb)
 			with open(output_notebook, "w") as f_out:
@@ -374,7 +379,7 @@ def convert_notebooks() -> None:
 # ============================================================
 
 
-def pdoc_combined(*modules, output_file: Path) -> None:  # noqa: ANN002
+def pdoc_combined(*modules: str, output_file: Path) -> None:
 	"""Render the documentation for a list of modules into a single HTML file.
 
 	Args:
@@ -391,12 +396,12 @@ def pdoc_combined(*modules, output_file: Path) -> None:  # noqa: ANN002
 
 	"""
 	# Extract all modules and submodules
-	all_modules: Dict[str, pdoc.doc.Module] = {}
+	all_modules: dict[str, pdoc.doc.Module] = {}
 	for module_name in pdoc.extract.walk_specs(modules):
 		all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
 
 	# Generate HTML content for each module
-	module_contents: List[str] = []
+	module_contents: list[str] = []
 	for module in all_modules.values():
 		module_html = pdoc.render.html_module(module, all_modules)
 		module_contents.append(module_html)
@@ -442,7 +447,7 @@ if __name__ == "__main__":
 	# configure pdoc
 	# --------------------------------------------------
 	# read what we need from the pyproject.toml, add stuff to pdoc globals
-	set_global_config()
+	CONFIG = set_global_config()  # pyright: ignore[reportConstantRedefinition]
 
 	# ignore warnings if needed
 	if not parsed_args.warn_all:
