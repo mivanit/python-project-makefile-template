@@ -90,7 +90,6 @@ jobs:
       # Documentation commands
       - run: make docs-html
       - run: make docs-md
-      - run: make docs-combined
       - run: make docs
       - run: make todo
       # these two will not work under python < 3.11
