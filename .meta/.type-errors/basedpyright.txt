@@ -1,5 +1,1 @@
-/home/miv/projects/tools/python-project-makefile-template/scripts/make/make_docs.py
-  /home/miv/projects/tools/python-project-makefile-template/scripts/make/make_docs.py:359:30 - warning: Type of "read" is partially unknown
-    Type of "read" is "(fp: Unknown, as_version: Unknown, capture_validation_error: Unknown | None = None, **kwargs: Unknown) -> (Unknown | Any)" (reportUnknownMemberType)
-  /home/miv/projects/tools/python-project-makefile-template/scripts/make/make_docs.py:360:25 - warning: Unnecessary "# pyright: ignore" rule: "reportUnknownMemberType" (reportUnnecessaryTypeIgnoreComment)
-0 errors, 2 warnings, 0 notes
+0 errors, 0 warnings, 0 notes

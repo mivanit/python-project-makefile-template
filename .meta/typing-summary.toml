@@ -1,5 +1,5 @@
 # mypy: Success: no issues found in 11 source files
-# basedpyright: 0 errors, 2 warnings, 0 notes
+# basedpyright: 0 errors, 0 warnings, 0 notes
 # ty: All checks passed!
 
 [type_errors.mypy]
@@ -15,16 +15,6 @@ total_errors = 0
 [type_errors.basedpyright.by_type]
 
 [type_errors.basedpyright.by_file]
-
-[type_warnings.basedpyright]
-total_warnings = 2
-
-[type_warnings.basedpyright.by_type]
-"reportUnknownMemberType" = 1
-"reportUnnecessaryTypeIgnoreComment" = 1
-
-[type_warnings.basedpyright.by_file]
-"scripts/make/make_docs.py" = 2
 
 [type_errors.ty]
 total_errors = 0
