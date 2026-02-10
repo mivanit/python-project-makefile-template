@@ -23,7 +23,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Dict, List, Literal, Tuple
+from typing import Callable, Literal
 
 
 def strip_cwd(path: str) -> str:
@@ -57,11 +57,11 @@ class TypeCheckResult:
 	"results from parsing a type checker output"
 
 	type_checker: Literal["mypy", "basedpyright", "ty"]
-	by_type: Dict[str, int] = field(default_factory=lambda: defaultdict(int))
-	by_file: Dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	by_type: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	by_file: dict[str, int] = field(default_factory=lambda: defaultdict(int))
 	# Separate tracking for warnings (used by basedpyright)
-	warnings_by_type: Dict[str, int] = field(default_factory=lambda: defaultdict(int))
-	warnings_by_file: Dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	warnings_by_type: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	warnings_by_file: dict[str, int] = field(default_factory=lambda: defaultdict(int))
 
 	@property
 	def total_errors(self) -> int:
@@ -90,22 +90,22 @@ class TypeCheckResult:
 	def sorted_results(self) -> TypeCheckResult:
 		"return a copy with errors sorted by count (descending)"
 		# Sort by count (descending)
-		sorted_by_type: List[Tuple[str, int]] = sorted(
+		sorted_by_type: list[tuple[str, int]] = sorted(
 			self.by_type.items(),
 			key=lambda x: x[1],
 			reverse=True,
 		)
-		sorted_by_file: List[Tuple[str, int]] = sorted(
+		sorted_by_file: list[tuple[str, int]] = sorted(
 			self.by_file.items(),
 			key=lambda x: x[1],
 			reverse=True,
 		)
-		sorted_warnings_by_type: List[Tuple[str, int]] = sorted(
+		sorted_warnings_by_type: list[tuple[str, int]] = sorted(
 			self.warnings_by_type.items(),
 			key=lambda x: x[1],
 			reverse=True,
 		)
-		sorted_warnings_by_file: List[Tuple[str, int]] = sorted(
+		sorted_warnings_by_file: list[tuple[str, int]] = sorted(
 			self.warnings_by_file.items(),
 			key=lambda x: x[1],
 			reverse=True,
@@ -122,7 +122,7 @@ class TypeCheckResult:
 
 	def to_toml(self) -> str:
 		"format as TOML output"
-		lines: List[str] = []
+		lines: list[str] = []
 
 		# Main section with total
 		lines.append(f"[type_errors.{self.type_checker}]")
@@ -267,8 +267,8 @@ def parse_ty(content: str) -> TypeCheckResult:
 	)
 
 	# Find all errors and their locations
-	errors: List[re.Match[str]] = list(error_pattern.finditer(content))
-	locations: List[re.Match[str]] = list(location_pattern.finditer(content))
+	errors: list[re.Match[str]] = list(error_pattern.finditer(content))
+	locations: list[re.Match[str]] = list(location_pattern.finditer(content))
 
 	# Match errors with locations (they should be in order)
 	error_match: re.Match[str]
@@ -291,21 +291,21 @@ def parse_ty(content: str) -> TypeCheckResult:
 def extract_summary_line(file_path: Path) -> str:
 	"extract the last non-empty line from a file (typically the summary line)"
 	content: str = file_path.read_text(encoding="utf-8")
-	lines: List[str] = [line.strip() for line in content.splitlines() if line.strip()]
+	lines: list[str] = [line.strip() for line in content.splitlines() if line.strip()]
 	if not lines:
 		return "(empty output)"
 	return lines[-1]
 
 
-def main(error_dir: str, output_file: str, checkers: List[str]) -> None:
+def main(error_dir: str, output_file: str, checkers: list[str]) -> None:
 	"parse all type checker outputs and generate breakdown"
 	error_path: Path = Path(error_dir)
 	output_path: Path = Path(output_file)
 
-	output_lines: List[str] = []
+	output_lines: list[str] = []
 
 	# First, extract summary lines from each type checker
-	checkers_info: List[Tuple[str, str, Callable[[str], TypeCheckResult]]] = [
+	checkers_info: list[tuple[str, str, Callable[[str], TypeCheckResult]]] = [
 		("mypy", "mypy.txt", parse_mypy),
 		("basedpyright", "basedpyright.txt", parse_basedpyright),
 		("ty", "ty.txt", parse_ty),
@@ -381,6 +381,6 @@ if __name__ == "__main__":
 	args: argparse.Namespace = parser.parse_args()
 
 	# Parse checkers list
-	checkers_list: List[str] = [c.strip() for c in args.checkers.split(",")]
+	checkers_list: list[str] = [c.strip() for c in args.checkers.split(",")]
 
 	main(error_dir=args.error_dir, output_file=args.output, checkers=checkers_list)

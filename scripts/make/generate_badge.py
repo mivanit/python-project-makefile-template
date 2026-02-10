@@ -224,17 +224,17 @@ def main() -> int:
 	)
 
 	# Generic mode
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--label",
 		type=str,
 		help="Badge label (left side text)",
 	)
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--value",
 		type=str,
 		help="Badge value (right side text)",
 	)
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--color",
 		type=str,
 		default="gray",
@@ -242,7 +242,7 @@ def main() -> int:
 	)
 
 	# Coverage mode
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--coverage",
 		type=Path,
 		metavar="PATH",
@@ -250,7 +250,7 @@ def main() -> int:
 	)
 
 	# Tests mode
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--pytest-results",
 		type=Path,
 		metavar="PATH",
@@ -304,7 +304,7 @@ def main() -> int:
 			parser.error(
 				"Must specify either --coverage, --pytest-results, or both --label and --value"
 			)
-			return 1
+			return 1  # pyright: ignore[reportUnreachable]
 
 		svg = generate_badge_svg(label, value, color)
 		print(svg)

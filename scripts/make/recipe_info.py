@@ -21,23 +21,23 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Literal, Set, Union, overload
+from typing import Literal, cast, overload
 
 
 @overload
 def _scan_makefile(
-	lines: List[str],
+	lines: list[str],
 	target_name: str,
 ) -> int: ...
 @overload
 def _scan_makefile(
-	lines: List[str],
+	lines: list[str],
 	target_name: None = None,
-) -> Dict[str, int]: ...
+) -> dict[str, int]: ...
 def _scan_makefile(
-	lines: List[str],
+	lines: list[str],
 	target_name: str | None = None,
-) -> Union[Dict[str, int], int]:
+) -> dict[str, int] | int:
 	"""Scan makefile for target definitions, skipping define blocks.
 
 	Args:
@@ -51,8 +51,8 @@ def _scan_makefile(
 
 	"""
 	in_define_block: bool = False
-	target_rx: re.Pattern = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
-	targets: Dict[str, int] = {}
+	target_rx: re.Pattern[str] = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
+	targets: dict[str, int] = {}
 
 	for i, line in enumerate(lines):
 		# Track if we're inside a define block (embedded scripts)
@@ -85,7 +85,7 @@ def _scan_makefile(
 	return targets
 
 
-def _scan_makefile_variables(lines: List[str]) -> Dict[str, int]:
+def _scan_makefile_variables(lines: list[str]) -> dict[str, int]:
 	"""Scan makefile for variable definitions, skipping define blocks.
 
 	Returns dict mapping variable names to line indices.
@@ -94,8 +94,10 @@ def _scan_makefile_variables(lines: List[str]) -> Dict[str, int]:
 	in_define_block: bool = False
 	# Match: VARNAME := value, VARNAME ?= value, VARNAME += value, VARNAME = value
 	# Allow leading whitespace to match variables inside ifeq/endif blocks
-	var_rx: re.Pattern = re.compile(r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$")
-	variables: Dict[str, int] = {}
+	var_rx: re.Pattern[str] = re.compile(
+		r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$"
+	)
+	variables: dict[str, int] = {}
 
 	for i, line in enumerate(lines):
 		# Track if we're inside a define block
@@ -124,22 +126,32 @@ def _scan_makefile_variables(lines: List[str]) -> Dict[str, int]:
 class Colors:
 	"""ANSI color codes"""
 
+	RESET: str
+	BOLD: str
+	RED: str
+	GREEN: str
+	YELLOW: str
+	BLUE: str
+	MAGENTA: str
+	CYAN: str
+	WHITE: str
+
 	def __init__(self, enabled: bool = True) -> None:
 		"init color codes, or empty strings if `not enabled`"
 		if enabled:
-			self.RESET = "\033[0m"
-			self.BOLD = "\033[1m"
-			self.RED = "\033[31m"
-			self.GREEN = "\033[32m"
-			self.YELLOW = "\033[33m"
-			self.BLUE = "\033[34m"
-			self.MAGENTA = "\033[35m"
-			self.CYAN = "\033[36m"
-			self.WHITE = "\033[37m"
+			self.RESET = "\033[0m"  # pyright: ignore[reportConstantRedefinition]
+			self.BOLD = "\033[1m"  # pyright: ignore[reportConstantRedefinition]
+			self.RED = "\033[31m"  # pyright: ignore[reportConstantRedefinition]
+			self.GREEN = "\033[32m"  # pyright: ignore[reportConstantRedefinition]
+			self.YELLOW = "\033[33m"  # pyright: ignore[reportConstantRedefinition]
+			self.BLUE = "\033[34m"  # pyright: ignore[reportConstantRedefinition]
+			self.MAGENTA = "\033[35m"  # pyright: ignore[reportConstantRedefinition]
+			self.CYAN = "\033[36m"  # pyright: ignore[reportConstantRedefinition]
+			self.WHITE = "\033[37m"  # pyright: ignore[reportConstantRedefinition]
 		else:
-			self.RESET = self.BOLD = ""
-			self.RED = self.GREEN = self.YELLOW = ""
-			self.BLUE = self.MAGENTA = self.CYAN = self.WHITE = ""
+			self.RESET = self.BOLD = ""  # pyright: ignore[reportConstantRedefinition]
+			self.RED = self.GREEN = self.YELLOW = ""  # pyright: ignore[reportConstantRedefinition]
+			self.BLUE = self.MAGENTA = self.CYAN = self.WHITE = ""  # pyright: ignore[reportConstantRedefinition]
 
 
 @dataclass
@@ -147,12 +159,12 @@ class MakeRecipe:
 	"""Information about a Makefile recipe/target."""
 
 	target: str
-	comments: List[str]
-	dependencies: List[str]
+	comments: list[str]
+	dependencies: list[str]
 	echo_message: str
 
 	@classmethod
-	def from_makefile(cls, lines: List[str], target: str) -> MakeRecipe:
+	def from_makefile(cls, lines: list[str], target: str) -> MakeRecipe:
 		"""Parse and create a MakeRecipe from makefile lines for *target*."""
 		i: int = _scan_makefile(lines, target_name=target)
 		if i == -1:
@@ -163,7 +175,7 @@ class MakeRecipe:
 
 		# contiguous comment block immediately above
 		# (skip backward past .PHONY declarations and blank lines)
-		comments: List[str] = []
+		comments: list[str] = []
 		j: int = i - 1
 		blank_count: int = 0
 		stripped: str
@@ -191,7 +203,7 @@ class MakeRecipe:
 
 		# prerequisites
 		deps_str: str = line.split(":", 1)[1].strip()
-		deps: List[str] = deps_str.split() if deps_str else []
+		deps: list[str] = deps_str.split() if deps_str else []
 
 		# first echo in the recipe
 		echo_msg: str = ""
@@ -217,9 +229,9 @@ class MakeRecipe:
 			echo_message=echo_msg,
 		)
 
-	def describe(self, color: bool = False) -> List[str]:
+	def describe(self, color: bool = False) -> list[str]:
 		"""Return a list of description lines for this recipe."""
-		output: List[str] = []
+		output: list[str] = []
 		c: Colors = Colors(enabled=color)
 
 		# Target name (bold blue) with colon in white
@@ -251,12 +263,12 @@ class MakeVariable:
 	name: str
 	raw_value: str  # as written in makefile, e.g., "$(shell git describe)"
 	operator: Literal["=", ":=", "?=", "+="]
-	comments: List[str]  # comments above the definition
+	comments: list[str]  # comments above the definition
 
 	@classmethod
 	def from_makefile(
 		cls,
-		lines: List[str],
+		lines: list[str],
 		var_name: str,
 		var_line_idx: int,
 	) -> MakeVariable:
@@ -264,7 +276,7 @@ class MakeVariable:
 		line: str = lines[var_line_idx]
 
 		# Parse the variable definition line (allow leading whitespace for ifeq blocks)
-		var_rx: re.Pattern = re.compile(
+		var_rx: re.Pattern[str] = re.compile(
 			r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$"
 		)
 		match = var_rx.match(line)
@@ -272,11 +284,11 @@ class MakeVariable:
 			err_msg: str = f"variable '{var_name}' not found at line {var_line_idx}"
 			raise ValueError(err_msg)
 
-		operator: Literal["=", ":=", "?=", "+="] = match.group(2)  # type: ignore[assignment]
+		operator: Literal["=", ":=", "?=", "+="] = match.group(2)  # type: ignore[assignment] # pyright: ignore[reportAssignmentType]
 		raw_value: str = match.group(3)
 
 		# Collect contiguous comment block above (same logic as MakeRecipe)
-		comments: List[str] = []
+		comments: list[str] = []
 		j: int = var_line_idx - 1
 		blank_count: int = 0
 		while j >= 0:
@@ -301,9 +313,9 @@ class MakeVariable:
 			comments=comments,
 		)
 
-	def describe(self, color: bool = True) -> List[str]:
+	def describe(self, color: bool = True) -> list[str]:
 		"""Return a list of description lines for this variable."""
-		output: List[str] = []
+		output: list[str] = []
 		c: Colors = Colors(enabled=color)
 
 		# Variable name in bold cyan, operator in white
@@ -325,7 +337,7 @@ class MakeVariable:
 		return output
 
 
-def find_all_variables(lines: List[str]) -> Dict[str, int]:
+def find_all_variables(lines: list[str]) -> dict[str, int]:
 	"""Find all variable definitions in the makefile.
 
 	Returns dict mapping variable names to line indices.
@@ -333,35 +345,35 @@ def find_all_variables(lines: List[str]) -> Dict[str, int]:
 	return _scan_makefile_variables(lines)
 
 
-def find_all_targets(lines: List[str]) -> List[str]:
+def find_all_targets(lines: list[str]) -> list[str]:
 	"""Find all .PHONY target names in the makefile."""
 	# First, get all .PHONY declarations
-	phony_targets: Set[str] = set()
+	phony_targets: set[str] = set()
 	# Use chr(36) to get dollar sign - works both standalone and embedded in makefile
 	# issue being that the makefile processes dollar sign as an escape character
-	phony_pattern: re.Pattern = re.compile(r"^\.PHONY:\s+(.+)" + chr(36))
+	phony_pattern: re.Pattern[str] = re.compile(r"^\.PHONY:\s+(.+)" + chr(36))
 
 	for line in lines:
 		match = phony_pattern.match(line)
 		if match:
 			# Get all targets from this .PHONY line (space-separated)
-			target_names: List[str] = match.group(1).split()
+			target_names: list[str] = match.group(1).split()
 			phony_targets.update(target_names)
 
 	# Now scan for actual target definitions and filter to .PHONY ones
-	all_target_defs: Dict[str, int] = _scan_makefile(lines)
+	all_target_defs: dict[str, int] = _scan_makefile(lines)
 	return [tgt for tgt in all_target_defs if tgt in phony_targets]
 
 
-def get_all_recipes(lines: List[str]) -> List[MakeRecipe]:
+def get_all_recipes(lines: list[str]) -> list[MakeRecipe]:
 	"""Get MakeRecipe objects for all .PHONY targets in the makefile."""
-	targets: List[str] = find_all_targets(lines)
+	targets: list[str] = find_all_targets(lines)
 	return [MakeRecipe.from_makefile(lines, target) for target in targets]
 
 
 def describe_target(makefile_path: Path, target: str) -> None:
 	"""Emit the description for *target*."""
-	lines: List[str] = makefile_path.read_text(encoding="utf-8").splitlines()
+	lines: list[str] = makefile_path.read_text(encoding="utf-8").splitlines()
 	recipe: MakeRecipe = MakeRecipe.from_makefile(lines, target)
 
 	for line in recipe.describe():
@@ -396,15 +408,15 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 	)
 	args: argparse.Namespace = parser.parse_args()
 
-	lines: List[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
+	lines: list[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
 	c: Colors = Colors(enabled=not args.no_color)
 
 	# Get all targets and variables upfront
-	all_targets: List[str] = find_all_targets(lines)
-	all_variables: Dict[str, int] = find_all_variables(lines)
+	all_targets: list[str] = find_all_targets(lines)
+	all_variables: dict[str, int] = find_all_variables(lines)
 
-	recipes: List[MakeRecipe] = []
-	variables: List[MakeVariable] = []
+	recipes: list[MakeRecipe] = []
+	variables: list[MakeVariable] = []
 
 	if args.all:
 		recipes = get_all_recipes(lines)
@@ -414,14 +426,14 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 
 			if has_wildcard:
 				# Pattern matching mode for targets
-				matched_targets: List[str] = [
+				matched_targets: list[str] = [
 					t for t in all_targets if fnmatch.fnmatch(t, query)
 				]
 				for matched in matched_targets:
 					recipes.append(MakeRecipe.from_makefile(lines, matched))
 
 				# Pattern matching for variables (case-insensitive)
-				matched_vars: List[str] = [
+				matched_vars: list[str] = [
 					v
 					for v in all_variables
 					if fnmatch.fnmatch(v.lower(), query.lower())
@@ -440,8 +452,7 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 
 				if not matched_targets and not matched_vars:
 					print(
-						f"Error: no targets or variables match pattern "
-						f"'{c.RED}{query}{c.RESET}'",
+						f"Error: no targets or variables match pattern '{c.RED}{query}{c.RESET}'",
 						file=sys.stderr,
 					)
 					sys.exit(1)
@@ -471,20 +482,23 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 
 				if not found_target and not found_variable:
 					# Find similar targets and variables (fuzzy matching)
-					all_names: List[str] = all_targets + list(all_variables.keys())
-					fuzzy_matches: List[str] = difflib.get_close_matches(
-						query,
-						all_names,
-						n=5,
-						cutoff=0.5,
+					all_names: list[str] = all_targets + list(all_variables.keys())
+					fuzzy_matches: list[str] = cast(
+						"list[str]",
+						difflib.get_close_matches(
+							query,
+							all_names,
+							n=5,
+							cutoff=0.5,
+						),
 					)
 					# Also find names that contain the query
-					substring_matches: List[str] = [
+					substring_matches: list[str] = [
 						n
 						for n in all_names
 						if query.lower() in n.lower() and n not in fuzzy_matches
 					]
-					matches: List[str] = (fuzzy_matches + substring_matches)[:5]
+					matches: list[str] = (fuzzy_matches + substring_matches)[:5]
 
 					print(
 						f"Error: '{c.RED}{query}{c.RESET}' not found as target or variable",
@@ -502,7 +516,7 @@ def main() -> None:  # noqa: PLR0912, PLR0915, C901
 
 	# Print descriptions
 	use_color: bool = not args.no_color
-	output_lines: List[str] = []
+	output_lines: list[str] = []
 
 	# Targets first
 	for recipe in recipes:

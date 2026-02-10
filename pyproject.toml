@@ -210,6 +210,10 @@
 		".mypy_cache",
 		".ruff_cache",
 	]
+	reportAny = "none"
+	reportUnusedCallResult = "none"
+	reportUnnecessaryIsInstance = "none"
+	reportExplicitAny = "none"
 
 # ty config
 [tool.ty.src]
@@ -222,6 +226,8 @@
 		".mypy_cache",
 		".ruff_cache",
 	]
+[tool.ty.rules]
+	unused-type-ignore-comment = "ignore"
 
 # `make lmcat` depends on the lmcat and can be configured here
 [tool.lmcat]

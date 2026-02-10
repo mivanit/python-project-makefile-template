@@ -14,11 +14,14 @@ import os
 import re
 import subprocess
 import sys
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, Any, Callable
+
+if TYPE_CHECKING:
+	from collections.abc import Mapping
 
 
 def print_info_dict(
-	info: Dict[str, Union[Any, Dict[str, Any]]],
+	info: Mapping[str, str | int | Mapping[str, Any]],
 	indent: str = "  ",
 	level: int = 1,
 ) -> None:
@@ -33,7 +36,7 @@ def print_info_dict(
 			print(f"{indent_str}{key:<{longest_key_len}} = {value}")
 
 
-def get_nvcc_info() -> Dict[str, str]:
+def get_nvcc_info() -> dict[str, str]:
 	"get info about cuda from nvcc --version"
 	# Run the nvcc command.
 	try:
@@ -47,7 +50,7 @@ def get_nvcc_info() -> Dict[str, str]:
 		return {"Failed to run 'nvcc --version'": str(e)}
 
 	output: str = result.stdout
-	lines: List[str] = [line.strip() for line in output.splitlines() if line.strip()]
+	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
 	if len(lines) != 5:
@@ -55,13 +58,13 @@ def get_nvcc_info() -> Dict[str, str]:
 		raise ValueError(msg)
 
 	# Compile shared regex for release info.
-	release_regex: re.Pattern = re.compile(
+	release_regex: re.Pattern[str] = re.compile(
 		r"Cuda compilation tools,\s*release\s*([^,]+),\s*(V.+)",
 	)
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: Dict[str, Tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: dict[str, tuple[int, re.Pattern[str], int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -73,9 +76,9 @@ def get_nvcc_info() -> Dict[str, str]:
 		"build": (4, re.compile(r"Build (.+)"), 1, str.strip),
 	}
 
-	info: Dict[str, str] = {}
+	info: dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: re.Match | None = pattern.search(lines[line_index])
+		match: re.Match[str] | None = pattern.search(lines[line_index])
 		if not match:
 			err_msg: str = (
 				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
@@ -88,10 +91,10 @@ def get_nvcc_info() -> Dict[str, str]:
 	return info
 
 
-def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
+def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 	"get info about pytorch and cuda devices"
-	exceptions: List[Exception] = []
-	info: Dict[str, Any] = {}
+	exceptions: list[Exception] = []
+	info: dict[str, Any] = {}
 
 	try:
 		import torch  # type: ignore[import-not-found] # noqa: PLC0415
@@ -114,25 +117,25 @@ def get_torch_info() -> Tuple[List[Exception], Dict[str, Any]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: Dict[str, Union[str, int]] = {}
+						current_device_info: dict[str, str | int] = {}
 
-						dev_prop = torch.cuda.get_device_properties(
+						dev_prop = torch.cuda.get_device_properties(  # pyright: ignore[reportUnknownVariableType,reportUnknownMemberType]
 							torch.device(f"cuda:{current_device}"),
 						)
 
-						current_device_info["name"] = dev_prop.name
+						current_device_info["name"] = dev_prop.name  # pyright: ignore[reportUnknownMemberType]
 						current_device_info["version"] = (
-							f"{dev_prop.major}.{dev_prop.minor}"
+							f"{dev_prop.major}.{dev_prop.minor}"  # pyright: ignore[reportUnknownMemberType]
 						)
 						current_device_info["total_memory"] = (
-							f"{dev_prop.total_memory} ({dev_prop.total_memory:.1e})"
+							f"{dev_prop.total_memory} ({dev_prop.total_memory:.1e})"  # pyright: ignore[reportUnknownMemberType]
 						)
 						current_device_info["multi_processor_count"] = (
-							dev_prop.multi_processor_count
+							dev_prop.multi_processor_count  # pyright: ignore[reportUnknownMemberType]
 						)
-						current_device_info["is_integrated"] = dev_prop.is_integrated
+						current_device_info["is_integrated"] = dev_prop.is_integrated  # pyright: ignore[reportUnknownMemberType]
 						current_device_info["is_multi_gpu_board"] = (
-							dev_prop.is_multi_gpu_board
+							dev_prop.is_multi_gpu_board  # pyright: ignore[reportUnknownMemberType]
 						)
 
 						info[f"device cuda:{current_device}"] = current_device_info
@@ -169,7 +172,7 @@ if __name__ == "__main__":
 		},
 	)
 
-	nvcc_info: Dict[str, Any] = get_nvcc_info()
+	nvcc_info: dict[str, Any] = get_nvcc_info()
 	print("nvcc:")
 	print_info_dict(nvcc_info)
 
