@@ -108,7 +108,7 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 		info["torch.cuda.is_available()"] = torch.cuda.is_available()
 
 		if torch.cuda.is_available():
-			info["torch.version.cuda"] = torch.version.cuda
+			info["torch.version.cuda"] = torch.version.cuda  # pyright: ignore[reportAttributeAccessIssue]
 			info["torch.cuda.device_count()"] = torch.cuda.device_count()
 
 			if torch.cuda.device_count() > 0:

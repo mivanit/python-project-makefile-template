@@ -14,7 +14,7 @@ import argparse
 from pathlib import Path
 from typing import Any
 
-from pdoc.markdown2 import (  # type: ignore[import-untyped,import-not-found] # pyright: ignore[reportMissingImports]
+from pdoc.markdown2 import (  # type: ignore[import-untyped,import-not-found,attr-defined] # pyright: ignore[reportMissingImports]
 	Markdown,  # pyright: ignore[reportUnknownVariableType]
 )
 
@@ -32,7 +32,7 @@ def convert_file(
 	# Convert to HTML using markdown2
 	markdown: Any = Markdown(  # pyright: ignore[reportUnknownVariableType]
 		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
-		safe_mode=safe_mode,
+		safe_mode=safe_mode,  # pyright: ignore[reportArgumentType]
 	)
 	html: str = str(markdown.convert(text))  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
 
