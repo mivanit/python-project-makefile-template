@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.4.0
+# version: 0.5.0
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Clean up docs directory based on pyproject.toml configuration.
@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any, cast
 
 try:
-	import tomllib  # type: ignore[import-not-found]
+	import tomllib  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
 except ImportError:
 	import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 

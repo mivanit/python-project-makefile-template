@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.4.0
+# version: 0.5.0
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Export dependencies to requirements.txt files based on pyproject.toml configuration.
@@ -17,9 +17,9 @@ import sys
 import warnings
 
 try:
-	import tomllib  # type: ignore[import-not-found]
+	import tomllib  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
 except ImportError:
-	import tomli as tomllib  # type: ignore[import-not-found,no-redef,import-untyped]  # pyright: ignore[reportMissingImports]
+	import tomli as tomllib  # type: ignore[import-not-found,no-redef,import-untyped] # pyright: ignore[reportMissingImports]
 from functools import reduce
 from pathlib import Path
 from typing import Any, cast
