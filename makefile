@@ -182,7 +182,7 @@ default: help
 # ==================================================
 
 # list of scripts to download when running `make self-setup-scripts`. these are the helper scripts that the makefile uses for various tasks (e.g., getting version info, generating docs, etc.)
-SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean typing_breakdown recipe_info make_docs
+SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean typing_breakdown recipe_info make_docs generate_badge
 
 # download makefile helper scripts from GitHub
 # uses curl to fetch scripts from the template repository
@@ -447,7 +447,7 @@ cov:
 	fi
 	mkdir $(COVERAGE_REPORTS_DIR) -p
 	$(PYTHON) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
-	$(PYTHON) -m coverage_badge -f -o $(COVERAGE_REPORTS_DIR)/coverage.svg
+	$(PYTHON) $(SCRIPTS_DIR)/generate_badge.py --coverage $(COVERAGE_REPORTS_DIR)/coverage.txt > $(COVERAGE_REPORTS_DIR)/coverage.svg
 	$(PYTHON) -m coverage html --directory=$(COVERAGE_REPORTS_DIR)/html/
 	rm -rf $(COVERAGE_REPORTS_DIR)/html/.gitignore
 

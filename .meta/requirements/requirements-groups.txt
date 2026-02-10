@@ -45,14 +45,9 @@ colorama==0.4.6 ; sys_platform == 'win32'
 comm==0.2.3
     # via ipykernel
 coverage==7.10.7 ; python_full_version < '3.10'
-    # via
-    #   coverage-badge
-    #   pytest-cov
+    # via pytest-cov
 coverage==7.13.3 ; python_full_version >= '3.10'
-    # via
-    #   coverage-badge
-    #   pytest-cov
-coverage-badge==1.1.2
+    # via pytest-cov
 cryptography==46.0.4 ; platform_machine != 'ppc64le' and platform_machine != 's390x' and sys_platform == 'linux'
     # via secretstorage
 cuda-bindings==12.9.4 ; python_full_version >= '3.10' and platform_machine == 'x86_64' and sys_platform == 'linux'
@@ -365,9 +360,8 @@ secretstorage==3.3.3 ; python_full_version < '3.10' and platform_machine != 'ppc
     # via keyring
 secretstorage==3.5.0 ; python_full_version >= '3.10' and platform_machine != 'ppc64le' and platform_machine != 's390x' and sys_platform == 'linux'
     # via keyring
-setuptools==82.0.0
+setuptools==82.0.0 ; python_full_version >= '3.12' or (python_full_version < '3.10' and platform_machine == 'x86_64' and sys_platform == 'linux')
     # via
-    #   coverage-badge
     #   torch
     #   triton
 six==1.17.0
