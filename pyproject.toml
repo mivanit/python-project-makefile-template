@@ -213,6 +213,7 @@
 	reportUnusedCallResult = "none"
 	reportUnnecessaryIsInstance = "none"
 	reportExplicitAny = "none"
+	reportUnnecessaryTypeIgnoreComment = "none"
 
 # ty config
 [tool.ty.src]

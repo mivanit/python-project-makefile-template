@@ -17,9 +17,9 @@ import sys
 import warnings
 
 try:
-	import tomllib  # type: ignore[import-not-found]
+	import tomllib  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
 except ImportError:
-	import tomli as tomllib  # type: ignore[import-not-found,no-redef,import-untyped]  # pyright: ignore[reportMissingImports]
+	import tomli as tomllib  # type: ignore[import-not-found,no-redef,import-untyped] # pyright: ignore[reportMissingImports]
 from functools import reduce
 from pathlib import Path
 from typing import Any, cast

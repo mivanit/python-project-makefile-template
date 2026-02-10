@@ -25,7 +25,7 @@ from typing import Any, cast
 from jinja2 import Template
 
 try:
-	import tomllib  # type: ignore[import-not-found]
+	import tomllib  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
 except ImportError:
 	import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 

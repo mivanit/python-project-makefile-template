@@ -25,9 +25,9 @@ from typing import Any, cast
 
 try:
 	# python 3.11+
-	import tomllib  # type: ignore[import-not-found]
+	import tomllib  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
 except ImportError:
-	import tomli as tomllib  # type: ignore  # pyright: ignore[reportMissingImports]
+	import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 
 import jinja2
 import pdoc  # type: ignore[import-not-found]
