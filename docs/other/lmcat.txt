@@ -1,8 +1,8 @@
 # Stats
-- 23 files
-- 5399 (5.4K) lines
-- 167781 (168K) chars
-- 19526 (20K) `whitespace-split` tokens
+- 24 files
+- 5243 (5.2K) lines
+- 166547 (167K) chars
+- 19493 (19K) `whitespace-split` tokens
 
 # File Tree
 
@@ -10,34 +10,35 @@
 python-project-makefile-template    
 ├── .github                         
 │   └── workflows                   
-│    ├── checks.yml                 [   80L  1,643C   162T]
-│    └── makefile-checks.yml        [  104L  2,762C   339T]
+│    ├── checks.yml                 [113L  2,154C   216T]
+│    └── makefile-checks.yml        [104L  2,763C   339T]
 ├── myproject                       
-│   ├── __init__.py                 [    1L     32C     3T]
-│   ├── helloworld.py               [   16L    429C    59T]
-│   └── other.py                    [    7L    168C    23T]
+│   ├── __init__.py                 [  1L     32C     3T]
+│   ├── helloworld.py               [ 16L    429C    59T]
+│   └── other.py                    [  7L    168C    23T]
 ├── notebooks                       
-│   ├── example.ipynb               [   66L  1,154C   133T]
-│   └── no_desc.ipynb               [   34L    640C    72T]
+│   ├── example.ipynb               [ 66L  1,154C   133T]
+│   └── no_desc.ipynb               [ 34L    640C    72T]
 ├── scripts                         
 │   ├── make                        
-│   │   ├── check_torch.py          [  175L  5,103C   515T]
-│   │   ├── docs_clean.py           [   85L  2,588C   305T]
-│   │   ├── export_requirements.py  [  125L  3,265C   386T]
-│   │   ├── get_commit_log.py       [   41L    939C   103T]
-│   │   ├── get_todos.py            [  422L 11,440C 1,318T]
-│   │   ├── get_version.py          [   21L    482C    57T]
-│   │   ├── mypy_report.py          [   53L  1,524C   171T]
-│   │   ├── pdoc_markdown2_cli.py   [   62L  1,591C   164T]
-│   │   └── recipe_info.py          [  289L 10,592C 1,051T]
-│   ├── assemble.py                 [   97L  2,733C   290T]
-│   └── make_docs.py                [  496L 14,479C 1,537T]
+│   │   ├── check_torch.py          [186L  5,732C   560T]
+│   │   ├── docs_clean.py           [103L  3,229C   359T]
+│   │   ├── export_requirements.py  [141L  3,895C   445T]
+│   │   ├── generate_badge.py       [320L  7,624C   840T]
+│   │   ├── get_commit_log.py       [ 48L  1,177C   120T]
+│   │   ├── get_todos.py            [436L 11,977C 1,368T]
+│   │   ├── get_version.py          [ 31L    948C    91T]
+│   │   ├── make_docs.py            [505L 15,434C 1,619T]
+│   │   ├── pdoc_markdown2_cli.py   [ 72L  2,081C   200T]
+│   │   ├── recipe_info.py          [537L 15,376C 1,745T]
+│   │   └── typing_breakdown.py     [386L 12,446C 1,241T]
+│   └── assemble.py                 [ 76L  2,292C   231T]
 ├── tests                           
-│   └── test_nothing.py             [    2L     42C     5T]
-├── README.md                       [  151L  7,041C   938T]
-├── makefile                        [1,964L 62,237C 7,243T]
-├── makefile.template               [  671L 23,790C 3,134T]
-├── pyproject.toml                  [  313L  9,258C 1,190T]
+│   └── test_nothing.py             [  2L     42C     5T]
+├── README.md                       [150L  6,880C   912T]
+├── makefile                        [706L 27,863C 3,636T]
+├── makefile.template               [706L 27,809C 3,633T]
+├── pyproject.toml                  [367L 10,415C 1,313T]
 ```
 
 # File Contents
@@ -67,20 +68,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # whole history for making version
-      
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.versions.python }}
 
-      - name: set up uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: print python version
         run: python --version
-        
+
       - name: check deps
         run: make dep-check
-        
+
       - name: make info-long
         run: make info-long
 
@@ -89,15 +92,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: install
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          make setup
+        run: make setup
 
       - name: format-check
         run: make format-check
@@ -112,17 +118,46 @@ jobs:
           # - python: "3.12"
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.versions.python }}
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: install
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          make setup
+        run: make setup
 
       - name: Unit tests
         run: make test
+
+  build:
+    name: Typing & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: install
+        run: make setup
+
+      - name: Type checking
+        run: make typing
+
+      - name: Build package
+        run: make build
+
 ``````{ end_of_file=".github/workflows/checks.yml" }
 
 ``````{ path=".github/workflows/makefile-checks.yml"  }
@@ -204,7 +239,7 @@ jobs:
       - run: make format-check
       - run: make format 
       - run: make typing
-      - run: make typing-report
+      - run: make typing-summary
 
       # Build commands
       - run: make build
@@ -377,7 +412,15 @@ def another_function() -> None:
 ``````{ end_of_file="notebooks/no_desc.ipynb" }
 
 ``````{ path="scripts/make/check_torch.py"  }
-"print info about current python, torch, cuda, and devices"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Print info about current python, torch, cuda, and devices.
+
+Useful for debugging environment issues and verifying GPU availability.
+"""
 
 from __future__ import annotations
 
@@ -385,11 +428,14 @@ import os
 import re
 import subprocess
 import sys
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Callable
+
+if TYPE_CHECKING:
+	from collections.abc import Mapping
 
 
 def print_info_dict(
-	info: dict[str, Union[Any, dict[str, Any]]],
+	info: Mapping[str, str | int | Mapping[str, Any]],
 	indent: str = "  ",
 	level: int = 1,
 ) -> None:
@@ -408,31 +454,31 @@ def get_nvcc_info() -> dict[str, str]:
 	"get info about cuda from nvcc --version"
 	# Run the nvcc command.
 	try:
-		result: subprocess.CompletedProcess[str] = subprocess.run(  # noqa: S603
+		result: subprocess.CompletedProcess[str] = subprocess.run(
 			["nvcc", "--version"],  # noqa: S607
 			check=True,
 			capture_output=True,
 			text=True,
 		)
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		return {"Failed to run 'nvcc --version'": str(e)}
 
 	output: str = result.stdout
 	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
 
 	# Ensure there are exactly 5 lines in the output.
-	assert len(lines) == 5, (  # noqa: PLR2004
-		f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
-	)
+	if len(lines) != 5:
+		msg = f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
+		raise ValueError(msg)
 
 	# Compile shared regex for release info.
-	release_regex: re.Pattern = re.compile(
+	release_regex: re.Pattern[str] = re.compile(
 		r"Cuda compilation tools,\s*release\s*([^,]+),\s*(V.+)",
 	)
 
 	# Define a mapping for each desired field:
 	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
+	patterns: dict[str, tuple[int, re.Pattern[str], int, Callable[[str], str]]] = {
 		"build_time": (
 			2,
 			re.compile(r"Built on (.+)"),
@@ -446,7 +492,7 @@ def get_nvcc_info() -> dict[str, str]:
 
 	info: dict[str, str] = {}
 	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: Optional[re.Match] = pattern.search(lines[line_index])
+		match: re.Match[str] | None = pattern.search(lines[line_index])
 		if not match:
 			err_msg: str = (
 				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
@@ -465,7 +511,7 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 	info: dict[str, Any] = {}
 
 	try:
-		import torch
+		import torch  # type: ignore[import-not-found] # noqa: PLC0415
 	except ImportError as e:
 		info["torch.__version__"] = "not available"
 		exceptions.append(e)
@@ -485,30 +531,30 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 				info["n_devices"] = n_devices
 				for current_device in range(n_devices):
 					try:
-						current_device_info: dict[str, Union[str, int]] = {}
+						current_device_info: dict[str, str | int] = {}
 
-						dev_prop = torch.cuda.get_device_properties(
+						dev_prop = torch.cuda.get_device_properties(  # pyright: ignore[reportUnknownVariableType,reportUnknownMemberType]
 							torch.device(f"cuda:{current_device}"),
 						)
 
-						current_device_info["name"] = dev_prop.name
+						current_device_info["name"] = dev_prop.name  # pyright: ignore[reportUnknownMemberType]
 						current_device_info["version"] = (
-							f"{dev_prop.major}.{dev_prop.minor}"
+							f"{dev_prop.major}.{dev_prop.minor}"  # pyright: ignore[reportUnknownMemberType]
 						)
 						current_device_info["total_memory"] = (
-							f"{dev_prop.total_memory} ({dev_prop.total_memory:.1e})"
+							f"{dev_prop.total_memory} ({dev_prop.total_memory:.1e})"  # pyright: ignore[reportUnknownMemberType]
 						)
 						current_device_info["multi_processor_count"] = (
-							dev_prop.multi_processor_count
+							dev_prop.multi_processor_count  # pyright: ignore[reportUnknownMemberType]
 						)
-						current_device_info["is_integrated"] = dev_prop.is_integrated
+						current_device_info["is_integrated"] = dev_prop.is_integrated  # pyright: ignore[reportUnknownMemberType]
 						current_device_info["is_multi_gpu_board"] = (
-							dev_prop.is_multi_gpu_board
+							dev_prop.is_multi_gpu_board  # pyright: ignore[reportUnknownMemberType]
 						)
 
 						info[f"device cuda:{current_device}"] = current_device_info
 
-					except Exception as e:  # noqa: PERF203,BLE001
+					except Exception as e:  # noqa: PERF203
 						exceptions.append(e)
 			else:
 				err_msg_nodevice: str = (
@@ -522,7 +568,7 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 			)
 			raise ValueError(err_msg_nocuda)  # noqa: TRY301
 
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		exceptions.append(e)
 
 	return exceptions, info
@@ -534,7 +580,7 @@ if __name__ == "__main__":
 		{
 			"python executable path: sys.executable": str(sys.executable),
 			"sys.platform": sys.platform,
-			"current working directory: os.getcwd()": os.getcwd(),  # noqa: PTH109
+			"current working directory: os.getcwd()": os.getcwd(),
 			"Host name: os.name": os.name,
 			"CPU count: os.cpu_count()": str(os.cpu_count()),
 		},
@@ -556,7 +602,18 @@ if __name__ == "__main__":
 ``````{ end_of_file="scripts/make/check_torch.py" }
 
 ``````{ path="scripts/make/docs_clean.py"  }
-"clean up docs directory based on pyproject.toml configuration"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Clean up docs directory based on pyproject.toml configuration.
+
+Removes generated documentation files while preserving resources and
+files specified in [tool.makefile.docs.no_clean].
+
+Usage: python docs_clean.py <pyproject_path> <docs_dir> [extra_preserve...]
+"""
 
 from __future__ import annotations
 
@@ -564,18 +621,23 @@ import shutil
 import sys
 from functools import reduce
 from pathlib import Path
-from typing import Any, List, Set
+from typing import Any, cast
 
 try:
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
-	import tomli as tomllib  # type: ignore
+	import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 
 TOOL_PATH: str = "tool.makefile.docs"
 DEFAULT_DOCS_DIR: str = "docs"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
+def deep_get(
+	d: dict[str, Any],
+	path: str,
+	default: Any = None,  # noqa: ANN401
+	sep: str = ".",
+) -> Any:  # noqa: ANN401
 	"""Get nested dictionary value via separated path with default."""
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
@@ -584,19 +646,19 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  #
 	)
 
 
-def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
+def read_config(pyproject_path: Path) -> tuple[Path, set[Path]]:
 	"read configuration from pyproject.toml"
 	if not pyproject_path.is_file():
 		return Path(DEFAULT_DOCS_DIR), set()
 
 	with pyproject_path.open("rb") as f:
-		config = tomllib.load(f)
+		config: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 	preserved: list[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
 	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
 
 	# Convert to absolute paths and validate
-	preserve_set: Set[Path] = set()
+	preserve_set: set[Path] = set()
 	for p in preserved:
 		full_path = (docs_dir / p).resolve()
 		if not full_path.as_posix().startswith(docs_dir.resolve().as_posix()):
@@ -607,7 +669,7 @@ def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
 	return docs_dir, preserve_set
 
 
-def clean_docs(docs_dir: Path, preserved: Set[Path]) -> None:
+def clean_docs(docs_dir: Path, preserved: set[Path]) -> None:
 	"""delete files not in preserved set
 
 	TODO: this is not recursive
@@ -626,13 +688,15 @@ def main(
 ) -> None:
 	"Clean up docs directory based on pyproject.toml configuration."
 	docs_dir: Path
-	preserved: Set[Path]
+	preserved: set[Path]
 	docs_dir, preserved = read_config(Path(pyproject_path))
 
-	assert docs_dir.is_dir(), f"Docs directory '{docs_dir}' not found"
-	assert docs_dir == Path(docs_dir_cli), (
-		f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
-	)
+	if not docs_dir.is_dir():
+		msg = f"Docs directory '{docs_dir}' not found"
+		raise FileNotFoundError(msg)
+	if docs_dir != Path(docs_dir_cli):
+		msg = f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
+		raise ValueError(msg)
 
 	for x in extra_preserve:
 		preserved.add(Path(x))
@@ -645,7 +709,18 @@ if __name__ == "__main__":
 ``````{ end_of_file="scripts/make/docs_clean.py" }
 
 ``````{ path="scripts/make/export_requirements.py"  }
-"export to requirements.txt files based on pyproject.toml configuration"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Export dependencies to requirements.txt files based on pyproject.toml configuration.
+
+Reads [tool.makefile.uv-exports] from pyproject.toml and generates uv export
+commands for each configured export. Output is shell commands printed to stdout.
+
+Usage: python export_requirements.py <pyproject_path> <output_dir>
+"""
 
 from __future__ import annotations
 
@@ -655,15 +730,20 @@ import warnings
 try:
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
-	import tomli as tomllib  # type: ignore
+	import tomli as tomllib  # type: ignore[import-not-found,no-redef,import-untyped]  # pyright: ignore[reportMissingImports]
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, cast
 
 TOOL_PATH: str = "tool.makefile.uv-exports"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
+def deep_get(
+	d: dict[str, Any],
+	path: str,
+	default: Any = None,  # noqa: ANN401
+	sep: str = ".",
+) -> Any:  # noqa: ANN401
 	"get a value from a nested dictionary"
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
@@ -673,10 +753,10 @@ def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  #
 
 
 def export_configuration(
-	export: dict,
+	export: dict[str, Any],
 	all_groups: list[str],
 	all_extras: list[str],
-	export_opts: dict,
+	export_opts: dict[str, Any],
 	output_dir: Path,
 ) -> None:
 	"print to console a uv command for make which will export a requirements.txt file"
@@ -690,8 +770,8 @@ def export_configuration(
 
 	# get other options with default fallbacks
 	filename: str = export.get("filename") or f"requirements-{name}.txt"
-	groups: Union[list[str], bool, None] = export.get("groups")
-	extras: Union[list[str], bool] = export.get("extras", [])
+	groups: list[str] | bool | None = export.get("groups")
+	extras: list[str] | bool = export.get("extras", [])
 	options: list[str] = export.get("options", [])
 
 	# init command
@@ -738,7 +818,7 @@ def main(
 	"export to requirements.txt files based on pyproject.toml configuration"
 	# read pyproject.toml
 	with open(pyproject_path, "rb") as f:
-		pyproject_data: dict = tomllib.load(f)
+		pyproject_data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 	# all available groups
 	all_groups: list[str] = list(pyproject_data.get("dependency-groups", {}).keys())
@@ -747,7 +827,7 @@ def main(
 	)
 
 	# options for exporting
-	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
+	export_opts: dict[str, Any] = deep_get(pyproject_data, TOOL_PATH, {})
 
 	# what are we exporting?
 	exports: list[dict[str, Any]] = export_opts.get("exports", [])
@@ -773,14 +853,345 @@ if __name__ == "__main__":
 
 ``````{ end_of_file="scripts/make/export_requirements.py" }
 
+``````{ path="scripts/make/generate_badge.py"  }
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Generate GitHub-style SVG badges for coverage, tests, or arbitrary label/value pairs.
+
+Usage:
+    python generate_badge.py [OPTIONS]
+
+Examples:
+    # Generic badge
+    python generate_badge.py --label "version" --value "1.2.3"
+    python generate_badge.py --label "license" --value "MIT" --color blue
+
+    # Coverage badge (reads from coverage.txt report)
+    python generate_badge.py --coverage coverage.txt
+
+    # Tests badge (parses pytest output)
+    python generate_badge.py --pytest-results .pytest_results.txt
+
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+# Color presets (GitHub badge style)
+COLORS: dict[str, str] = {
+	"brightgreen": "#4c1",
+	"green": "#97ca00",
+	"yellowgreen": "#a4a61d",
+	"yellow": "#dfb317",
+	"orange": "#fe7d37",
+	"red": "#e05d44",
+	"blue": "#007ec6",
+	"gray": "#555",
+	"lightgray": "#9f9f9f",
+}
+
+
+def get_coverage_color(percent: float) -> str:
+	"""Get color based on coverage percentage."""
+	if percent >= 80:
+		return COLORS["brightgreen"]
+	elif percent >= 60:
+		return COLORS["yellowgreen"]
+	elif percent >= 40:
+		return COLORS["orange"]
+	else:
+		return COLORS["red"]
+
+
+def get_tests_color(passed: int, failed: int) -> str:
+	"""Get color based on test results."""
+	if failed > 0:
+		return COLORS["red"]
+	elif passed > 0:
+		return COLORS["brightgreen"]
+	else:
+		return COLORS["gray"]
+
+
+def estimate_text_width(text: str) -> int:
+	"""Estimate text width in pixels for the badge font.
+
+	Uses approximate character widths for DejaVu Sans 11px.
+	"""
+	# Approximate widths for common characters
+	narrow_chars = "iIl1|!.,;:'"
+	wide_chars = "mwMWOQGD%@"
+
+	width = 0
+	for char in text:
+		if char in narrow_chars:
+			width += 4
+		elif char in wide_chars:
+			width += 10
+		elif char.isupper():
+			width += 8
+		else:
+			width += 7
+
+	return width + 10  # Add padding
+
+
+def generate_badge_svg(label: str, value: str, color: str) -> str:
+	"""Generate a GitHub-style flat badge SVG.
+
+	Args:
+		label: Left side text (e.g., "coverage", "tests")
+		value: Right side text (e.g., "85%", "42 passed")
+		color: Hex color for the value background (with or without #)
+
+	Returns:
+		SVG string
+
+	"""
+	if not color.startswith("#"):
+		color = f"#{color}"
+
+	label_width = estimate_text_width(label)
+	value_width = estimate_text_width(value)
+	total_width = label_width + value_width
+
+	label_x = label_width / 2
+	value_x = label_width + value_width / 2
+
+	svg = f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="20">
+    <clipPath id="r"><rect width="{total_width}" height="20" rx="3"/></clipPath>
+    <g clip-path="url(#r)">
+        <rect width="{label_width}" height="20" fill="#555"/>
+        <rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+        <text x="{label_x}" y="14">{label}</text>
+        <text x="{value_x}" y="14">{value}</text>
+    </g>
+</svg>
+"""
+	return svg
+
+
+def read_coverage_from_txt(coverage_path: Path) -> float:
+	"""Read coverage percentage from coverage.txt report.
+
+	Args:
+		coverage_path: Path to coverage.txt file
+
+	Returns:
+		Coverage percentage (0-100)
+
+	"""
+	content = coverage_path.read_text()
+
+	# Look for TOTAL line, e.g., "TOTAL    1234    567    54%"
+	match = re.search(r"^TOTAL\s+\d+\s+\d+\s+(\d+)%", content, re.MULTILINE)
+	if match:
+		return float(match.group(1))
+
+	# Try alternate format with cover column
+	match = re.search(r"^TOTAL\s+\d+\s+\d+\s+\d+\s+(\d+)%", content, re.MULTILINE)
+	if match:
+		return float(match.group(1))
+
+	msg = f"Could not parse coverage percentage from {coverage_path}"
+	raise RuntimeError(msg)
+
+
+def parse_pytest_results(results_path: Path) -> tuple[int, int, int]:
+	"""Parse pytest output to get test counts.
+
+	Args:
+		results_path: Path to file containing pytest output
+
+	Returns:
+		Tuple of (passed, failed, total)
+
+	"""
+	content = results_path.read_text()
+
+	passed = 0
+	failed = 0
+	skipped = 0
+	errors = 0
+
+	# Look for summary line like "42 passed, 3 failed, 1 skipped in 1.23s"
+	# or "===== 42 passed in 1.23s ====="
+	summary_match = re.search(
+		r"=+\s*([\d\w\s,]+(?:passed|failed|error|skipped)[^=]*)\s*=+",
+		content,
+		re.IGNORECASE,
+	)
+
+	if summary_match:
+		summary = summary_match.group(1)
+
+		passed_match = re.search(r"(\d+)\s*passed", summary, re.IGNORECASE)
+		if passed_match:
+			passed = int(passed_match.group(1))
+
+		failed_match = re.search(r"(\d+)\s*failed", summary, re.IGNORECASE)
+		if failed_match:
+			failed = int(failed_match.group(1))
+
+		skipped_match = re.search(r"(\d+)\s*skipped", summary, re.IGNORECASE)
+		if skipped_match:
+			skipped = int(skipped_match.group(1))
+
+		error_match = re.search(r"(\d+)\s*error", summary, re.IGNORECASE)
+		if error_match:
+			errors = int(error_match.group(1))
+
+	total = passed + failed + skipped + errors
+	return passed, failed + errors, total
+
+
+def resolve_color(color_input: str) -> str:
+	"""Resolve color name or hex code to hex value.
+
+	Args:
+		color_input: Color name (e.g., "green") or hex code (e.g., "#4c1" or "4c1")
+
+	Returns:
+		Hex color code with #
+
+	"""
+	if color_input in COLORS:
+		return COLORS[color_input]
+	if color_input.startswith("#"):
+		return color_input
+	return f"#{color_input}"
+
+
+def main() -> int:
+	parser = argparse.ArgumentParser(
+		description="Generate GitHub-style SVG badges",
+		formatter_class=argparse.RawDescriptionHelpFormatter,
+		epilog=__doc__,
+	)
+
+	# Generic mode
+	_ = parser.add_argument(
+		"--label",
+		type=str,
+		help="Badge label (left side text)",
+	)
+	_ = parser.add_argument(
+		"--value",
+		type=str,
+		help="Badge value (right side text)",
+	)
+	_ = parser.add_argument(
+		"--color",
+		type=str,
+		default="gray",
+		help="Badge color (name or hex, default: gray)",
+	)
+
+	# Coverage mode
+	_ = parser.add_argument(
+		"--coverage",
+		type=Path,
+		metavar="PATH",
+		help="Path to coverage.txt report",
+	)
+
+	# Tests mode
+	_ = parser.add_argument(
+		"--pytest-results",
+		type=Path,
+		metavar="PATH",
+		help="Path to file containing pytest output",
+	)
+
+	args = parser.parse_args()
+
+	# Determine mode and generate badge
+	try:
+		if args.coverage:
+			# Coverage mode
+			coverage_path = args.coverage
+			if not coverage_path.exists():
+				print(
+					f"Error: Coverage file not found: {coverage_path}", file=sys.stderr
+				)
+				return 1
+
+			percent = read_coverage_from_txt(coverage_path)
+			label = "coverage"
+			value = f"{percent:.0f}%"
+			color = get_coverage_color(percent)
+
+		elif args.pytest_results:
+			# Tests mode
+			if not args.pytest_results.exists():
+				print(
+					f"Error: Pytest results file not found: {args.pytest_results}",
+					file=sys.stderr,
+				)
+				return 1
+
+			passed, failed, total = parse_pytest_results(args.pytest_results)
+			label = "tests"
+
+			if failed > 0:
+				value = f"{passed}/{total} passed"
+			else:
+				value = f"{passed} passed"
+
+			color = get_tests_color(passed, failed)
+
+		elif args.label and args.value:
+			# Generic mode
+			label = args.label
+			value = args.value
+			color = resolve_color(args.color)
+
+		else:
+			parser.error(
+				"Must specify either --coverage, --pytest-results, or both --label and --value"
+			)
+			return 1  # pyright: ignore[reportUnreachable]
+
+		svg = generate_badge_svg(label, value, color)
+		print(svg)
+
+		return 0
+
+	except Exception as e:
+		print(f"Error: {e}", file=sys.stderr)
+		return 1
+
+
+if __name__ == "__main__":
+	sys.exit(main())
+
+``````{ end_of_file="scripts/make/generate_badge.py" }
+
 ``````{ path="scripts/make/get_commit_log.py"  }
-"pretty print a commit log amd wrote it to a file"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Generate a formatted commit log and write it to a file.
+
+Usage: python get_commit_log.py <last_version> <output_file>
+"""
 
 from __future__ import annotations
 
 import subprocess
 import sys
-from typing import List
 
 
 def main(
@@ -804,7 +1215,7 @@ def main(
 			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")  # noqa: S603
 		)
 		with open(commit_log_file, "w") as f:
-			f.write("\n".join(reversed(commits)))
+			_ = f.write("\n".join(reversed(commits)))
 	except subprocess.CalledProcessError as e:
 		print(f"Error: {e}", file=sys.stderr)
 		sys.exit(1)
@@ -819,7 +1230,16 @@ if __name__ == "__main__":
 ``````{ end_of_file="scripts/make/get_commit_log.py" }
 
 ``````{ path="scripts/make/get_todos.py"  }
-"read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Scrape TODO/FIXME/etc comments from source files and generate reports.
+
+Reads configuration from [tool.makefile.inline-todo] in pyproject.toml.
+Outputs markdown, jsonl, and html reports with links to source and GitHub issues.
+"""
 
 from __future__ import annotations
 
@@ -832,19 +1252,24 @@ import warnings
 from dataclasses import asdict, dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, cast
 
 from jinja2 import Template
 
 try:
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
-	import tomli as tomllib  # type: ignore
+	import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 
 TOOL_PATH: str = "tool.makefile.inline-todo"
 
 
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
+def deep_get(
+	d: dict[str, Any],
+	path: str,
+	default: Any = None,  # noqa: ANN401
+	sep: str = ".",
+) -> Any:  # noqa: ANN401
 	"get a value from a nested dictionary"
 	return reduce(
 		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
@@ -914,8 +1339,8 @@ class Config:
 	extensions: list[str] = field(default_factory=lambda: ["py", "md"])
 	exclude: list[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
 	context_lines: int = 2
-	valid_post_tag: Union[str, list[str]] = " \t:<>|[](){{}}"
-	valid_pre_tag: Union[str, list[str]] = " \t:<>|[](){{}}#"
+	valid_post_tag: str | list[str] = " \t:<>|[](){{}}"
+	valid_pre_tag: str | list[str] = " \t:<>|[](){{}}#"
 	tag_label_map: dict[str, str] = field(
 		default_factory=lambda: {
 			"CRIT": "bug",
@@ -973,7 +1398,7 @@ class Config:
 		if config_file.is_file():
 			# read file and load if present
 			with config_file.open("rb") as f:
-				data: dict[str, Any] = tomllib.load(f)
+				data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 			# try to get the repo url
 			repo_url: str = "UNKNOWN"
@@ -985,7 +1410,7 @@ class Config:
 					repo_url = urls["repository"]
 				if "github" in urls:
 					repo_url = urls["github"]
-			except Exception as e:  # noqa: BLE001
+			except Exception as e:
 				warnings.warn(
 					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
 				)
@@ -1008,7 +1433,7 @@ class Config:
 		return output
 
 	@classmethod
-	def load(cls, data: dict) -> Config:
+	def load(cls, data: dict[str, Any]) -> Config:
 		"load from a dictionary, converting to `Path` as needed"
 		# process variables that should be paths
 		data = {
@@ -1041,7 +1466,7 @@ class TodoItem:
 	content: str
 	context: str = ""
 
-	def serialize(self) -> dict[str, Union[str, int]]:
+	def serialize(self) -> dict[str, str | int]:
 		"serialize to a dict we can dump to json"
 		return {
 			**asdict(self),
@@ -1180,7 +1605,7 @@ def main(config_file: Path) -> None:
 	global CFG  # noqa: PLW0603
 	# read configuration
 	cfg: Config = Config.read(config_file)
-	CFG = cfg
+	CFG = cfg  # pyright: ignore[reportConstantRedefinition]
 
 	# get data
 	files: list[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
@@ -1195,8 +1620,7 @@ def main(config_file: Path) -> None:
 
 	# write raw to jsonl
 	with open(cfg.out_file_base.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
-		for itm in all_items:
-			f.write(json.dumps(itm.serialize()) + "\n")
+		f.writelines(json.dumps(itm.serialize()) + "\n" for itm in all_items)
 
 	# group, render
 	grouped: dict[str, dict[str, list[TodoItem]]] = group_items_by_tag_and_file(
@@ -1211,7 +1635,7 @@ def main(config_file: Path) -> None:
 				cfg.out_file_base.stem + f"-{template_key}",
 			).with_suffix(".md"),
 		)
-		template_out_path.write_text(rendered, encoding="utf-8")
+		_ = template_out_path.write_text(rendered, encoding="utf-8")
 
 	# write html output
 	try:
@@ -1219,11 +1643,11 @@ def main(config_file: Path) -> None:
 			"//{{DATA}}//",
 			json.dumps([itm.serialize() for itm in all_items]),
 		)
-		cfg.out_file_base.with_suffix(".html").write_text(
+		_ = cfg.out_file_base.with_suffix(".html").write_text(
 			html_rendered,
 			encoding="utf-8",
 		)
-	except Exception as e:  # noqa: BLE001
+	except Exception as e:
 		warnings.warn(f"Failed to write html output: {e}")
 
 	print("wrote to:")
@@ -1233,568 +1657,65 @@ def main(config_file: Path) -> None:
 if __name__ == "__main__":
 	# parse args
 	parser: argparse.ArgumentParser = argparse.ArgumentParser("inline_todo")
-	parser.add_argument(
+	_ = parser.add_argument(
 		"--config-file",
 		default="pyproject.toml",
 		help="Path to the TOML config, will look under [tool.inline-todo].",
 	)
 	args: argparse.Namespace = parser.parse_args()
+	config_file: str = args.config_file
 	# call main
-	main(Path(args.config_file))
+	main(Path(config_file))
 
 ``````{ end_of_file="scripts/make/get_todos.py" }
 
 ``````{ path="scripts/make/get_version.py"  }
-"write the current version of the project to a file"
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Extract version from pyproject.toml and print to stdout.
+
+Usage: python get_version.py <pyproject_path>
+Prints 'v<version>' on success, 'NULL' on failure.
+"""
 
 from __future__ import annotations
 
 import sys
+from typing import Any, cast
 
 try:
 	try:
 		import tomllib  # type: ignore[import-not-found]
 	except ImportError:
-		import tomli as tomllib  # type: ignore
+		import tomli as tomllib  # type: ignore[import-untyped,import-not-found,no-redef] # pyright: ignore[reportMissingImports]
 
 	pyproject_path: str = sys.argv[1].strip()
 
 	with open(pyproject_path, "rb") as f:
-		pyproject_data: dict = tomllib.load(f)
+		pyproject_data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 	print("v" + pyproject_data["project"]["version"], end="")
-except Exception:  # noqa: BLE001
+except Exception:
 	print("NULL", end="")
 	sys.exit(1)
 
 ``````{ end_of_file="scripts/make/get_version.py" }
 
-``````{ path="scripts/make/mypy_report.py"  }
-"usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
+``````{ path="scripts/make/make_docs.py"  }
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
 
-from __future__ import annotations
+"""Generate HTML and markdown documentation using pdoc.
 
-import argparse
-import json
-import re
-import sys
-from pathlib import Path
-from typing import Dict, List, Tuple
+Reads configuration from [tool.makefile.docs] in pyproject.toml.
+Supports combined single-file markdown output and notebook conversion.
 
-
-def parse_mypy_output(lines: list[str]) -> dict[str, int]:
-	"given mypy output, turn it into a dict of `filename: error_count`"
-	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
-	counts: dict[str, int] = {}
-	for line in lines:
-		m = pattern.match(line)
-		if m:
-			f_raw: str = m.group("file")
-			f_norm: str = Path(f_raw).as_posix()
-			counts[f_norm] = counts.get(f_norm, 0) + 1
-	return counts
-
-
-def main() -> None:
-	"cli interface for mypy_report"
-	parser: argparse.ArgumentParser = argparse.ArgumentParser()
-	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
-	args: argparse.Namespace = parser.parse_args()
-	lines: list[str] = sys.stdin.read().splitlines()
-	error_dict: dict[str, int] = parse_mypy_output(lines)
-	sorted_errors: list[tuple[str, int]] = sorted(
-		error_dict.items(),
-		key=lambda x: x[1],
-	)
-	if len(sorted_errors) == 0:
-		print("# no errors found!")
-		return
-	if args.mode == "jsonl":
-		for fname, count in sorted_errors:
-			print(json.dumps({"filename": fname, "errors": count}))
-	elif args.mode == "toml":
-		for fname, count in sorted_errors:
-			print(f'"{fname}", # {count}')
-	else:
-		err_msg: str = f"unknown mode {args.mode}"
-		raise ValueError(err_msg)
-	print(f"# total errors: {sum(error_dict.values())}")
-
-
-if __name__ == "__main__":
-	main()
-
-``````{ end_of_file="scripts/make/mypy_report.py" }
-
-``````{ path="scripts/make/pdoc_markdown2_cli.py"  }
-"cli to convert markdown files to HTML using pdoc's markdown2"
-
-from __future__ import annotations
-
-import argparse
-from pathlib import Path
-from typing import Optional
-
-from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
-
-
-def convert_file(
-	input_path: Path,
-	output_path: Path,
-	safe_mode: Optional[_safe_mode] = None,
-	encoding: str = "utf-8",
-) -> None:
-	"""Convert a markdown file to HTML"""
-	# Read markdown input
-	text: str = input_path.read_text(encoding=encoding)
-
-	# Convert to HTML using markdown2
-	markdown: Markdown = Markdown(
-		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
-		safe_mode=safe_mode,
-	)
-	html: str = markdown.convert(text)
-
-	# Write HTML output
-	output_path.write_text(str(html), encoding=encoding)
-
-
-def main() -> None:
-	"cli entry point"
-	parser: argparse.ArgumentParser = argparse.ArgumentParser(
-		description="Convert markdown files to HTML using pdoc's markdown2",
-	)
-	parser.add_argument("input", type=Path, help="Input markdown file path")
-	parser.add_argument("output", type=Path, help="Output HTML file path")
-	parser.add_argument(
-		"--safe-mode",
-		choices=["escape", "replace"],
-		help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]",
-	)
-	parser.add_argument(
-		"--encoding",
-		default="utf-8",
-		help="Character encoding for reading/writing files (default: utf-8)",
-	)
-
-	args: argparse.Namespace = parser.parse_args()
-
-	convert_file(
-		args.input,
-		args.output,
-		safe_mode=args.safe_mode,
-		encoding=args.encoding,
-	)
-
-
-if __name__ == "__main__":
-	main()
-
-``````{ end_of_file="scripts/make/pdoc_markdown2_cli.py" }
-
-``````{ path="scripts/make/recipe_info.py"  }
-"""CLI tool to get information about Makefile recipes/targets."""
-
-import argparse
-import difflib
-import fnmatch
-import re
-import sys
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
-
-
-def _scan_makefile(lines: list[str], target_name: Optional[str] = None) -> Union[dict[str, int], int]:
-    """Scan makefile for target definitions, skipping define blocks.
-
-    Args:
-        lines: Makefile lines
-        target_name: If provided, return line index for this specific target.
-                    If None, return dict of all targets.
-
-    Returns:
-        If target_name is None: dict mapping target names to line indices
-        If target_name is provided: line index of that target, or -1 if not found
-    """
-    in_define_block: bool = False
-    target_rx: re.Pattern = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
-    targets: dict[str, int] = {}
-
-    for i, line in enumerate(lines):
-        # Track if we're inside a define block (embedded scripts)
-        if line.startswith("define "):
-            in_define_block = True
-            continue
-        if line.startswith("endef"):
-            in_define_block = False
-            continue
-
-        # Skip lines inside define blocks
-        if in_define_block:
-            continue
-
-        # Match target definitions
-        match = target_rx.match(line)
-        if match:
-            tgt_name: str = match.group(1)
-            if target_name is not None:
-                # Looking for specific target
-                if tgt_name == target_name:
-                    return i
-            else:
-                # Collecting all targets
-                targets[tgt_name] = i
-
-    # Return results based on mode
-    if target_name is not None:
-        return -1  # Target not found
-    return targets
-
-
-class Colors:
-    """ANSI color codes"""
-
-    def __init__(self, enabled: bool = True) -> None:
-        if enabled:
-            self.RESET = "\033[0m"
-            self.BOLD = "\033[1m"
-            self.RED = "\033[31m"
-            self.GREEN = "\033[32m"
-            self.YELLOW = "\033[33m"
-            self.BLUE = "\033[34m"
-            self.MAGENTA = "\033[35m"
-            self.WHITE = "\033[37m"
-        else:
-            self.RESET = self.BOLD = ""
-            self.RED = self.GREEN = self.YELLOW = ""
-            self.BLUE = self.MAGENTA = self.WHITE = ""
-
-@dataclass
-class MakeRecipe:
-    """Information about a Makefile recipe/target."""
-
-    target: str
-    comments: list[str]
-    dependencies: list[str]
-    echo_message: str
-
-    @classmethod
-    def from_makefile(cls, lines: list[str], target: str) -> "MakeRecipe":
-        """Parse and create a MakeRecipe from makefile lines for *target*."""
-        i: int = _scan_makefile(lines, target_name=target)
-        if i == -1:
-            err_msg: str = f"target '{target}' not found in makefile"
-            raise ValueError(err_msg)
-
-        line: str = lines[i]
-
-        # contiguous comment block immediately above
-        # (skip backward past .PHONY declarations and blank lines)
-        comments: list[str] = []
-        j: int = i - 1
-        blank_count: int = 0
-        while j >= 0:
-            stripped: str = lines[j].lstrip()
-            if stripped.startswith("#"):
-                comments.append(stripped[1:].lstrip())
-                blank_count = 0  # Reset blank counter when we hit a comment
-                j -= 1
-            elif stripped == "":
-                # Track consecutive blank lines
-                blank_count += 1
-                if blank_count >= 2:
-                    # Hit 2 blank lines in a row - stop
-                    break
-                j -= 1
-            elif stripped.startswith(".PHONY:"):
-                # Skip .PHONY declarations
-                blank_count = 0  # Reset blank counter
-                j -= 1
-            else:
-                # Hit a non-comment, non-blank, non-.PHONY line - stop
-                break
-        comments.reverse()
-
-        # prerequisites
-        deps_str: str = line.split(":", 1)[1].strip()
-        deps: list[str] = deps_str.split() if deps_str else []
-
-        # first echo in the recipe
-        echo_msg: str = ""
-        k: int = i + 1
-        while k < len(lines) and (lines[k].startswith("\t") or lines[k].startswith("    ")):
-            stripped: str = lines[k].lstrip()
-            m = re.match(r"@?echo[ \t]+(.*)", stripped)
-            if m:
-                content: str = m.group(1).strip()
-                if (content.startswith('"') and content.endswith('"')) or (
-                    content.startswith("'") and content.endswith("'")
-                ):
-                    content = content[1:-1]
-                echo_msg = content
-                break
-            k += 1
-
-        return cls(
-            target=target,
-            comments=comments,
-            dependencies=deps,
-            echo_message=echo_msg,
-        )
-
-    def describe(self, color: bool = False) -> list[str]:
-        """Return a list of description lines for this recipe."""
-        output: list[str] = []
-        c: Colors = Colors(enabled=color)
-
-        # Target name (bold blue) with colon in white
-        output.append(f"{c.BOLD}{c.BLUE}{self.target}{c.RESET}{c.WHITE}:{c.RESET}")
-
-        # Echo message (description) in yellow
-        if self.echo_message:
-            output.append(f"  {c.YELLOW}{self.echo_message}{c.RESET}")
-
-        # Dependencies in magenta
-        if self.dependencies:
-            deps_str = " ".join(f"{c.MAGENTA}{dep}{c.RESET}" for dep in self.dependencies)
-            output.append(f"  {c.RED}depends-on:{c.RESET} {deps_str}")
-
-        # Comments in green
-        if self.comments:
-            output.append(f"  {c.RED}comments:{c.RESET}")
-            output.extend(f"    {c.GREEN}{line}{c.RESET}" for line in self.comments)
-
-        return output
-
-
-def find_all_targets(lines: list[str]) -> list[str]:
-    """Find all .PHONY target names in the makefile."""
-    # First, get all .PHONY declarations
-    phony_targets: Set[str] = set()
-    # Use chr(36) to get dollar sign - works both standalone and embedded in makefile
-    # issue being that the makefile processes dollar sign as an escape character
-    phony_pattern: re.Pattern = re.compile(r"^\.PHONY:\s+(.+)" + chr(36))
-
-    for line in lines:
-        match = phony_pattern.match(line)
-        if match:
-            # Get all targets from this .PHONY line (space-separated)
-            target_names: list[str] = match.group(1).split()
-            phony_targets.update(target_names)
-
-    # Now scan for actual target definitions and filter to .PHONY ones
-    all_target_defs: dict[str, int] = _scan_makefile(lines)
-    return [tgt for tgt in all_target_defs if tgt in phony_targets]
-
-
-def get_all_recipes(lines: list[str]) -> list[MakeRecipe]:
-    """Get MakeRecipe objects for all .PHONY targets in the makefile."""
-    targets: list[str] = find_all_targets(lines)
-    return [MakeRecipe.from_makefile(lines, target) for target in targets]
-
-
-def describe_target(makefile_path: Path, target: str) -> None:
-    """Emit the description for *target*."""
-    lines: list[str] = makefile_path.read_text(encoding="utf-8").splitlines()
-    recipe: MakeRecipe = MakeRecipe.from_makefile(lines, target)
-
-    for line in recipe.describe():
-        print(line)
-
-
-def main() -> None:
-    """CLI entry point."""
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        "recipe_info",
-        description="Get detailed information about Makefile recipes/targets",
-    )
-    parser.add_argument(
-        "-f",
-        "--file",
-        default="makefile",
-        help="Path to the Makefile (default: ./makefile)",
-    )
-    parser.add_argument(
-        "-a",
-        "--all",
-        action="store_true",
-        help="Print help for all targets in the Makefile",
-    )
-    parser.add_argument(
-        "--no-color",
-        action="store_true",
-        help="Disable colored output (color is enabled by default)",
-    )
-    parser.add_argument("targets", nargs="*", help="Target names")
-    args: argparse.Namespace = parser.parse_args()
-
-    lines: list[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
-
-    # Get recipes to describe
-    if args.all:
-        recipes: list[MakeRecipe] = get_all_recipes(lines)
-    elif args.targets:
-        recipes = []
-        all_targets: list[str] = find_all_targets(lines)
-        c: Colors = Colors(enabled=not args.no_color)
-        for tgt in args.targets:
-            # Check if target contains wildcard characters
-            if any(char in tgt for char in ['*', '?', '[']):
-                # Pattern matching mode
-                matched_targets: list[str] = [t for t in all_targets if fnmatch.fnmatch(t, tgt)]
-                if matched_targets:
-                    for matched in matched_targets:
-                        recipes.append(MakeRecipe.from_makefile(lines, matched))
-                else:
-                    print(f"Error: no targets match pattern '{c.RED}{tgt}{c.RESET}'", file=sys.stderr)
-                    sys.exit(1)
-            else:
-                # Exact target lookup
-                try:
-                    recipes.append(MakeRecipe.from_makefile(lines, tgt))
-                except ValueError: # noqa: PERF203
-                    # Find similar targets (fuzzy matching)
-                    fuzzy_matches: list[str] = difflib.get_close_matches(tgt, all_targets, n=5, cutoff=0.6)
-                    # Also find targets that contain the attempted target
-                    substring_matches: list[str] = [t for t in all_targets if tgt in t and t not in fuzzy_matches]
-                    # Combine and deduplicate while preserving order
-                    matches: list[str] = fuzzy_matches + substring_matches
-                    matches = matches[:5]  # Limit to 5 suggestions
-
-                    print(f"Error: target '{c.RED}{tgt}{c.RESET}' not found in makefile", file=sys.stderr)
-                    if matches:
-                        suggestions: str = ", ".join(f"{c.BLUE}{m}{c.RESET}" for m in matches)
-                        print(f"Did you mean: {suggestions}?", file=sys.stderr)
-                    sys.exit(1)
-    else:
-        recipes = []
-
-    if not recipes:
-        parser.error("Provide target names or use --all flag")
-
-    # Print descriptions (color is True by default, unless --no-color is passed)
-    descriptions: list[str] = [
-        line for recipe in recipes for line in recipe.describe(color=not args.no_color)
-    ]
-    print("\n".join(descriptions).replace("\n\n", f"\n{'-' * 40}\n"))
-
-
-if __name__ == "__main__":
-    main()
-
-``````{ end_of_file="scripts/make/recipe_info.py" }
-
-``````{ path="scripts/assemble.py"  }
-"add scripts and version to the makefile -- this one isnt put in the makefile"
-
-from __future__ import annotations
-
-from pathlib import Path
-from typing import Dict
-
-try:
-	import tomllib  # type: ignore[import-not-found]
-except ImportError:
-	import tomli as tomllib  # type: ignore
-
-MAKEFILE_TEMPLATE_PATH: Path = Path("makefile.template")
-"path of the makefile template which we read"
-
-MAKEFILE_PATH: Path = Path("makefile")
-"path of the assembled makefile which we write"
-
-SCRIPTS_DIR: Path = Path("scripts")
-"path to all scripts, including this one and make docs"
-
-SCRIPTS_MAKE_DIR: Path = SCRIPTS_DIR / "make"
-"path to scripts which go in the makefile"
-
-TEMPLATE_SYNTAX: str = "##[[{var}]]##"
-"template syntax in the makefile and make_docs templates"
-
-IGNORE_SCRIPTS: set[str] = set()
-"scripts from `SCRIPTS_MAKE_DIR` to ignore"
-
-DOCS_MAKE_PATH: Path = SCRIPTS_DIR / "make_docs.py"
-"path to the make_docs script template"
-
-DOCS_MAKE_PATH_OUT: Path = Path("docs/resources/make_docs.py")
-"path to the make_docs script output"
-
-with open("pyproject.toml", "rb") as f_pyproject:
-	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
-
-
-def read_scripts(scripts_dir: Path = SCRIPTS_MAKE_DIR) -> dict[str, str]:
-	"read script contents into a dict"
-	scripts: dict[str, str] = {}
-	for script in scripts_dir.iterdir():
-		if script.is_file() and script.suffix == ".py":
-			script_text: str = script.read_text()
-			# add a link to the script
-			script_text = f"# source: https://github.com/mivanit/python-project-makefile-template/tree/main/{script.as_posix()}\n\n{script_text}"
-			scripts[script.stem] = script_text
-	return scripts
-
-
-def assemble_make() -> None:
-	"assemble the makefile"
-	contents: str = MAKEFILE_TEMPLATE_PATH.read_text()
-	scripts: dict[str, str] = read_scripts()
-
-	# inline each script
-	for script_name, script_contents in scripts.items():
-		if script_name in IGNORE_SCRIPTS:
-			continue
-
-		template_replace: str = TEMPLATE_SYNTAX.format(
-			var=f"SCRIPT_{script_name.upper()}",
-		)
-		assert template_replace in contents, (
-			f"Template syntax not found in {MAKEFILE_TEMPLATE_PATH}:\n{template_replace}"
-		)
-
-		contents = contents.replace(
-			template_replace,
-			script_contents,
-		)
-
-	# version
-	version_str: str = f"#| version: v{VERSION}"
-	contents = contents.replace(
-		TEMPLATE_SYNTAX.format(var="VERSION"),
-		f"{version_str:<68}|",
-	)
-
-	MAKEFILE_PATH.write_text(contents)
-
-
-def assemble_make_docs() -> None:
-	"assemble the make_docs script"
-	make_docs_base: str = DOCS_MAKE_PATH.read_text()
-	make_docs_base = make_docs_base.replace(
-		TEMPLATE_SYNTAX.format(var="VERSION"),
-		VERSION,
-	)
-	DOCS_MAKE_PATH_OUT.write_text(make_docs_base)
-
-
-if __name__ == "__main__":
-	assemble_make()
-	assemble_make_docs()
-
-``````{ end_of_file="scripts/assemble.py" }
-
-``````{ path="scripts/make_docs.py"  }
-"""python project makefile template -- docs generation script
-
-originally by Michael Ivanitskiy (mivanits@umich.edu)
-https://github.com/mivanit/python-project-makefile-template
-version: ##[[VERSION]]##
-license: https://creativecommons.org/licenses/by-sa/4.0/
-modifications from the original should be denoted with `~~~~~`
-as this makes it easier to find edits when updating
+Usage: python make_docs.py [--serve] [--warn-all] [--combined]
 """
 
 from __future__ import annotations
@@ -1807,13 +1728,13 @@ import warnings
 from dataclasses import asdict, dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, cast
 
 try:
 	# python 3.11+
 	import tomllib  # type: ignore[import-not-found]
 except ImportError:
-	import tomli as tomllib  # type: ignore
+	import tomli as tomllib  # type: ignore  # pyright: ignore[reportMissingImports]
 
 import jinja2
 import pdoc  # type: ignore[import-not-found]
@@ -1847,8 +1768,8 @@ HTML_TO_MD_MAP: dict[str, str] = {
 	"&apos;": "'",
 }
 
-pdoc.render_helpers.markdown_extensions["alerts"] = True  # type: ignore[assignment]
-pdoc.render_helpers.markdown_extensions["admonitions"] = True  # type: ignore[assignment]
+pdoc.render_helpers.markdown_extensions["alerts"] = True  # type: ignore[assignment]  # pyright: ignore[reportArgumentType]
+pdoc.render_helpers.markdown_extensions["admonitions"] = True  # type: ignore[assignment]  # pyright: ignore[reportArgumentType]
 
 
 _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
@@ -1878,11 +1799,11 @@ _CONFIG_NOTEBOOKS_INDEX_TEMPLATE: str = r"""<!doctype html>
 
 
 def deep_get(
-	d: dict,
+	d: dict[str, Any],
 	path: str,
 	default: Any = None,  # noqa: ANN401
 	sep: str = ".",
-	warn_msg_on_default: Optional[str] = None,
+	warn_msg_on_default: str | None = None,
 ) -> Any:  # noqa: ANN401
 	"Get a value from a nested dictionary"
 	output: Any = reduce(
@@ -1935,7 +1856,7 @@ class Config:
 	def module_name(self) -> str:
 		"""name of the module, which is the package name with '-' replaced by '_'
 
-		HACK: this is kid of fragile
+		HACK: this is kind of fragile
 		"""
 		return self.package_name.replace("-", "_")
 
@@ -1972,7 +1893,7 @@ _CFG_PATHS: dict[str, str] = dict(
 )
 
 
-def set_global_config() -> None:
+def set_global_config() -> Config:
 	"""set global var `CONFIG` from pyproject.toml"""
 	global CONFIG  # noqa: PLW0603
 
@@ -1980,10 +1901,10 @@ def set_global_config() -> None:
 	cfg_default: Config = Config()
 
 	with CONFIG_PATH.open("rb") as f:
-		pyproject_data = tomllib.load(f)
+		pyproject_data: dict[str, Any] = cast("dict[str, Any]", tomllib.load(f))  # pyright: ignore[reportUnknownMemberType]
 
 	# apply the mapping from toml path to attribute
-	cfg_partial: dict = {
+	cfg_partial: dict[str, Any] = {
 		key: deep_get(
 			d=pyproject_data,
 			path=path,
@@ -1996,13 +1917,15 @@ def set_global_config() -> None:
 	}
 
 	# set the global var
-	CONFIG = Config(**cfg_partial)
+	CONFIG = Config(**cfg_partial)  # pyright: ignore[reportConstantRedefinition]
 
 	# add the package meta to the pdoc globals
-	pdoc.render.env.globals["package_version"] = CONFIG.package_version
-	pdoc.render.env.globals["package_name"] = CONFIG.package_name
-	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url
-	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url
+	pdoc.render.env.globals["package_version"] = CONFIG.package_version  # pyright: ignore[reportArgumentType]
+	pdoc.render.env.globals["package_name"] = CONFIG.package_name  # pyright: ignore[reportArgumentType]
+	pdoc.render.env.globals["package_repo_url"] = CONFIG.package_repo_url  # pyright: ignore[reportArgumentType]
+	pdoc.render.env.globals["package_code_url"] = CONFIG.package_code_url  # pyright: ignore[reportArgumentType]
+
+	return CONFIG
 
 
 """
@@ -2018,7 +1941,7 @@ def set_global_config() -> None:
 # ============================================================
 
 
-def replace_heading(match: re.Match) -> str:
+def replace_heading(match: re.Match[str]) -> str:
 	"replace a matched heading with an incremented version"
 	current_level: int = len(match.group(1))
 	new_level: int = min(
@@ -2040,17 +1963,17 @@ def increment_markdown_headings(markdown_text: str) -> str:
 		The Markdown text with incremented heading levels.
 	"""
 	# Regular expression to match Markdown headings
-	heading_pattern: re.Pattern = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
+	heading_pattern: re.Pattern[str] = re.compile(r"^(#{1,6})(.+)$", re.MULTILINE)
 
 	# Replace all headings with incremented versions
 	return heading_pattern.sub(replace_heading, markdown_text)
 
 
-def format_signature(sig: inspect.Signature, colon: bool) -> str:
+def format_signature(sig: inspect.Signature, colon: bool) -> Markup:
 	"""Format a function signature for Markdown. Returns a single-line Markdown string."""
 	# First get a list with all params as strings.
-	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore
-	return_annot = pdoc.doc._PrettySignature._return_annotation_str(sig)  # type: ignore
+	result = pdoc.doc._PrettySignature._params(sig)  # type: ignore  # pyright: ignore[reportArgumentType,reportPrivateUsage]
+	return_annot = pdoc.doc._PrettySignature._return_annotation_str(sig)  # type: ignore  # pyright: ignore[reportArgumentType,reportPrivateUsage]
 
 	def _format_param(param: str) -> str:
 		"""Format a parameter for Markdown, including potential links."""
@@ -2072,18 +1995,19 @@ def format_signature(sig: inspect.Signature, colon: bool) -> str:
 		anno += ":"
 
 	# Construct the full signature
-	return f"`(`{params_str}`{anno}`"
+	return Markup(f"`(`{params_str}`{anno}`")  # noqa: S704
 
 
 def markup_safe(sig: inspect.Signature) -> str:
 	"mark some text as safe, no escaping needed"
 	output: str = str(sig)
-	return Markup(output)
+	# the user is marking it as safe, not our problem
+	return Markup(output)  # noqa: S704
 
 
 def use_markdown_format() -> None:
 	"set some functions to output markdown format"
-	pdoc.render_helpers.format_signature = format_signature
+	pdoc.render_helpers.format_signature = format_signature  # type: ignore[invalid-assignment]
 	pdoc.render.env.filters["markup_safe"] = markup_safe
 	pdoc.render.env.filters["increment_markdown_headings"] = increment_markdown_headings
 
@@ -2104,8 +2028,8 @@ def use_markdown_format() -> None:
 def convert_notebooks() -> None:
 	"""Convert Jupyter notebooks to HTML files"""
 	try:
-		import nbconvert
-		import nbformat
+		import nbconvert  # noqa: PLC0415
+		import nbformat  # noqa: PLC0415
 	except ImportError as e:
 		err_msg: str = 'nbformat and nbconvert are required to convert notebooks to HTML, add "nbconvert>=7.16.4" to dev/docs deps'
 		raise ImportError(err_msg) from e
@@ -2138,8 +2062,11 @@ def convert_notebooks() -> None:
 			CONFIG.notebooks_output_path / notebook.with_suffix(".html").name
 		)
 		with open(notebook, "r") as f_in:
-			nb: nbformat.NotebookNode = nbformat.read(f_in, as_version=4)
-			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()
+			nb: nbformat.NotebookNode = cast(
+				"nbformat.NotebookNode",
+				nbformat.read(f_in, as_version=4),  # pyright: ignore[reportUnknownMemberType]
+			)
+			html_exporter: nbconvert.HTMLExporter = nbconvert.HTMLExporter()  # ty: ignore[possibly-missing-attribute]
 			body: str
 			body, _ = html_exporter.from_notebook_node(nb)
 			with open(output_notebook, "w") as f_out:
@@ -2159,7 +2086,7 @@ def convert_notebooks() -> None:
 # ============================================================
 
 
-def pdoc_combined(*modules, output_file: Path) -> None:  # noqa: ANN002
+def pdoc_combined(*modules: str, output_file: Path) -> None:
 	"""Render the documentation for a list of modules into a single HTML file.
 
 	Args:
@@ -2227,7 +2154,7 @@ if __name__ == "__main__":
 	# configure pdoc
 	# --------------------------------------------------
 	# read what we need from the pyproject.toml, add stuff to pdoc globals
-	set_global_config()
+	CONFIG = set_global_config()  # pyright: ignore[reportConstantRedefinition]
 
 	# ignore warnings if needed
 	if not parsed_args.warn_all:
@@ -2284,7 +2211,1094 @@ if __name__ == "__main__":
 			print(f"Serving at http://localhost:{port}")
 			httpd.serve_forever()
 
-``````{ end_of_file="scripts/make_docs.py" }
+``````{ end_of_file="scripts/make/make_docs.py" }
+
+``````{ path="scripts/make/pdoc_markdown2_cli.py"  }
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""CLI to convert markdown files to HTML using pdoc's markdown2.
+
+Usage: python pdoc_markdown2_cli.py <input.md> <output.html> [--safe-mode escape|replace]
+"""
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+from typing import Any
+
+from pdoc.markdown2 import (  # type: ignore[import-untyped,import-not-found] # pyright: ignore[reportMissingImports]
+	Markdown,  # pyright: ignore[reportUnknownVariableType]
+)
+
+
+def convert_file(
+	input_path: Path,
+	output_path: Path,
+	safe_mode: str | None = None,
+	encoding: str = "utf-8",
+) -> None:
+	"""Convert a markdown file to HTML"""
+	# Read markdown input
+	text: str = input_path.read_text(encoding=encoding)
+
+	# Convert to HTML using markdown2
+	markdown: Any = Markdown(  # pyright: ignore[reportUnknownVariableType]
+		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
+		safe_mode=safe_mode,
+	)
+	html: str = str(markdown.convert(text))  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
+
+	# Write HTML output
+	output_path.write_text(html, encoding=encoding)
+
+
+def main() -> None:
+	"cli entry point"
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
+		description="Convert markdown files to HTML using pdoc's markdown2",
+	)
+	parser.add_argument("input", type=Path, help="Input markdown file path")
+	parser.add_argument("output", type=Path, help="Output HTML file path")
+	parser.add_argument(
+		"--safe-mode",
+		choices=["escape", "replace"],
+		help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]",
+	)
+	parser.add_argument(
+		"--encoding",
+		default="utf-8",
+		help="Character encoding for reading/writing files (default: utf-8)",
+	)
+
+	args: argparse.Namespace = parser.parse_args()
+
+	convert_file(
+		args.input,
+		args.output,
+		safe_mode=args.safe_mode,
+		encoding=args.encoding,
+	)
+
+
+if __name__ == "__main__":
+	main()
+
+``````{ end_of_file="scripts/make/pdoc_markdown2_cli.py" }
+
+``````{ path="scripts/make/recipe_info.py"  }
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""CLI tool to get information about Makefile recipes/targets.
+
+Parses a makefile and displays detailed info about targets including
+dependencies, comments, and echo messages. Supports fuzzy matching
+and wildcard patterns.
+
+Usage: python recipe_info.py [-f makefile] [--all | target1 target2 ...]
+"""
+
+from __future__ import annotations
+
+import argparse
+import difflib
+import fnmatch
+import re
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Literal, cast, overload
+
+
+@overload
+def _scan_makefile(
+	lines: list[str],
+	target_name: str,
+) -> int: ...
+@overload
+def _scan_makefile(
+	lines: list[str],
+	target_name: None = None,
+) -> dict[str, int]: ...
+def _scan_makefile(
+	lines: list[str],
+	target_name: str | None = None,
+) -> dict[str, int] | int:
+	"""Scan makefile for target definitions, skipping define blocks.
+
+	Args:
+		lines: Makefile lines
+		target_name: If provided, return line index for this specific target.
+					If None, return dict of all targets.
+
+	Returns:
+		If target_name is None: dict mapping target names to line indices
+		If target_name is provided: line index of that target, or -1 if not found
+
+	"""
+	in_define_block: bool = False
+	target_rx: re.Pattern[str] = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
+	targets: dict[str, int] = {}
+
+	for i, line in enumerate(lines):
+		# Track if we're inside a define block (embedded scripts)
+		if line.startswith("define "):
+			in_define_block = True
+			continue
+		if line.startswith("endef"):
+			in_define_block = False
+			continue
+
+		# Skip lines inside define blocks
+		if in_define_block:
+			continue
+
+		# Match target definitions
+		match = target_rx.match(line)
+		if match:
+			tgt_name: str = match.group(1)
+			if target_name is not None:
+				# Looking for specific target
+				if tgt_name == target_name:
+					return i
+			else:
+				# Collecting all targets
+				targets[tgt_name] = i
+
+	# Return results based on mode
+	if target_name is not None:
+		return -1  # Target not found
+	return targets
+
+
+def _scan_makefile_variables(lines: list[str]) -> dict[str, int]:
+	"""Scan makefile for variable definitions, skipping define blocks.
+
+	Returns dict mapping variable names to line indices.
+	Only matches variables that start with uppercase letter or underscore.
+	"""
+	in_define_block: bool = False
+	# Match: VARNAME := value, VARNAME ?= value, VARNAME += value, VARNAME = value
+	# Allow leading whitespace to match variables inside ifeq/endif blocks
+	var_rx: re.Pattern[str] = re.compile(
+		r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$"
+	)
+	variables: dict[str, int] = {}
+
+	for i, line in enumerate(lines):
+		# Track if we're inside a define block
+		if line.startswith("define "):
+			in_define_block = True
+			continue
+		if line.startswith("endef"):
+			in_define_block = False
+			continue
+
+		# Skip lines inside define blocks
+		if in_define_block:
+			continue
+
+		# Match variable definitions
+		match = var_rx.match(line)
+		if match:
+			var_name: str = match.group(1)
+			# Only store the first definition (in case of multiple assignments)
+			if var_name not in variables:
+				variables[var_name] = i
+
+	return variables
+
+
+class Colors:
+	"""ANSI color codes"""
+
+	RESET: str
+	BOLD: str
+	RED: str
+	GREEN: str
+	YELLOW: str
+	BLUE: str
+	MAGENTA: str
+	CYAN: str
+	WHITE: str
+
+	def __init__(self, enabled: bool = True) -> None:
+		"init color codes, or empty strings if `not enabled`"
+		if enabled:
+			self.RESET = "\033[0m"  # pyright: ignore[reportConstantRedefinition]
+			self.BOLD = "\033[1m"  # pyright: ignore[reportConstantRedefinition]
+			self.RED = "\033[31m"  # pyright: ignore[reportConstantRedefinition]
+			self.GREEN = "\033[32m"  # pyright: ignore[reportConstantRedefinition]
+			self.YELLOW = "\033[33m"  # pyright: ignore[reportConstantRedefinition]
+			self.BLUE = "\033[34m"  # pyright: ignore[reportConstantRedefinition]
+			self.MAGENTA = "\033[35m"  # pyright: ignore[reportConstantRedefinition]
+			self.CYAN = "\033[36m"  # pyright: ignore[reportConstantRedefinition]
+			self.WHITE = "\033[37m"  # pyright: ignore[reportConstantRedefinition]
+		else:
+			self.RESET = self.BOLD = ""  # pyright: ignore[reportConstantRedefinition]
+			self.RED = self.GREEN = self.YELLOW = ""  # pyright: ignore[reportConstantRedefinition]
+			self.BLUE = self.MAGENTA = self.CYAN = self.WHITE = ""  # pyright: ignore[reportConstantRedefinition]
+
+
+@dataclass
+class MakeRecipe:
+	"""Information about a Makefile recipe/target."""
+
+	target: str
+	comments: list[str]
+	dependencies: list[str]
+	echo_message: str
+
+	@classmethod
+	def from_makefile(cls, lines: list[str], target: str) -> MakeRecipe:
+		"""Parse and create a MakeRecipe from makefile lines for *target*."""
+		i: int = _scan_makefile(lines, target_name=target)
+		if i == -1:
+			err_msg: str = f"target '{target}' not found in makefile"
+			raise ValueError(err_msg)
+
+		line: str = lines[i]
+
+		# contiguous comment block immediately above
+		# (skip backward past .PHONY declarations and blank lines)
+		comments: list[str] = []
+		j: int = i - 1
+		blank_count: int = 0
+		stripped: str
+		while j >= 0:
+			stripped = lines[j].lstrip()
+			if stripped.startswith("#"):
+				comments.append(stripped[1:].lstrip())
+				blank_count = 0  # Reset blank counter when we hit a comment
+				j -= 1
+			elif stripped == "":
+				# Track consecutive blank lines
+				blank_count += 1
+				if blank_count >= 2:
+					# Hit 2 blank lines in a row - stop
+					break
+				j -= 1
+			elif stripped.startswith(".PHONY:"):
+				# Skip .PHONY declarations
+				blank_count = 0  # Reset blank counter
+				j -= 1
+			else:
+				# Hit a non-comment, non-blank, non-.PHONY line - stop
+				break
+		comments.reverse()
+
+		# prerequisites
+		deps_str: str = line.split(":", 1)[1].strip()
+		deps: list[str] = deps_str.split() if deps_str else []
+
+		# first echo in the recipe
+		echo_msg: str = ""
+		k: int = i + 1
+		while k < len(lines) and (
+			lines[k].startswith("\t") or lines[k].startswith("    ")
+		):
+			m = re.match(r"@?echo[ \t]+(.*)", lines[k].lstrip())
+			if m:
+				content: str = m.group(1).strip()
+				if (content.startswith('"') and content.endswith('"')) or (
+					content.startswith("'") and content.endswith("'")
+				):
+					content = content[1:-1]
+				echo_msg = content
+				break
+			k += 1
+
+		return cls(
+			target=target,
+			comments=comments,
+			dependencies=deps,
+			echo_message=echo_msg,
+		)
+
+	def describe(self, color: bool = False) -> list[str]:
+		"""Return a list of description lines for this recipe."""
+		output: list[str] = []
+		c: Colors = Colors(enabled=color)
+
+		# Target name (bold blue) with colon in white
+		output.append(f"{c.BOLD}{c.BLUE}{self.target}{c.RESET}{c.WHITE}:{c.RESET}")
+
+		# Echo message (description) in yellow
+		if self.echo_message:
+			output.append(f"  {c.YELLOW}{self.echo_message}{c.RESET}")
+
+		# Dependencies in magenta
+		if self.dependencies:
+			deps_str = " ".join(
+				f"{c.MAGENTA}{dep}{c.RESET}" for dep in self.dependencies
+			)
+			output.append(f"  {c.RED}depends-on:{c.RESET} {deps_str}")
+
+		# Comments in green
+		if self.comments:
+			output.append(f"  {c.RED}comments:{c.RESET}")
+			output.extend(f"    {c.GREEN}{line}{c.RESET}" for line in self.comments)
+
+		return output
+
+
+@dataclass
+class MakeVariable:
+	"""Information about a Makefile variable."""
+
+	name: str
+	raw_value: str  # as written in makefile, e.g., "$(shell git describe)"
+	operator: Literal["=", ":=", "?=", "+="]
+	comments: list[str]  # comments above the definition
+
+	@classmethod
+	def from_makefile(
+		cls,
+		lines: list[str],
+		var_name: str,
+		var_line_idx: int,
+	) -> MakeVariable:
+		"""Parse and create a MakeVariable from makefile lines."""
+		line: str = lines[var_line_idx]
+
+		# Parse the variable definition line (allow leading whitespace for ifeq blocks)
+		var_rx: re.Pattern[str] = re.compile(
+			r"^\s*([A-Z_][A-Z0-9_]*)\s*(\?=|:=|\+=|=)\s*(.*)$"
+		)
+		match = var_rx.match(line)
+		if not match:
+			err_msg: str = f"variable '{var_name}' not found at line {var_line_idx}"
+			raise ValueError(err_msg)
+
+		operator: Literal["=", ":=", "?=", "+="] = match.group(2)  # type: ignore[assignment] # pyright: ignore[reportAssignmentType]
+		raw_value: str = match.group(3)
+
+		# Collect contiguous comment block above (same logic as MakeRecipe)
+		comments: list[str] = []
+		j: int = var_line_idx - 1
+		blank_count: int = 0
+		while j >= 0:
+			stripped: str = lines[j].lstrip()
+			if stripped.startswith("#"):
+				comments.append(stripped[1:].lstrip())
+				blank_count = 0
+				j -= 1
+			elif stripped == "":
+				blank_count += 1
+				if blank_count >= 2:
+					break
+				j -= 1
+			else:
+				break
+		comments.reverse()
+
+		return cls(
+			name=var_name,
+			raw_value=raw_value,
+			operator=operator,
+			comments=comments,
+		)
+
+	def describe(self, color: bool = True) -> list[str]:
+		"""Return a list of description lines for this variable."""
+		output: list[str] = []
+		c: Colors = Colors(enabled=color)
+
+		# Variable name in bold cyan, operator in white
+		output.append(
+			f"{c.BOLD}{c.CYAN}{self.name}{c.RESET} {c.WHITE}{self.operator}{c.RESET}"
+		)
+
+		# Raw value in yellow
+		output.append(f"  {c.YELLOW}{self.raw_value}{c.RESET}")
+
+		# Comments in green (same style as targets)
+		if self.comments:
+			output.append(f"  {c.RED}comments:{c.RESET}")
+			output.extend(f"    {c.GREEN}{line}{c.RESET}" for line in self.comments)
+
+		# Hint for computed values
+		output.append(f"  {c.WHITE}(run 'make info-long' for computed values){c.RESET}")
+
+		return output
+
+
+def find_all_variables(lines: list[str]) -> dict[str, int]:
+	"""Find all variable definitions in the makefile.
+
+	Returns dict mapping variable names to line indices.
+	"""
+	return _scan_makefile_variables(lines)
+
+
+def find_all_targets(lines: list[str]) -> list[str]:
+	"""Find all .PHONY target names in the makefile."""
+	# First, get all .PHONY declarations
+	phony_targets: set[str] = set()
+	# Use chr(36) to get dollar sign - works both standalone and embedded in makefile
+	# issue being that the makefile processes dollar sign as an escape character
+	phony_pattern: re.Pattern[str] = re.compile(r"^\.PHONY:\s+(.+)" + chr(36))
+
+	for line in lines:
+		match = phony_pattern.match(line)
+		if match:
+			# Get all targets from this .PHONY line (space-separated)
+			target_names: list[str] = match.group(1).split()
+			phony_targets.update(target_names)
+
+	# Now scan for actual target definitions and filter to .PHONY ones
+	all_target_defs: dict[str, int] = _scan_makefile(lines)
+	return [tgt for tgt in all_target_defs if tgt in phony_targets]
+
+
+def get_all_recipes(lines: list[str]) -> list[MakeRecipe]:
+	"""Get MakeRecipe objects for all .PHONY targets in the makefile."""
+	targets: list[str] = find_all_targets(lines)
+	return [MakeRecipe.from_makefile(lines, target) for target in targets]
+
+
+def describe_target(makefile_path: Path, target: str) -> None:
+	"""Emit the description for *target*."""
+	lines: list[str] = makefile_path.read_text(encoding="utf-8").splitlines()
+	recipe: MakeRecipe = MakeRecipe.from_makefile(lines, target)
+
+	for line in recipe.describe():
+		print(line)
+
+
+def main() -> None:  # noqa: PLR0912, PLR0915, C901
+	"""CLI entry point."""
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
+		"recipe_info",
+		description="Get detailed information about Makefile recipes/targets and variables",
+	)
+	parser.add_argument(
+		"-f",
+		"--file",
+		default="makefile",
+		help="Path to the Makefile (default: ./makefile)",
+	)
+	parser.add_argument(
+		"-a",
+		"--all",
+		action="store_true",
+		help="Print help for all targets in the Makefile",
+	)
+	parser.add_argument(
+		"--no-color",
+		action="store_true",
+		help="Disable colored output (color is enabled by default)",
+	)
+	parser.add_argument(
+		"targets", nargs="*", help="Target or variable names (case-insensitive)"
+	)
+	args: argparse.Namespace = parser.parse_args()
+
+	lines: list[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
+	c: Colors = Colors(enabled=not args.no_color)
+
+	# Get all targets and variables upfront
+	all_targets: list[str] = find_all_targets(lines)
+	all_variables: dict[str, int] = find_all_variables(lines)
+
+	recipes: list[MakeRecipe] = []
+	variables: list[MakeVariable] = []
+
+	if args.all:
+		recipes = get_all_recipes(lines)
+	elif args.targets:
+		for query in args.targets:
+			has_wildcard: bool = any(char in query for char in ["*", "?", "["])
+
+			if has_wildcard:
+				# Pattern matching mode for targets
+				matched_targets: list[str] = [
+					t for t in all_targets if fnmatch.fnmatch(t, query)
+				]
+				for matched in matched_targets:
+					recipes.append(MakeRecipe.from_makefile(lines, matched))
+
+				# Pattern matching for variables (case-insensitive)
+				matched_vars: list[str] = [
+					v
+					for v in all_variables
+					if fnmatch.fnmatch(v.lower(), query.lower())
+				]
+
+				variables.extend(
+					[
+						MakeVariable.from_makefile(
+							lines=lines,
+							var_name=var_name,
+							var_line_idx=all_variables[var_name],
+						)
+						for var_name in matched_vars
+					]
+				)
+
+				if not matched_targets and not matched_vars:
+					print(
+						f"Error: no targets or variables match pattern '{c.RED}{query}{c.RESET}'",
+						file=sys.stderr,
+					)
+					sys.exit(1)
+			else:
+				# Exact/case-insensitive lookup
+				found_target: bool = False
+				found_variable: bool = False
+
+				# Check for exact target match
+				if query in all_targets:
+					recipes.append(MakeRecipe.from_makefile(lines, query))
+					found_target = True
+
+				# Check for case-insensitive variable match
+				query_upper: str = query.upper()
+				for var_name, var_line_idx in all_variables.items():
+					if var_name.upper() == query_upper:
+						variables.append(
+							MakeVariable.from_makefile(
+								lines=lines,
+								var_name=var_name,
+								var_line_idx=var_line_idx,
+							)
+						)
+						found_variable = True
+						break
+
+				if not found_target and not found_variable:
+					# Find similar targets and variables (fuzzy matching)
+					all_names: list[str] = all_targets + list(all_variables.keys())
+					fuzzy_matches: list[str] = cast(
+						"list[str]",
+						difflib.get_close_matches(
+							query,
+							all_names,
+							n=5,
+							cutoff=0.5,
+						),
+					)
+					# Also find names that contain the query
+					substring_matches: list[str] = [
+						n
+						for n in all_names
+						if query.lower() in n.lower() and n not in fuzzy_matches
+					]
+					matches: list[str] = (fuzzy_matches + substring_matches)[:5]
+
+					print(
+						f"Error: '{c.RED}{query}{c.RESET}' not found as target or variable",
+						file=sys.stderr,
+					)
+					if matches:
+						suggestions: str = ", ".join(
+							f"{c.BLUE}{m}{c.RESET}" for m in matches
+						)
+						print(f"Did you mean: {suggestions}?", file=sys.stderr)
+					sys.exit(1)
+
+	if not recipes and not variables:
+		parser.error("Provide target/variable names or use --all flag")
+
+	# Print descriptions
+	use_color: bool = not args.no_color
+	output_lines: list[str] = []
+
+	# Targets first
+	for recipe in recipes:
+		output_lines.extend(recipe.describe(color=use_color))
+
+	# Separator if we have both
+	if recipes and variables:
+		output_lines.append("-" * 40)
+
+	# Variables
+	for var in variables:
+		output_lines.extend(var.describe(color=use_color))
+
+	print("\n".join(output_lines).replace("\n\n", f"\n{'-' * 40}\n"))
+
+
+if __name__ == "__main__":
+	main()
+
+``````{ end_of_file="scripts/make/recipe_info.py" }
+
+``````{ path="scripts/make/typing_breakdown.py"  }
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# version: ##[[VERSION]]##
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Parse type checker outputs and generate detailed breakdown of errors by type and file.
+
+Usage:
+    python typing_breakdown.py [OPTIONS]
+
+Examples:
+    python typing_breakdown.py
+    python typing_breakdown.py --error-dir .meta/.type-errors
+    python typing_breakdown.py --output .meta/typing-summary.toml --checkers mypy,basedpyright,ty
+
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+from collections import defaultdict
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Callable, Literal
+
+
+def strip_cwd(path: str) -> str:
+	"""Strip the current working directory from a file path to make it relative.
+
+	Args:
+		path: File path (absolute or relative)
+
+	Returns:
+		Relative path with CWD stripped, or original path if not under CWD
+
+	"""
+	cwd: str = os.getcwd()
+	# Normalize both paths to handle different separators and resolve symlinks
+	abs_path: str = os.path.abspath(path)
+	abs_cwd: str = os.path.abspath(cwd)
+
+	# Ensure CWD ends with separator for proper prefix matching
+	if not abs_cwd.endswith(os.sep):
+		abs_cwd += os.sep
+
+	# Strip CWD prefix if present
+	if abs_path.startswith(abs_cwd):
+		return abs_path[len(abs_cwd) :]
+
+	return path
+
+
+@dataclass
+class TypeCheckResult:
+	"results from parsing a type checker output"
+
+	type_checker: Literal["mypy", "basedpyright", "ty"]
+	by_type: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	by_file: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	# Separate tracking for warnings (used by basedpyright)
+	warnings_by_type: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+	warnings_by_file: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+
+	@property
+	def total_errors(self) -> int:
+		"total number of errors across all types, validates they match between type and file dicts"
+		total_by_type: int = sum(self.by_type.values())
+		total_by_file: int = sum(self.by_file.values())
+
+		if total_by_type != total_by_file:
+			err_msg: str = f"Error count mismatch for {self.type_checker}: by_type={total_by_type}, by_file={total_by_file}"
+			raise ValueError(err_msg)
+
+		return total_by_type
+
+	@property
+	def total_warnings(self) -> int:
+		"total number of warnings across all types"
+		total_by_type: int = sum(self.warnings_by_type.values())
+		total_by_file: int = sum(self.warnings_by_file.values())
+
+		if total_by_type != total_by_file:
+			err_msg: str = f"Warning count mismatch for {self.type_checker}: by_type={total_by_type}, by_file={total_by_file}"
+			raise ValueError(err_msg)
+
+		return total_by_type
+
+	def sorted_results(self) -> TypeCheckResult:
+		"return a copy with errors sorted by count (descending)"
+		# Sort by count (descending)
+		sorted_by_type: list[tuple[str, int]] = sorted(
+			self.by_type.items(),
+			key=lambda x: x[1],
+			reverse=True,
+		)
+		sorted_by_file: list[tuple[str, int]] = sorted(
+			self.by_file.items(),
+			key=lambda x: x[1],
+			reverse=True,
+		)
+		sorted_warnings_by_type: list[tuple[str, int]] = sorted(
+			self.warnings_by_type.items(),
+			key=lambda x: x[1],
+			reverse=True,
+		)
+		sorted_warnings_by_file: list[tuple[str, int]] = sorted(
+			self.warnings_by_file.items(),
+			key=lambda x: x[1],
+			reverse=True,
+		)
+
+		# Create new instance with sorted data (dicts maintain insertion order in Python 3.7+)
+		result: TypeCheckResult = TypeCheckResult(type_checker=self.type_checker)
+		result.by_type = dict(sorted_by_type)
+		result.by_file = dict(sorted_by_file)
+		result.warnings_by_type = dict(sorted_warnings_by_type)
+		result.warnings_by_file = dict(sorted_warnings_by_file)
+
+		return result
+
+	def to_toml(self) -> str:
+		"format as TOML output"
+		lines: list[str] = []
+
+		# Main section with total
+		lines.append(f"[type_errors.{self.type_checker}]")
+		try:
+			lines.append(f"total_errors = {self.total_errors}")
+		except ValueError:
+			lines.append(f"total_errors_by_type = {sum(self.by_type.values())}")
+			lines.append(f"total_errors_by_file = {sum(self.by_file.values())}")
+		lines.append("")
+
+		# by_type section
+		lines.append(f"[type_errors.{self.type_checker}.by_type]")
+		error_type: str
+		count: int
+		for error_type, count in self.by_type.items():
+			# Always quote keys
+			lines.append(f'"{error_type}" = {count}')
+
+		lines.append("")
+
+		# by_file section
+		lines.append(f"[type_errors.{self.type_checker}.by_file]")
+		file_path: str
+		for file_path, count in self.by_file.items():
+			# Always quote file paths
+			lines.append(f'"{file_path}" = {count}')
+
+		# Add warnings sections if there are any warnings
+		if self.warnings_by_type or self.warnings_by_file:
+			lines.append("")
+			lines.append(f"[type_warnings.{self.type_checker}]")
+			try:
+				lines.append(f"total_warnings = {self.total_warnings}")
+			except ValueError:
+				lines.append(
+					f"total_warnings_by_type = {sum(self.warnings_by_type.values())}"
+				)
+				lines.append(
+					f"total_warnings_by_file = {sum(self.warnings_by_file.values())}"
+				)
+			lines.append("")
+
+			# warnings by_type section
+			lines.append(f"[type_warnings.{self.type_checker}.by_type]")
+			warning_type: str
+			for warning_type, count in self.warnings_by_type.items():
+				lines.append(f'"{warning_type}" = {count}')
+
+			lines.append("")
+
+			# warnings by_file section
+			lines.append(f"[type_warnings.{self.type_checker}.by_file]")
+			for file_path, count in self.warnings_by_file.items():
+				lines.append(f'"{file_path}" = {count}')
+
+		return "\n".join(lines)
+
+
+def parse_mypy(content: str) -> TypeCheckResult:
+	"parse mypy output: file.py:line: error: message [error-code]"
+	result: TypeCheckResult = TypeCheckResult(type_checker="mypy")
+
+	pattern: re.Pattern[str] = re.compile(
+		r"^(.+?):\d+: error: .+ \[(.+?)\]", re.MULTILINE
+	)
+	match: re.Match[str]
+	for match in pattern.finditer(content):
+		file_path: str = match.group(1)
+		error_code: str = match.group(2)
+		result.by_type[error_code] += 1
+		result.by_file[file_path] += 1
+
+	return result
+
+
+def parse_basedpyright(content: str) -> TypeCheckResult:
+	"parse basedpyright output: path on line, then indented errors with (code)"
+	result: TypeCheckResult = TypeCheckResult(type_checker="basedpyright")
+
+	# Pattern for file paths (lines that start with /)
+	# Pattern for errors: indented line with - error/warning: message (code)
+	# Some diagnostics span multiple lines with (reportCode) on a continuation line
+	current_file: str = ""
+	pending_diagnostic_type: str | None = None  # "error" or "warning" waiting for code
+
+	line: str
+	for line in content.splitlines():
+		# Check if this is a file path line (starts with / and no leading space)
+		if line and not line.startswith(" ") and line.startswith("/"):
+			current_file = strip_cwd(line.strip())
+			pending_diagnostic_type = None
+
+		elif line.strip() and current_file:
+			# Try to match single-line format: "  path:line:col - warning: message (reportCode)"
+			match: re.Match[str] | None = re.search(
+				r"\s+.+:\d+:\d+ - (error|warning): .+ \((\w+)\)", line
+			)
+			if match:
+				diagnostic_type: str = match.group(1)
+				error_code: str = match.group(2)
+				if diagnostic_type == "warning":
+					result.warnings_by_type[error_code] += 1
+					result.warnings_by_file[current_file] += 1
+				else:
+					result.by_type[error_code] += 1
+					result.by_file[current_file] += 1
+				pending_diagnostic_type = None
+			else:
+				# Check if this is a diagnostic line without code (multi-line format start)
+				diag_match: re.Match[str] | None = re.search(
+					r"\s+.+:\d+:\d+ - (error|warning): ", line
+				)
+				if diag_match:
+					pending_diagnostic_type = diag_match.group(1)
+				# Check if this is a continuation line with the code
+				elif pending_diagnostic_type:
+					code_match: re.Match[str] | None = re.search(r"\((\w+)\)\s*$", line)
+					if code_match:
+						error_code = code_match.group(1)
+						if pending_diagnostic_type == "warning":
+							result.warnings_by_type[error_code] += 1
+							result.warnings_by_file[current_file] += 1
+						else:
+							result.by_type[error_code] += 1
+							result.by_file[current_file] += 1
+						pending_diagnostic_type = None
+
+	return result
+
+
+def parse_ty(content: str) -> TypeCheckResult:
+	"parse ty output: error[error-code]: message then --> file:line:col"
+	result: TypeCheckResult = TypeCheckResult(type_checker="ty")
+
+	# Pattern for error type: error[code]: or warning[code]:
+	error_pattern: re.Pattern[str] = re.compile(
+		r"^(error|warning)\[(.+?)\]:", re.MULTILINE
+	)
+	# Pattern for location: --> file:line:col
+	location_pattern: re.Pattern[str] = re.compile(
+		r"^\s+-->\s+(.+?):\d+:\d+", re.MULTILINE
+	)
+
+	# Find all errors and their locations
+	errors: list[re.Match[str]] = list(error_pattern.finditer(content))
+	locations: list[re.Match[str]] = list(location_pattern.finditer(content))
+
+	# Match errors with locations (they should be in order)
+	error_match: re.Match[str]
+	for error_match in errors:
+		error_code: str = error_match.group(2)
+		result.by_type[error_code] += 1
+
+		# Find the next location after this error
+		error_pos: int = error_match.end()
+		loc_match: re.Match[str]
+		for loc_match in locations:
+			if loc_match.start() > error_pos:
+				file_path: str = loc_match.group(1)
+				result.by_file[file_path] += 1
+				break
+
+	return result
+
+
+def extract_summary_line(file_path: Path) -> str:
+	"extract the last non-empty line from a file (typically the summary line)"
+	content: str = file_path.read_text(encoding="utf-8")
+	lines: list[str] = [line.strip() for line in content.splitlines() if line.strip()]
+	if not lines:
+		return "(empty output)"
+	return lines[-1]
+
+
+def main(error_dir: str, output_file: str, checkers: list[str]) -> None:
+	"parse all type checker outputs and generate breakdown"
+	error_path: Path = Path(error_dir)
+	output_path: Path = Path(output_file)
+
+	output_lines: list[str] = []
+
+	# First, extract summary lines from each type checker
+	checkers_info: list[tuple[str, str, Callable[[str], TypeCheckResult]]] = [
+		("mypy", "mypy.txt", parse_mypy),
+		("basedpyright", "basedpyright.txt", parse_basedpyright),
+		("ty", "ty.txt", parse_ty),
+	]
+
+	# Add summary comments
+	name: str
+	filename: str
+	for name, filename, _ in checkers_info:
+		if name not in checkers:
+			continue
+		file_path: Path = error_path / filename
+		if not file_path.exists():
+			output_lines.append(f"# {name}: (not run or file not found)")
+		else:
+			summary: str = extract_summary_line(file_path)
+			output_lines.append(f"# {name}: {summary}")
+
+	output_lines.append("")
+
+	# Parse each type checker
+	parser_fn: Callable[[str], TypeCheckResult]
+	for name, filename, parser_fn in checkers_info:
+		if name not in checkers:
+			continue
+		file_path_: Path = error_path / filename
+		if not file_path_.exists():
+			continue
+		content: str = file_path_.read_text(encoding="utf-8")
+		result: TypeCheckResult = parser_fn(content)
+		# Sort the results
+		sorted_result: TypeCheckResult = result.sorted_results()
+		# Convert to TOML
+		breakdown: str = sorted_result.to_toml()
+		output_lines.append(breakdown)
+		output_lines.append("")  # Add blank line between checkers
+
+	# Write to output file
+	final_output: str = "\n".join(output_lines)
+	output_path.parent.mkdir(parents=True, exist_ok=True)
+	_ = output_path.write_text(final_output, encoding="utf-8")
+
+	# Also print to stdout
+	print(final_output)
+
+
+if __name__ == "__main__":
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
+		description="Parse type checker outputs and generate detailed breakdown of errors by type and file",
+		formatter_class=argparse.RawDescriptionHelpFormatter,
+	)
+	_ = parser.add_argument(
+		"--error-dir",
+		type=str,
+		default=".meta/.type-errors",
+		help="Directory containing type checker output files (default: .meta/.type-errors)",
+	)
+	_ = parser.add_argument(
+		"--output",
+		"-o",
+		type=str,
+		default=".meta/typing-summary.toml",
+		help="Output file to write summary to (default: .meta/typing-summary.toml)",
+	)
+	_ = parser.add_argument(
+		"--checkers",
+		"-c",
+		type=str,
+		default="mypy,basedpyright,ty",
+		help="Comma-separated list of checkers to process (default: mypy,basedpyright,ty)",
+	)
+
+	args: argparse.Namespace = parser.parse_args()
+
+	# Parse checkers list
+	checkers_list: list[str] = [c.strip() for c in args.checkers.split(",")]
+
+	main(error_dir=args.error_dir, output_file=args.output, checkers=checkers_list)
+
+``````{ end_of_file="scripts/make/typing_breakdown.py" }
+
+``````{ path="scripts/assemble.py"  }
+# python project makefile template
+# https://github.com/mivanit/python-project-makefile-template
+# license: https://creativecommons.org/licenses/by-sa/4.0/
+
+"""Assemble the makefile and helper scripts by replacing version placeholders.
+
+Reads version from pyproject.toml and replaces ##[[VERSION]]## placeholders in:
+- makefile.template -> makefile
+- scripts/make/*.py -> scripts/out/*.py, .meta/scripts/*.py
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+try:
+	import tomllib  # type: ignore[import-not-found]
+except ImportError:
+	import tomli as tomllib  # type: ignore
+
+MAKEFILE_TEMPLATE_PATH: Path = Path("makefile.template")
+"path of the makefile template which we read"
+
+MAKEFILE_PATH: Path = Path("makefile")
+"path of the assembled makefile which we write"
+
+SCRIPTS_DIR: Path = Path("scripts")
+"path to all scripts, including this one"
+
+SCRIPTS_MAKE_DIR: Path = SCRIPTS_DIR / "make"
+"path to template scripts (with version placeholders)"
+
+SCRIPTS_OUT_DIR: Path = SCRIPTS_DIR / "out"
+"path to assembled scripts (with version replaced)"
+
+META_SCRIPTS_DIR: Path = Path(".meta") / "scripts"
+"path to meta scripts (used by makefile)"
+
+TEMPLATE_SYNTAX: str = "##[[{var}]]##"
+"template syntax in the makefile and script templates"
+
+with open("pyproject.toml", "rb") as f_pyproject:
+	VERSION: str = tomllib.load(f_pyproject)["project"]["version"]
+
+
+def assemble_make() -> None:
+	"assemble the makefile (just version replacement)"
+	contents: str = MAKEFILE_TEMPLATE_PATH.read_text()
+
+	# version
+	version_str: str = f"#| version: v{VERSION}"
+	contents = contents.replace(
+		TEMPLATE_SYNTAX.format(var="VERSION"),
+		f"{version_str:<68}|",
+	)
+
+	MAKEFILE_PATH.write_text(contents)
+
+
+def assemble_scripts() -> None:
+	"read template scripts from scripts/make/, replace version, write to scripts/out/ and .meta/scripts/"
+	SCRIPTS_OUT_DIR.mkdir(exist_ok=True)
+	META_SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
+	for script_path in SCRIPTS_MAKE_DIR.glob("*.py"):
+		contents: str = script_path.read_text()
+		contents = contents.replace(
+			TEMPLATE_SYNTAX.format(var="VERSION"),
+			VERSION,
+		)
+		(SCRIPTS_OUT_DIR / script_path.name).write_text(contents)
+		(META_SCRIPTS_DIR / script_path.name).write_text(contents)
+
+
+if __name__ == "__main__":
+	assemble_make()
+	assemble_scripts()
+
+``````{ end_of_file="scripts/assemble.py" }
 
 ``````{ path="tests/test_nothing.py"  }
 def test_nothing():
@@ -2321,10 +3335,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - the `pyproject.toml` of this repo has dev dependencies that you might need, you may want to copy those
   - it's also got some configuration that is worth looking at
 - copy `makefile` from this repo into the root of your repo
+- run `make setup` to download helper scripts and sync dependencies
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
 - if you want automatic documentation generation, copy `docs/resources/`. it contains:
-  - `docs/resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
   - `docs/resources/templates/`: jinja2 templates for the docs, template for the todolist
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for the docs
 
@@ -2364,6 +3378,7 @@ $ make help
     make lmcat                write the lmcat full output to pyproject.toml:[tool.lmcat.output]
     make lmcat-tree           show in console the lmcat tree view
     make publish              run all checks, build, and then publish
+    make self-setup-scripts  downloading makefile scripts from GitHub
     make setup                install and update via uv
     make test                 running tests
     make todo                 get all TODO's from the code
@@ -2436,13 +3451,11 @@ Pattern matching supports shell-style wildcards:
 
 # Development
 
-`makefile.template` is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.
+`makefile.template` is the template file for the makefile. Helper scripts are in `scripts/make/` and are downloaded from GitHub via `make self-setup-scripts`.
 
-the scripts used to generate the makefile are located in `scripts/`, with the exception of `scripts/assemble_make.py` which is the script used to populate the makefile.
-
-If developing, modify the `makefile.template` file or scripts in `scripts/`, and then run
+If developing, modify `makefile.template` or scripts in `scripts/make/`, then run:
 ```sh
-python scripts/assemble_make.py
+python scripts/assemble.py
 ```
 ``````{ end_of_file="README.md" }
 
@@ -2453,8 +3466,12 @@ python scripts/assemble_make.py
 #| https://github.com/mivanit/python-project-makefile-template      |
 #| version: v0.4.0                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
-#| modifications from the original should be denoted with `~~~~~`   |
-#| as this makes it easier to find edits when updating makefile     |
+#|==================================================================|
+#| CUSTOMIZATION:                                                   |
+#| - modify PACKAGE_NAME and other variables in config section      |
+#| - mark custom changes with `~~~~~` for easier template updates   |
+#| - run `make help` to see available targets                       |
+#| - run `make help=TARGET` for detailed info about specific target |
 #|==================================================================|
 
 
@@ -2469,6 +3486,7 @@ python scripts/assemble_make.py
 # ==================================================
 # configuration & variables
 # ==================================================
+
 
 # !!! MODIFY AT LEAST THIS PART TO SUIT YOUR PROJECT !!!
 # it assumes that the source is in a directory named the same as the package name
@@ -2498,6 +3516,13 @@ PYPROJECT := pyproject.toml
 # use of `.meta/` inspired by https://news.ycombinator.com/item?id=36472613
 META_DIR := .meta
 
+# scripts download configuration
+# override SCRIPTS_VERSION to download a specific version (e.g., make self-setup-scripts SCRIPTS_VERSION=v0.5.0)
+SCRIPTS_DIR := $(META_DIR)/scripts
+SCRIPTS_VERSION ?= main
+SCRIPTS_REPO := mivanit/python-project-makefile-template
+SCRIPTS_URL_BASE := https://raw.githubusercontent.com/$(SCRIPTS_REPO)/$(SCRIPTS_VERSION)/scripts/out
+
 # requirements.txt files for base package, all extras, dev, and all
 REQUIREMENTS_DIR := $(META_DIR)/requirements
 
@@ -2523,9 +3548,6 @@ PYTHON_BASE := python
 # where the commit log will be stored
 COMMIT_LOG_FILE := $(LOCAL_DIR)/.commit_log
 
-# pandoc commands (for docs)
-PANDOC ?= pandoc
-
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
@@ -2536,7 +3558,7 @@ COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 DOCS_RESOURCES_DIR := $(DOCS_DIR)/resources
 
 # location of the make docs script
-MAKE_DOCS_SCRIPT_PATH := $(DOCS_RESOURCES_DIR)/make_docs.py
+MAKE_DOCS_SCRIPT_PATH := $(SCRIPTS_DIR)/make_docs.py
 
 # version vars - extracted automatically from `pyproject.toml`, `$(LAST_VERSION_FILE)`, and $(PYTHON)
 # --------------------------------------------------
@@ -2552,6 +3574,7 @@ PYTHON_VERSION := NULL
 # ==================================================
 # reading command line options
 # ==================================================
+
 
 # for formatting or something, we might want to run python without uv
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
@@ -2578,26 +3601,29 @@ endif
 # options we might want to pass to pytest
 # --------------------------------------------------
 
-# base options for pytest, will be appended to if `COV` or `VERBOSE` are 1.
-# user can also set this when running make to add more options
+# base options for pytest, user can set this when running make to add more options
 PYTEST_OPTIONS ?=
 
-# set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file
-COV ?= 1
-# set to `1` to run pytest with `--verbose`
-VERBOSE ?= 0
+# type checker configuration
+# --------------------------------------------------
 
-ifeq ($(VERBOSE),1)
-	PYTEST_OPTIONS += --verbose
-endif
+# which type checkers to run (comma-separated)
+# available: mypy,basedpyright,ty
+TYPE_CHECKERS ?= mypy,basedpyright,ty
 
-ifeq ($(COV),1)
-	PYTEST_OPTIONS += --cov=.
-endif
+# path to type check (empty = use config from pyproject.toml)
+TYPECHECK_PATH ?=
+
+# directory to store type checker outputs
+TYPE_ERRORS_DIR := $(META_DIR)/.type-errors
+
+# typing summary output file
+TYPING_SUMMARY_FILE := $(META_DIR)/typing-summary.toml
 
 # ==================================================
 # default target (help)
 # ==================================================
+
 
 # first/default target is help
 .PHONY: default
@@ -2614,1370 +3640,25 @@ default: help
  ######   ######  ##     ## #### ##           ##     ######
 
 # ==================================================
-# python scripts we want to use inside the makefile
-# when developing, these are populated by `scripts/assemble_make.py`
+# downloading scripts from github
 # ==================================================
 
-# create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
-define SCRIPT_EXPORT_REQUIREMENTS
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/export_requirements.py
-
-"export to requirements.txt files based on pyproject.toml configuration"
-
-from __future__ import annotations
-
-import sys
-import warnings
-
-try:
-	import tomllib  # type: ignore[import-not-found]
-except ImportError:
-	import tomli as tomllib  # type: ignore
-from functools import reduce
-from pathlib import Path
-from typing import Any, Dict, List, Union
-
-TOOL_PATH: str = "tool.makefile.uv-exports"
-
-
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
-	"get a value from a nested dictionary"
-	return reduce(
-		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path,  # sequence
-		d,  # initial
-	)
-
-
-def export_configuration(
-	export: dict,
-	all_groups: list[str],
-	all_extras: list[str],
-	export_opts: dict,
-	output_dir: Path,
-) -> None:
-	"print to console a uv command for make which will export a requirements.txt file"
-	# get name and validate
-	name = export.get("name")
-	if not name or not name.isalnum():
-		warnings.warn(
-			f"Export configuration missing valid 'name' field {export}",
-		)
-		return
-
-	# get other options with default fallbacks
-	filename: str = export.get("filename") or f"requirements-{name}.txt"
-	groups: Union[list[str], bool, None] = export.get("groups")
-	extras: Union[list[str], bool] = export.get("extras", [])
-	options: list[str] = export.get("options", [])
-
-	# init command
-	cmd: list[str] = ["uv", "export", *export_opts.get("args", [])]
-
-	# handle groups
-	if groups is not None:
-		groups_list: list[str] = []
-		if isinstance(groups, bool):
-			if groups:
-				groups_list = all_groups.copy()
-		else:
-			groups_list = groups
-
-		for group in all_groups:
-			if group in groups_list:
-				cmd.extend(["--group", group])
-			else:
-				cmd.extend(["--no-group", group])
-
-	# handle extras
-	extras_list: list[str] = []
-	if isinstance(extras, bool):
-		if extras:
-			extras_list = all_extras.copy()
-	else:
-		extras_list = extras
-
-	for extra in extras_list:
-		cmd.extend(["--extra", extra])
-
-	# add extra options
-	cmd.extend(options)
-
-	# assemble the command and print to console -- makefile will run it
-	output_path = output_dir / filename
-	print(f"{' '.join(cmd)} > {output_path.as_posix()}")
-
-
-def main(
-	pyproject_path: Path,
-	output_dir: Path,
-) -> None:
-	"export to requirements.txt files based on pyproject.toml configuration"
-	# read pyproject.toml
-	with open(pyproject_path, "rb") as f:
-		pyproject_data: dict = tomllib.load(f)
-
-	# all available groups
-	all_groups: list[str] = list(pyproject_data.get("dependency-groups", {}).keys())
-	all_extras: list[str] = list(
-		deep_get(pyproject_data, "project.optional-dependencies", {}).keys(),
-	)
-
-	# options for exporting
-	export_opts: dict = deep_get(pyproject_data, TOOL_PATH, {})
-
-	# what are we exporting?
-	exports: list[dict[str, Any]] = export_opts.get("exports", [])
-	if not exports:
-		exports = [{"name": "all", "groups": [], "extras": [], "options": []}]
-
-	# export each configuration
-	for export in exports:
-		export_configuration(
-			export=export,
-			all_groups=all_groups,
-			all_extras=all_extras,
-			export_opts=export_opts,
-			output_dir=output_dir,
-		)
-
-
-if __name__ == "__main__":
-	main(
-		pyproject_path=Path(sys.argv[1]),
-		output_dir=Path(sys.argv[2]),
-	)
-
-endef
-
-export SCRIPT_EXPORT_REQUIREMENTS
-
-
-# get the version from `pyproject.toml:project.version`
-define SCRIPT_GET_VERSION
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_version.py
-
-"write the current version of the project to a file"
-
-from __future__ import annotations
-
-import sys
-
-try:
-	try:
-		import tomllib  # type: ignore[import-not-found]
-	except ImportError:
-		import tomli as tomllib  # type: ignore
-
-	pyproject_path: str = sys.argv[1].strip()
-
-	with open(pyproject_path, "rb") as f:
-		pyproject_data: dict = tomllib.load(f)
-
-	print("v" + pyproject_data["project"]["version"], end="")
-except Exception:  # noqa: BLE001
-	print("NULL", end="")
-	sys.exit(1)
-
-endef
-
-export SCRIPT_GET_VERSION
-
-
-# get the commit log since the last version from `$(LAST_VERSION_FILE)`
-define SCRIPT_GET_COMMIT_LOG
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_commit_log.py
-
-"pretty print a commit log amd wrote it to a file"
-
-from __future__ import annotations
-
-import subprocess
-import sys
-from typing import List
-
-
-def main(
-	last_version: str,
-	commit_log_file: str,
-) -> None:
-	"pretty print a commit log amd wrote it to a file"
-	if last_version == "NULL":
-		print("!!! ERROR !!!", file=sys.stderr)
-		print("LAST_VERSION is NULL, can't get commit log!", file=sys.stderr)
-		sys.exit(1)
-
-	try:
-		log_cmd: list[str] = [
-			"git",
-			"log",
-			f"{last_version}..HEAD",
-			"--pretty=format:- %s (%h)",
-		]
-		commits: list[str] = (
-			subprocess.check_output(log_cmd).decode("utf-8").strip().split("\n")  # noqa: S603
-		)
-		with open(commit_log_file, "w") as f:
-			f.write("\n".join(reversed(commits)))
-	except subprocess.CalledProcessError as e:
-		print(f"Error: {e}", file=sys.stderr)
-		sys.exit(1)
-
-
-if __name__ == "__main__":
-	main(
-		last_version=sys.argv[1].strip(),
-		commit_log_file=sys.argv[2].strip(),
-	)
-
-endef
-
-export SCRIPT_GET_COMMIT_LOG
-
-
-# get cuda information and whether torch sees it
-define SCRIPT_CHECK_TORCH
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/check_torch.py
-
-"print info about current python, torch, cuda, and devices"
-
-from __future__ import annotations
-
-import os
-import re
-import subprocess
-import sys
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
-
-def print_info_dict(
-	info: dict[str, Union[Any, dict[str, Any]]],
-	indent: str = "  ",
-	level: int = 1,
-) -> None:
-	"pretty print the info"
-	indent_str: str = indent * level
-	longest_key_len: int = max(map(len, info.keys()))
-	for key, value in info.items():
-		if isinstance(value, dict):
-			print(f"{indent_str}{key:<{longest_key_len}}:")
-			print_info_dict(value, indent, level + 1)
-		else:
-			print(f"{indent_str}{key:<{longest_key_len}} = {value}")
-
-
-def get_nvcc_info() -> dict[str, str]:
-	"get info about cuda from nvcc --version"
-	# Run the nvcc command.
-	try:
-		result: subprocess.CompletedProcess[str] = subprocess.run(  # noqa: S603
-			["nvcc", "--version"],  # noqa: S607
-			check=True,
-			capture_output=True,
-			text=True,
-		)
-	except Exception as e:  # noqa: BLE001
-		return {"Failed to run 'nvcc --version'": str(e)}
-
-	output: str = result.stdout
-	lines: list[str] = [line.strip() for line in output.splitlines() if line.strip()]
-
-	# Ensure there are exactly 5 lines in the output.
-	assert len(lines) == 5, (  # noqa: PLR2004
-		f"Expected exactly 5 lines from nvcc --version, got {len(lines)} lines:\n{output}"
-	)
-
-	# Compile shared regex for release info.
-	release_regex: re.Pattern = re.compile(
-		r"Cuda compilation tools,\s*release\s*([^,]+),\s*(V.+)",
-	)
-
-	# Define a mapping for each desired field:
-	# key -> (line index, regex pattern, group index, transformation function)
-	patterns: dict[str, tuple[int, re.Pattern, int, Callable[[str], str]]] = {
-		"build_time": (
-			2,
-			re.compile(r"Built on (.+)"),
-			1,
-			lambda s: s.replace("_", " "),
-		),
-		"release": (3, release_regex, 1, str.strip),
-		"release_V": (3, release_regex, 2, str.strip),
-		"build": (4, re.compile(r"Build (.+)"), 1, str.strip),
-	}
-
-	info: dict[str, str] = {}
-	for key, (line_index, pattern, group_index, transform) in patterns.items():
-		match: Optional[re.Match] = pattern.search(lines[line_index])
-		if not match:
-			err_msg: str = (
-				f"Unable to parse {key} from nvcc output: {lines[line_index]}"
-			)
-			raise ValueError(err_msg)
-		info[key] = transform(match.group(group_index))
-
-	info["release_short"] = info["release"].replace(".", "").strip()
-
-	return info
-
-
-def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
-	"get info about pytorch and cuda devices"
-	exceptions: list[Exception] = []
-	info: dict[str, Any] = {}
-
-	try:
-		import torch
-	except ImportError as e:
-		info["torch.__version__"] = "not available"
-		exceptions.append(e)
-		return exceptions, info
-
-	try:
-		info["torch.__version__"] = torch.__version__
-		info["torch.cuda.is_available()"] = torch.cuda.is_available()
-
-		if torch.cuda.is_available():
-			info["torch.version.cuda"] = torch.version.cuda
-			info["torch.cuda.device_count()"] = torch.cuda.device_count()
-
-			if torch.cuda.device_count() > 0:
-				info["torch.cuda.current_device()"] = torch.cuda.current_device()
-				n_devices: int = torch.cuda.device_count()
-				info["n_devices"] = n_devices
-				for current_device in range(n_devices):
-					try:
-						current_device_info: dict[str, Union[str, int]] = {}
-
-						dev_prop = torch.cuda.get_device_properties(
-							torch.device(f"cuda:{current_device}"),
-						)
-
-						current_device_info["name"] = dev_prop.name
-						current_device_info["version"] = (
-							f"{dev_prop.major}.{dev_prop.minor}"
-						)
-						current_device_info["total_memory"] = (
-							f"{dev_prop.total_memory} ({dev_prop.total_memory:.1e})"
-						)
-						current_device_info["multi_processor_count"] = (
-							dev_prop.multi_processor_count
-						)
-						current_device_info["is_integrated"] = dev_prop.is_integrated
-						current_device_info["is_multi_gpu_board"] = (
-							dev_prop.is_multi_gpu_board
-						)
-
-						info[f"device cuda:{current_device}"] = current_device_info
-
-					except Exception as e:  # noqa: PERF203,BLE001
-						exceptions.append(e)
-			else:
-				err_msg_nodevice: str = (
-					f"{torch.cuda.device_count() = } devices detected, invalid"
-				)
-				raise ValueError(err_msg_nodevice)  # noqa: TRY301
-
-		else:
-			err_msg_nocuda: str = (
-				f"CUDA is NOT available in torch: {torch.cuda.is_available() = }"
-			)
-			raise ValueError(err_msg_nocuda)  # noqa: TRY301
-
-	except Exception as e:  # noqa: BLE001
-		exceptions.append(e)
-
-	return exceptions, info
-
-
-if __name__ == "__main__":
-	print(f"python: {sys.version}")
-	print_info_dict(
-		{
-			"python executable path: sys.executable": str(sys.executable),
-			"sys.platform": sys.platform,
-			"current working directory: os.getcwd()": os.getcwd(),  # noqa: PTH109
-			"Host name: os.name": os.name,
-			"CPU count: os.cpu_count()": str(os.cpu_count()),
-		},
-	)
-
-	nvcc_info: dict[str, Any] = get_nvcc_info()
-	print("nvcc:")
-	print_info_dict(nvcc_info)
-
-	torch_exceptions, torch_info = get_torch_info()
-	print("torch:")
-	print_info_dict(torch_info)
-
-	if torch_exceptions:
-		print("torch_exceptions:")
-		for e in torch_exceptions:
-			print(f"  {e}")
-
-endef
-
-export SCRIPT_CHECK_TORCH
-
-
-# get todo's from the code
-define SCRIPT_GET_TODOS
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/get_todos.py
-
-"read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
-
-from __future__ import annotations
-
-import argparse
-import fnmatch
-import json
-import textwrap
-import urllib.parse
-import warnings
-from dataclasses import asdict, dataclass, field
-from functools import reduce
-from pathlib import Path
-from typing import Any, Dict, List, Union
-
-from jinja2 import Template
-
-try:
-	import tomllib  # type: ignore[import-not-found]
-except ImportError:
-	import tomli as tomllib  # type: ignore
-
-TOOL_PATH: str = "tool.makefile.inline-todo"
-
-
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
-	"get a value from a nested dictionary"
-	return reduce(
-		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path,  # sequence
-		d,  # initial
-	)
-
-
-_TEMPLATE_MD_LIST: str = """\
-# Inline TODOs
-
-{% for tag, file_map in grouped|dictsort %}
-# {{ tag }}
-{% for filepath, item_list in file_map|dictsort %}
-## [`{{ filepath }}`](/{{ filepath }})
-{% for itm in item_list %}
-- {{ itm.stripped_title }}  
-  local link: [`/{{ filepath }}:{{ itm.line_num }}`](/{{ filepath }}#L{{ itm.line_num }}) 
-  | view on GitHub: [{{ itm.file }}#L{{ itm.line_num }}]({{ itm.code_url | safe }})
-  | [Make Issue]({{ itm.issue_url | safe }})
-{% if itm.context %}
-  ```{{ itm.file_lang }}
-{{ itm.context_indented }}
-  ```
-{% endif %}
-{% endfor %}
-
-{% endfor %}
-{% endfor %}
-"""
-
-_TEMPLATE_MD_TABLE: str = """\
-# Inline TODOs
-
-| Location | Tag | Todo | GitHub | Issue |
-|:---------|:----|:-----|:-------|:------|
-{% for itm in all_items %}| [`{{ itm.file }}:{{ itm.line_num }}`](/{{ itm.file }}#L{{ itm.line_num }}) | {{ itm.tag }} | {{ itm.stripped_title_escaped }} | [View]({{ itm.code_url | safe }}) | [Create]({{ itm.issue_url | safe }}) |
-{% endfor %}
-"""
-
-TEMPLATES_MD: dict[str, str] = dict(
-	standard=_TEMPLATE_MD_LIST,
-	table=_TEMPLATE_MD_TABLE,
-)
-
-TEMPLATE_ISSUE: str = """\
-# source
-
-[`{file}#L{line_num}`]({code_url})
-
-# context
-```{file_lang}
-{context}
-```
-"""
-
-
-@dataclass
-class Config:
-	"""Configuration for the inline-todo scraper"""
-
-	search_dir: Path = Path()
-	out_file_base: Path = Path("docs/todo-inline")
-	tags: list[str] = field(
-		default_factory=lambda: ["CRIT", "TODO", "FIXME", "HACK", "BUG"],
-	)
-	extensions: list[str] = field(default_factory=lambda: ["py", "md"])
-	exclude: list[str] = field(default_factory=lambda: ["docs/**", ".venv/**"])
-	context_lines: int = 2
-	valid_post_tag: Union[str, list[str]] = " \t:<>|[](){{}}"
-	valid_pre_tag: Union[str, list[str]] = " \t:<>|[](){{}}#"
-	tag_label_map: dict[str, str] = field(
-		default_factory=lambda: {
-			"CRIT": "bug",
-			"TODO": "enhancement",
-			"FIXME": "bug",
-			"BUG": "bug",
-			"HACK": "enhancement",
-		},
-	)
-	extension_lang_map: dict[str, str] = field(
-		default_factory=lambda: {
-			"py": "python",
-			"md": "markdown",
-			"html": "html",
-			"css": "css",
-			"js": "javascript",
-		},
-	)
-
-	templates_md: dict[str, str] = field(default_factory=lambda: TEMPLATES_MD)
-	# templates for the output markdown file
-
-	template_issue: str = TEMPLATE_ISSUE
-	# template for the issue creation
-
-	template_html_source: Path = Path("docs/resources/templates/todo-template.html")
-	# template source for the output html file (interactive table)
-
-	@property
-	def template_html(self) -> str:
-		"read the html template"
-		return self.template_html_source.read_text(encoding="utf-8")
-
-	template_code_url_: str = "{repo_url}/blob/{branch}/{file}#L{line_num}"
-	# template for the code url
-
-	@property
-	def template_code_url(self) -> str:
-		"code url with repo url and branch substituted"
-		return self.template_code_url_.replace("{repo_url}", self.repo_url).replace(
-			"{branch}",
-			self.branch,
-		)
-
-	repo_url: str = "UNKNOWN"
-	# for the issue creation url
-
-	branch: str = "main"
-	# branch for links to files on github
-
-	@classmethod
-	def read(cls, config_file: Path) -> Config:
-		"read from a file, or return default"
-		output: Config
-		if config_file.is_file():
-			# read file and load if present
-			with config_file.open("rb") as f:
-				data: dict[str, Any] = tomllib.load(f)
-
-			# try to get the repo url
-			repo_url: str = "UNKNOWN"
-			try:
-				urls: dict[str, str] = {
-					k.lower(): v for k, v in data["project"]["urls"].items()
-				}
-				if "repository" in urls:
-					repo_url = urls["repository"]
-				if "github" in urls:
-					repo_url = urls["github"]
-			except Exception as e:  # noqa: BLE001
-				warnings.warn(
-					f"No repository URL found in pyproject.toml, 'make issue' links will not work.\n{e}",
-				)
-
-			# load the inline-todo config if present
-			data_inline_todo: dict[str, Any] = deep_get(
-				d=data,
-				path=TOOL_PATH,
-				default={},
-			)
-
-			if "repo_url" not in data_inline_todo:
-				data_inline_todo["repo_url"] = repo_url
-
-			output = cls.load(data_inline_todo)
-		else:
-			# return default otherwise
-			output = cls()
-
-		return output
-
-	@classmethod
-	def load(cls, data: dict) -> Config:
-		"load from a dictionary, converting to `Path` as needed"
-		# process variables that should be paths
-		data = {
-			k: Path(v)
-			if k in {"search_dir", "out_file_base", "template_html_source"}
-			else v
-			for k, v in data.items()
-		}
-
-		# default value for the templates
-		data["templates_md"] = {
-			**TEMPLATES_MD,
-			**data.get("templates_md", {}),
-		}
-
-		return cls(**data)
-
-
-CFG: Config = Config()
-# this is messy, but we use a global config so we can get `TodoItem().issue_url` to work
-
-
-@dataclass
-class TodoItem:
-	"""Holds one todo occurrence"""
-
-	tag: str
-	file: str
-	line_num: int
-	content: str
-	context: str = ""
-
-	def serialize(self) -> dict[str, Union[str, int]]:
-		"serialize to a dict we can dump to json"
-		return {
-			**asdict(self),
-			"issue_url": self.issue_url,
-			"file_lang": self.file_lang,
-			"stripped_title": self.stripped_title,
-			"code_url": self.code_url,
-		}
-
-	@property
-	def context_indented(self) -> str:
-		"""Returns the context with each line indented"""
-		dedented: str = textwrap.dedent(self.context)
-		return textwrap.indent(dedented, "  ")
-
-	@property
-	def code_url(self) -> str:
-		"""Returns a URL to the code on GitHub"""
-		return CFG.template_code_url.format(
-			file=self.file,
-			line_num=self.line_num,
-		)
-
-	@property
-	def stripped_title(self) -> str:
-		"""Returns the title of the issue, stripped of the tag"""
-		return self.content.split(self.tag, 1)[-1].lstrip(":").strip()
-
-	@property
-	def stripped_title_escaped(self) -> str:
-		"""Returns the title of the issue, stripped of the tag and escaped for markdown"""
-		return self.stripped_title.replace("|", "\\|")
-
-	@property
-	def issue_url(self) -> str:
-		"""Constructs a GitHub issue creation URL for a given TodoItem."""
-		# title
-		title: str = self.stripped_title
-		if not title:
-			title = "Issue from inline todo"
-		# body
-		body: str = CFG.template_issue.format(
-			file=self.file,
-			line_num=self.line_num,
-			context=self.context,
-			context_indented=self.context_indented,
-			code_url=self.code_url,
-			file_lang=self.file_lang,
-		).strip()
-		# labels
-		label: str = CFG.tag_label_map.get(self.tag, self.tag)
-		# assemble url
-		query: dict[str, str] = dict(title=title, body=body, labels=label)
-		query_string: str = urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
-		return f"{CFG.repo_url}/issues/new?{query_string}"
-
-	@property
-	def file_lang(self) -> str:
-		"""Returns the language for the file extension"""
-		ext: str = Path(self.file).suffix.lstrip(".")
-		return CFG.extension_lang_map.get(ext, ext)
-
-
-def scrape_file(
-	file_path: Path,
-	cfg: Config,
-) -> list[TodoItem]:
-	"""Scrapes a file for lines containing any of the specified tags"""
-	items: list[TodoItem] = []
-	if not file_path.is_file():
-		return items
-	lines: list[str] = file_path.read_text(encoding="utf-8").splitlines(True)
-
-	# over all lines
-	for i, line in enumerate(lines):
-		# over all tags
-		for tag in cfg.tags:
-			# check tag is present
-			if tag in line[:200]:
-				# check tag is surrounded by valid strings
-				tag_idx_start: int = line.index(tag)
-				tag_idx_end: int = tag_idx_start + len(tag)
-				if (
-					line[tag_idx_start - 1] in cfg.valid_pre_tag
-					and line[tag_idx_end] in cfg.valid_post_tag
-				):
-					# get the context and add the item
-					start: int = max(0, i - cfg.context_lines)
-					end: int = min(len(lines), i + cfg.context_lines + 1)
-					snippet: str = "".join(lines[start:end])
-					items.append(
-						TodoItem(
-							tag=tag,
-							file=file_path.as_posix(),
-							line_num=i + 1,
-							content=line.strip("\n"),
-							context=snippet.strip("\n"),
-						),
-					)
-				break
-	return items
-
-
-def collect_files(
-	search_dir: Path,
-	extensions: list[str],
-	exclude: list[str],
-) -> list[Path]:
-	"""Recursively collects all files with specified extensions, excluding matches via globs"""
-	results: list[Path] = []
-	for ext in extensions:
-		results.extend(search_dir.rglob(f"*.{ext}"))
-
-	return [
-		f
-		for f in results
-		if not any(fnmatch.fnmatch(f.as_posix(), pattern) for pattern in exclude)
-	]
-
-
-def group_items_by_tag_and_file(
-	items: list[TodoItem],
-) -> dict[str, dict[str, list[TodoItem]]]:
-	"""Groups items by tag, then by file"""
-	grouped: dict[str, dict[str, list[TodoItem]]] = {}
-	for itm in items:
-		grouped.setdefault(itm.tag, {}).setdefault(itm.file, []).append(itm)
-	for tag_dict in grouped.values():
-		for file_list in tag_dict.values():
-			file_list.sort(key=lambda x: x.line_num)
-	return grouped
-
-
-def main(config_file: Path) -> None:
-	"cli interface to get todos"
-	global CFG  # noqa: PLW0603
-	# read configuration
-	cfg: Config = Config.read(config_file)
-	CFG = cfg
-
-	# get data
-	files: list[Path] = collect_files(cfg.search_dir, cfg.extensions, cfg.exclude)
-	all_items: list[TodoItem] = []
-	n_files: int = len(files)
-	for i, fpath in enumerate(files):
-		print(f"Scraping {i + 1:>2}/{n_files:>2}: {fpath.as_posix():<60}", end="\r")
-		all_items.extend(scrape_file(fpath, cfg))
-
-	# create dir
-	cfg.out_file_base.parent.mkdir(parents=True, exist_ok=True)
-
-	# write raw to jsonl
-	with open(cfg.out_file_base.with_suffix(".jsonl"), "w", encoding="utf-8") as f:
-		for itm in all_items:
-			f.write(json.dumps(itm.serialize()) + "\n")
-
-	# group, render
-	grouped: dict[str, dict[str, list[TodoItem]]] = group_items_by_tag_and_file(
-		all_items,
-	)
-
-	# render each template and save
-	for template_key, template in cfg.templates_md.items():
-		rendered: str = Template(template).render(grouped=grouped, all_items=all_items)
-		template_out_path: Path = Path(
-			cfg.out_file_base.with_stem(
-				cfg.out_file_base.stem + f"-{template_key}",
-			).with_suffix(".md"),
-		)
-		template_out_path.write_text(rendered, encoding="utf-8")
-
-	# write html output
-	try:
-		html_rendered: str = cfg.template_html.replace(
-			"//{{DATA}}//",
-			json.dumps([itm.serialize() for itm in all_items]),
-		)
-		cfg.out_file_base.with_suffix(".html").write_text(
-			html_rendered,
-			encoding="utf-8",
-		)
-	except Exception as e:  # noqa: BLE001
-		warnings.warn(f"Failed to write html output: {e}")
-
-	print("wrote to:")
-	print(cfg.out_file_base.with_suffix(".md").as_posix())
-
-
-if __name__ == "__main__":
-	# parse args
-	parser: argparse.ArgumentParser = argparse.ArgumentParser("inline_todo")
-	parser.add_argument(
-		"--config-file",
-		default="pyproject.toml",
-		help="Path to the TOML config, will look under [tool.inline-todo].",
-	)
-	args: argparse.Namespace = parser.parse_args()
-	# call main
-	main(Path(args.config_file))
-
-endef
-
-export SCRIPT_GET_TODOS
-
-
-# markdown to html using pdoc
-define SCRIPT_PDOC_MARKDOWN2_CLI
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/pdoc_markdown2_cli.py
-
-"cli to convert markdown files to HTML using pdoc's markdown2"
-
-from __future__ import annotations
-
-import argparse
-from pathlib import Path
-from typing import Optional
-
-from pdoc.markdown2 import Markdown, _safe_mode  # type: ignore
-
-
-def convert_file(
-	input_path: Path,
-	output_path: Path,
-	safe_mode: Optional[_safe_mode] = None,
-	encoding: str = "utf-8",
-) -> None:
-	"""Convert a markdown file to HTML"""
-	# Read markdown input
-	text: str = input_path.read_text(encoding=encoding)
-
-	# Convert to HTML using markdown2
-	markdown: Markdown = Markdown(
-		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
-		safe_mode=safe_mode,
-	)
-	html: str = markdown.convert(text)
-
-	# Write HTML output
-	output_path.write_text(str(html), encoding=encoding)
-
-
-def main() -> None:
-	"cli entry point"
-	parser: argparse.ArgumentParser = argparse.ArgumentParser(
-		description="Convert markdown files to HTML using pdoc's markdown2",
-	)
-	parser.add_argument("input", type=Path, help="Input markdown file path")
-	parser.add_argument("output", type=Path, help="Output HTML file path")
-	parser.add_argument(
-		"--safe-mode",
-		choices=["escape", "replace"],
-		help="Sanitize literal HTML: 'escape' escapes HTML meta chars, 'replace' replaces with [HTML_REMOVED]",
-	)
-	parser.add_argument(
-		"--encoding",
-		default="utf-8",
-		help="Character encoding for reading/writing files (default: utf-8)",
-	)
-
-	args: argparse.Namespace = parser.parse_args()
-
-	convert_file(
-		args.input,
-		args.output,
-		safe_mode=args.safe_mode,
-		encoding=args.encoding,
-	)
-
-
-if __name__ == "__main__":
-	main()
-
-endef
-
-export SCRIPT_PDOC_MARKDOWN2_CLI
-
-# clean up the docs (configurable in pyproject.toml)
-define SCRIPT_DOCS_CLEAN
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/docs_clean.py
-
-"clean up docs directory based on pyproject.toml configuration"
-
-from __future__ import annotations
-
-import shutil
-import sys
-from functools import reduce
-from pathlib import Path
-from typing import Any, List, Set
-
-try:
-	import tomllib  # type: ignore[import-not-found]
-except ImportError:
-	import tomli as tomllib  # type: ignore
-
-TOOL_PATH: str = "tool.makefile.docs"
-DEFAULT_DOCS_DIR: str = "docs"
-
-
-def deep_get(d: dict, path: str, default: Any = None, sep: str = ".") -> Any:  # noqa: ANN401
-	"""Get nested dictionary value via separated path with default."""
-	return reduce(
-		lambda x, y: x.get(y, default) if isinstance(x, dict) else default,  # function
-		path.split(sep) if isinstance(path, str) else path,  # sequence
-		d,  # initial
-	)
-
-
-def read_config(pyproject_path: Path) -> tuple[Path, Set[Path]]:
-	"read configuration from pyproject.toml"
-	if not pyproject_path.is_file():
-		return Path(DEFAULT_DOCS_DIR), set()
-
-	with pyproject_path.open("rb") as f:
-		config = tomllib.load(f)
-
-	preserved: list[str] = deep_get(config, f"{TOOL_PATH}.no_clean", [])
-	docs_dir: Path = Path(deep_get(config, f"{TOOL_PATH}.output_dir", DEFAULT_DOCS_DIR))
-
-	# Convert to absolute paths and validate
-	preserve_set: Set[Path] = set()
-	for p in preserved:
-		full_path = (docs_dir / p).resolve()
-		if not full_path.as_posix().startswith(docs_dir.resolve().as_posix()):
-			err_msg: str = f"Preserved path '{p}' must be within docs directory"
-			raise ValueError(err_msg)
-		preserve_set.add(docs_dir / p)
-
-	return docs_dir, preserve_set
-
-
-def clean_docs(docs_dir: Path, preserved: Set[Path]) -> None:
-	"""delete files not in preserved set
-
-	TODO: this is not recursive
-	"""
-	for path in docs_dir.iterdir():
-		if path.is_file() and path not in preserved:
-			path.unlink()
-		elif path.is_dir() and path not in preserved:
-			shutil.rmtree(path)
-
-
-def main(
-	pyproject_path: str,
-	docs_dir_cli: str,
-	extra_preserve: list[str],
-) -> None:
-	"Clean up docs directory based on pyproject.toml configuration."
-	docs_dir: Path
-	preserved: Set[Path]
-	docs_dir, preserved = read_config(Path(pyproject_path))
-
-	assert docs_dir.is_dir(), f"Docs directory '{docs_dir}' not found"
-	assert docs_dir == Path(docs_dir_cli), (
-		f"Docs directory mismatch: {docs_dir = } != {docs_dir_cli = }. this is probably because you changed one of `pyproject.toml:{TOOL_PATH}.output_dir` (the former) or `makefile:DOCS_DIR` (the latter) without updating the other."
-	)
-
-	for x in extra_preserve:
-		preserved.add(Path(x))
-	clean_docs(docs_dir, preserved)
-
-
-if __name__ == "__main__":
-	main(sys.argv[1], sys.argv[2], sys.argv[3:])
-
-endef
-
-export SCRIPT_DOCS_CLEAN
-
-# generate a report of the mypy output
-define SCRIPT_MYPY_REPORT
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/mypy_report.py
-
-"usage: mypy ... | mypy_report.py [--mode jsonl|exclude]"
-
-from __future__ import annotations
-
-import argparse
-import json
-import re
-import sys
-from pathlib import Path
-from typing import Dict, List, Tuple
-
-
-def parse_mypy_output(lines: list[str]) -> dict[str, int]:
-	"given mypy output, turn it into a dict of `filename: error_count`"
-	pattern: re.Pattern[str] = re.compile(r"^(?P<file>[^:]+):\d+:\s+error:")
-	counts: dict[str, int] = {}
-	for line in lines:
-		m = pattern.match(line)
-		if m:
-			f_raw: str = m.group("file")
-			f_norm: str = Path(f_raw).as_posix()
-			counts[f_norm] = counts.get(f_norm, 0) + 1
-	return counts
-
-
-def main() -> None:
-	"cli interface for mypy_report"
-	parser: argparse.ArgumentParser = argparse.ArgumentParser()
-	parser.add_argument("--mode", choices=["jsonl", "toml"], default="jsonl")
-	args: argparse.Namespace = parser.parse_args()
-	lines: list[str] = sys.stdin.read().splitlines()
-	error_dict: dict[str, int] = parse_mypy_output(lines)
-	sorted_errors: list[tuple[str, int]] = sorted(
-		error_dict.items(),
-		key=lambda x: x[1],
-	)
-	if len(sorted_errors) == 0:
-		print("# no errors found!")
-		return
-	if args.mode == "jsonl":
-		for fname, count in sorted_errors:
-			print(json.dumps({"filename": fname, "errors": count}))
-	elif args.mode == "toml":
-		for fname, count in sorted_errors:
-			print(f'"{fname}", # {count}')
-	else:
-		err_msg: str = f"unknown mode {args.mode}"
-		raise ValueError(err_msg)
-	print(f"# total errors: {sum(error_dict.values())}")
-
-
-if __name__ == "__main__":
-	main()
-
-endef
-
-export SCRIPT_MYPY_REPORT
-
-
-# get information about makefile recipes/targets
-define SCRIPT_RECIPE_INFO
-# source: https://github.com/mivanit/python-project-makefile-template/tree/main/scripts/make/recipe_info.py
-
-"""CLI tool to get information about Makefile recipes/targets."""
-
-import argparse
-import difflib
-import fnmatch
-import re
-import sys
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
-
-
-def _scan_makefile(lines: list[str], target_name: Optional[str] = None) -> Union[dict[str, int], int]:
-    """Scan makefile for target definitions, skipping define blocks.
-
-    Args:
-        lines: Makefile lines
-        target_name: If provided, return line index for this specific target.
-                    If None, return dict of all targets.
-
-    Returns:
-        If target_name is None: dict mapping target names to line indices
-        If target_name is provided: line index of that target, or -1 if not found
-    """
-    in_define_block: bool = False
-    target_rx: re.Pattern = re.compile(r"^([a-zA-Z0-9_-]+)[ \t]*:")
-    targets: dict[str, int] = {}
-
-    for i, line in enumerate(lines):
-        # Track if we're inside a define block (embedded scripts)
-        if line.startswith("define "):
-            in_define_block = True
-            continue
-        if line.startswith("endef"):
-            in_define_block = False
-            continue
-
-        # Skip lines inside define blocks
-        if in_define_block:
-            continue
-
-        # Match target definitions
-        match = target_rx.match(line)
-        if match:
-            tgt_name: str = match.group(1)
-            if target_name is not None:
-                # Looking for specific target
-                if tgt_name == target_name:
-                    return i
-            else:
-                # Collecting all targets
-                targets[tgt_name] = i
-
-    # Return results based on mode
-    if target_name is not None:
-        return -1  # Target not found
-    return targets
-
-
-class Colors:
-    """ANSI color codes"""
-
-    def __init__(self, enabled: bool = True) -> None:
-        if enabled:
-            self.RESET = "\033[0m"
-            self.BOLD = "\033[1m"
-            self.RED = "\033[31m"
-            self.GREEN = "\033[32m"
-            self.YELLOW = "\033[33m"
-            self.BLUE = "\033[34m"
-            self.MAGENTA = "\033[35m"
-            self.WHITE = "\033[37m"
-        else:
-            self.RESET = self.BOLD = ""
-            self.RED = self.GREEN = self.YELLOW = ""
-            self.BLUE = self.MAGENTA = self.WHITE = ""
-
-@dataclass
-class MakeRecipe:
-    """Information about a Makefile recipe/target."""
-
-    target: str
-    comments: list[str]
-    dependencies: list[str]
-    echo_message: str
-
-    @classmethod
-    def from_makefile(cls, lines: list[str], target: str) -> "MakeRecipe":
-        """Parse and create a MakeRecipe from makefile lines for *target*."""
-        i: int = _scan_makefile(lines, target_name=target)
-        if i == -1:
-            err_msg: str = f"target '{target}' not found in makefile"
-            raise ValueError(err_msg)
-
-        line: str = lines[i]
-
-        # contiguous comment block immediately above
-        # (skip backward past .PHONY declarations and blank lines)
-        comments: list[str] = []
-        j: int = i - 1
-        blank_count: int = 0
-        while j >= 0:
-            stripped: str = lines[j].lstrip()
-            if stripped.startswith("#"):
-                comments.append(stripped[1:].lstrip())
-                blank_count = 0  # Reset blank counter when we hit a comment
-                j -= 1
-            elif stripped == "":
-                # Track consecutive blank lines
-                blank_count += 1
-                if blank_count >= 2:
-                    # Hit 2 blank lines in a row - stop
-                    break
-                j -= 1
-            elif stripped.startswith(".PHONY:"):
-                # Skip .PHONY declarations
-                blank_count = 0  # Reset blank counter
-                j -= 1
-            else:
-                # Hit a non-comment, non-blank, non-.PHONY line - stop
-                break
-        comments.reverse()
-
-        # prerequisites
-        deps_str: str = line.split(":", 1)[1].strip()
-        deps: list[str] = deps_str.split() if deps_str else []
-
-        # first echo in the recipe
-        echo_msg: str = ""
-        k: int = i + 1
-        while k < len(lines) and (lines[k].startswith("\t") or lines[k].startswith("    ")):
-            stripped: str = lines[k].lstrip()
-            m = re.match(r"@?echo[ \t]+(.*)", stripped)
-            if m:
-                content: str = m.group(1).strip()
-                if (content.startswith('"') and content.endswith('"')) or (
-                    content.startswith("'") and content.endswith("'")
-                ):
-                    content = content[1:-1]
-                echo_msg = content
-                break
-            k += 1
-
-        return cls(
-            target=target,
-            comments=comments,
-            dependencies=deps,
-            echo_message=echo_msg,
-        )
-
-    def describe(self, color: bool = False) -> list[str]:
-        """Return a list of description lines for this recipe."""
-        output: list[str] = []
-        c: Colors = Colors(enabled=color)
-
-        # Target name (bold blue) with colon in white
-        output.append(f"{c.BOLD}{c.BLUE}{self.target}{c.RESET}{c.WHITE}:{c.RESET}")
-
-        # Echo message (description) in yellow
-        if self.echo_message:
-            output.append(f"  {c.YELLOW}{self.echo_message}{c.RESET}")
-
-        # Dependencies in magenta
-        if self.dependencies:
-            deps_str = " ".join(f"{c.MAGENTA}{dep}{c.RESET}" for dep in self.dependencies)
-            output.append(f"  {c.RED}depends-on:{c.RESET} {deps_str}")
-
-        # Comments in green
-        if self.comments:
-            output.append(f"  {c.RED}comments:{c.RESET}")
-            output.extend(f"    {c.GREEN}{line}{c.RESET}" for line in self.comments)
-
-        return output
-
-
-def find_all_targets(lines: list[str]) -> list[str]:
-    """Find all .PHONY target names in the makefile."""
-    # First, get all .PHONY declarations
-    phony_targets: Set[str] = set()
-    # Use chr(36) to get dollar sign - works both standalone and embedded in makefile
-    # issue being that the makefile processes dollar sign as an escape character
-    phony_pattern: re.Pattern = re.compile(r"^\.PHONY:\s+(.+)" + chr(36))
-
-    for line in lines:
-        match = phony_pattern.match(line)
-        if match:
-            # Get all targets from this .PHONY line (space-separated)
-            target_names: list[str] = match.group(1).split()
-            phony_targets.update(target_names)
-
-    # Now scan for actual target definitions and filter to .PHONY ones
-    all_target_defs: dict[str, int] = _scan_makefile(lines)
-    return [tgt for tgt in all_target_defs if tgt in phony_targets]
-
-
-def get_all_recipes(lines: list[str]) -> list[MakeRecipe]:
-    """Get MakeRecipe objects for all .PHONY targets in the makefile."""
-    targets: list[str] = find_all_targets(lines)
-    return [MakeRecipe.from_makefile(lines, target) for target in targets]
-
-
-def describe_target(makefile_path: Path, target: str) -> None:
-    """Emit the description for *target*."""
-    lines: list[str] = makefile_path.read_text(encoding="utf-8").splitlines()
-    recipe: MakeRecipe = MakeRecipe.from_makefile(lines, target)
-
-    for line in recipe.describe():
-        print(line)
-
-
-def main() -> None:
-    """CLI entry point."""
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        "recipe_info",
-        description="Get detailed information about Makefile recipes/targets",
-    )
-    parser.add_argument(
-        "-f",
-        "--file",
-        default="makefile",
-        help="Path to the Makefile (default: ./makefile)",
-    )
-    parser.add_argument(
-        "-a",
-        "--all",
-        action="store_true",
-        help="Print help for all targets in the Makefile",
-    )
-    parser.add_argument(
-        "--no-color",
-        action="store_true",
-        help="Disable colored output (color is enabled by default)",
-    )
-    parser.add_argument("targets", nargs="*", help="Target names")
-    args: argparse.Namespace = parser.parse_args()
-
-    lines: list[str] = Path(args.file).read_text(encoding="utf-8").splitlines()
-
-    # Get recipes to describe
-    if args.all:
-        recipes: list[MakeRecipe] = get_all_recipes(lines)
-    elif args.targets:
-        recipes = []
-        all_targets: list[str] = find_all_targets(lines)
-        c: Colors = Colors(enabled=not args.no_color)
-        for tgt in args.targets:
-            # Check if target contains wildcard characters
-            if any(char in tgt for char in ['*', '?', '[']):
-                # Pattern matching mode
-                matched_targets: list[str] = [t for t in all_targets if fnmatch.fnmatch(t, tgt)]
-                if matched_targets:
-                    for matched in matched_targets:
-                        recipes.append(MakeRecipe.from_makefile(lines, matched))
-                else:
-                    print(f"Error: no targets match pattern '{c.RED}{tgt}{c.RESET}'", file=sys.stderr)
-                    sys.exit(1)
-            else:
-                # Exact target lookup
-                try:
-                    recipes.append(MakeRecipe.from_makefile(lines, tgt))
-                except ValueError: # noqa: PERF203
-                    # Find similar targets (fuzzy matching)
-                    fuzzy_matches: list[str] = difflib.get_close_matches(tgt, all_targets, n=5, cutoff=0.6)
-                    # Also find targets that contain the attempted target
-                    substring_matches: list[str] = [t for t in all_targets if tgt in t and t not in fuzzy_matches]
-                    # Combine and deduplicate while preserving order
-                    matches: list[str] = fuzzy_matches + substring_matches
-                    matches = matches[:5]  # Limit to 5 suggestions
-
-                    print(f"Error: target '{c.RED}{tgt}{c.RESET}' not found in makefile", file=sys.stderr)
-                    if matches:
-                        suggestions: str = ", ".join(f"{c.BLUE}{m}{c.RESET}" for m in matches)
-                        print(f"Did you mean: {suggestions}?", file=sys.stderr)
-                    sys.exit(1)
-    else:
-        recipes = []
-
-    if not recipes:
-        parser.error("Provide target names or use --all flag")
-
-    # Print descriptions (color is True by default, unless --no-color is passed)
-    descriptions: list[str] = [
-        line for recipe in recipes for line in recipe.describe(color=not args.no_color)
-    ]
-    print("\n".join(descriptions).replace("\n\n", f"\n{'-' * 40}\n"))
-
-
-if __name__ == "__main__":
-    main()
-
-endef
-
-export SCRIPT_RECIPE_INFO
-
+# list of scripts to download when running `make self-setup-scripts`. these are the helper scripts that the makefile uses for various tasks (e.g., getting version info, generating docs, etc.)
+SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean typing_breakdown recipe_info make_docs generate_badge
+
+# download makefile helper scripts from GitHub
+# uses curl to fetch scripts from the template repository
+# override version: make self-setup-scripts SCRIPTS_VERSION=v0.5.0
+.PHONY: self-setup-scripts
+self-setup-scripts:
+	@echo "downloading makefile scripts (version: $(SCRIPTS_VERSION))"
+	@mkdir -p $(SCRIPTS_DIR)
+	@for script in $(SCRIPTS_LIST); do \
+		echo "  $$script.py"; \
+		curl -fsSL "$(SCRIPTS_URL_BASE)/$$script.py" -o "$(SCRIPTS_DIR)/$$script.py"; \
+	done
+	@echo "$(SCRIPTS_VERSION)" > $(SCRIPTS_DIR)/VERSION
+	@echo "done"
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -3992,15 +3673,16 @@ export SCRIPT_RECIPE_INFO
 # we do this in a separate target because it takes a bit of time
 # ==================================================
 
+
 # this recipe is weird. we need it because:
 # - a one liner for getting the version with toml is unwieldy, and using regex is fragile
 # - using $$SCRIPT_GET_VERSION within $(shell ...) doesn't work because of escaping issues
 # - trying to write to the file inside the `gen-version-info` recipe doesn't work, 
-# 	shell eval happens before our `python -c ...` gets run and `cat` doesn't see the new file
+#   shell eval happens before our `python ...` gets run and `cat` doesn't see the new file
 .PHONY: write-proj-version
 write-proj-version:
 	@mkdir -p $(VERSIONS_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_VERSION" "$(PYPROJECT)" > $(VERSION_FILE)
+	@$(PYTHON) $(SCRIPTS_DIR)/get_version.py "$(PYPROJECT)" > $(VERSION_FILE)
 
 # gets version info from $(PYPROJECT), last version from $(LAST_VERSION_FILE), and python version
 # uses just `python` for everything except getting the python version. no echo here, because this is "private"
@@ -4023,7 +3705,7 @@ gen-commit-log: gen-version-info
 		exit 1; \
 	fi
 	@mkdir -p $(LOCAL_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)" "$(COMMIT_LOG_FILE)"
+	@$(PYTHON) $(SCRIPTS_DIR)/get_commit_log.py "$(LAST_VERSION)" "$(COMMIT_LOG_FILE)"
 
 
 # force the version info to be read, printing it out
@@ -4054,32 +3736,50 @@ version: gen-commit-log
 # dependencies and setup
 # ==================================================
 
+
 .PHONY: setup
-setup: dep-check
-	@echo "install and update via uv"
-	@echo "To activate the virtual environment, run one of:"
+setup: self-setup-scripts dep-check
+	@echo "download scripts and sync dependencies"
+	@echo ""
+	@echo "setup complete! To activate the virtual environment, run one of:"
 	@echo "  source .venv/bin/activate"
 	@echo "  source .venv/Scripts/activate"
 
 .PHONY: dep-check-torch
 dep-check-torch:
 	@echo "see if torch is installed, and which CUDA version and devices it sees"
-	$(PYTHON) -c "$$SCRIPT_CHECK_TORCH"
+	$(PYTHON) $(SCRIPTS_DIR)/check_torch.py
 
+# sync dependencies and export to requirements.txt files
+# - syncs all extras and groups with uv (including dev dependencies)
+# - compiles bytecode for faster imports
+# - exports to requirements.txt files per tool.uv-exports.exports config
+# configure via pyproject.toml:[tool.uv-exports]:
+#   [tool.uv-exports]
+#   exports = [
+#     { name = "base", extras = [], groups = [] },  # base package deps only
+#     { name = "dev", extras = [], groups = ["dev"] },  # dev dependencies
+#     { name = "all", extras = ["all"], groups = ["dev"] }  # everything
+#   ]
 .PHONY: dep
 dep:
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups --compile-bytecode
 	mkdir -p $(REQUIREMENTS_DIR)
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
-	
+	$(PYTHON) $(SCRIPTS_DIR)/export_requirements.py $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
 
+
+# verify that requirements.txt files match current dependencies
+# - exports deps to temp directory
+# - diffs temp against existing requirements files
+# - FAILS if any differences found (means you need to run `make dep`)
+# useful in CI to catch when pyproject.toml changed but requirements weren't regenerated
 .PHONY: dep-check
 dep-check:
 	@echo "Checking that exported requirements are up to date"
 	uv sync --all-extras --all-groups
 	mkdir -p $(REQUIREMENTS_DIR)-TEMP
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR)-TEMP | sh -x
+	$(PYTHON) $(SCRIPTS_DIR)/export_requirements.py $(PYPROJECT) $(REQUIREMENTS_DIR)-TEMP | sh -x
 	diff -r $(REQUIREMENTS_DIR)-TEMP $(REQUIREMENTS_DIR)
 	rm -rf $(REQUIREMENTS_DIR)-TEMP
 
@@ -4104,40 +3804,65 @@ dep-clean:
 # checks (formatting/linting, typing, tests)
 # ==================================================
 
-# runs ruff and pycln to format the code
+
+# format code AND auto-fix linting issues
+# performs TWO operations: reformats code, then auto-fixes safe linting issues
+# configure in pyproject.toml:[tool.ruff]
 .PHONY: format
 format:
 	@echo "format the source code"
 	$(PYTHON) -m ruff format --config $(PYPROJECT) .
 	$(PYTHON) -m ruff check --fix --config $(PYPROJECT) .
-	$(PYTHON) -m pycln --config $(PYPROJECT) --all .
 
-# runs ruff and pycln to check if the code is formatted correctly
+# runs ruff to check if the code is formatted correctly
 .PHONY: format-check
 format-check:
 	@echo "check if the source code is formatted correctly"
 	$(PYTHON) -m ruff check --config $(PYPROJECT) .
-	$(PYTHON) -m pycln --check --config $(PYPROJECT) .
 
-# runs type checks with mypy
+# runs type checks with configured checkers
+# set TYPE_CHECKERS to customize which checkers run (e.g., TYPE_CHECKERS=mypy,basedpyright)
+# set TYPING_OUTPUT_DIR to save outputs to files (used by typing-summary)
+# returns exit code 1 if any checker fails
 .PHONY: typing
-typing: clean
+typing:
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+	@div="--------------------------------------------------"; \
+	failed=0; \
+	for c in $$(echo "$(TYPE_CHECKERS)" | tr ',' ' '); do \
+		case "$$c" in ty) subcmd="check";; *) subcmd="";; esac; \
+		printf "\033[36m$$div\n[$$c]\n$$div\033[0m\n"; \
+		$(PYTHON) -m $$c $$subcmd $(TYPECHECK_ARGS) $(TYPECHECK_PATH) $(if $(TYPING_OUTPUT_DIR),> $(TYPING_OUTPUT_DIR)/$$c.txt 2>&1) || failed=1; \
+	done; \
+	if [ $$failed -eq 1 ]; then \
+		printf "\033[31m$$div\nnot all type checks passed\n$$div\033[0m\n"; \
+		exit 1; \
+	else \
+		printf "\033[32m$$div\nall type checks passed\n$$div\033[0m\n"; \
+	fi
 
-# generates a report of the mypy output
-.PHONY: typing-report
-typing-report:
-	@echo "generate a report of the type check output -- errors per file"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
+# save type check outputs and generate detailed breakdown
+# outputs are saved to $(TYPE_ERRORS_DIR)/*.txt
+# summary is generated to $(TYPING_SUMMARY_FILE)
+.PHONY: typing-summary
+typing-summary:
+	@echo "running type checks and saving to $(TYPE_ERRORS_DIR)/"
+	@mkdir -p $(TYPE_ERRORS_DIR)
+	-@$(MAKE) --no-print-directory typing TYPING_OUTPUT_DIR=$(TYPE_ERRORS_DIR)
+	@echo "generating typing summary..."
+	$(PYTHON) $(SCRIPTS_DIR)/typing_breakdown.py --error-dir $(TYPE_ERRORS_DIR) --output $(TYPING_SUMMARY_FILE) --checkers $(TYPE_CHECKERS)
 
+# run tests with pytest
+# you can pass custom args. for example:
+# make test PYTEST_OPTIONS="--maxfail=1 -x"
+# pytest config in pyproject.toml:[tool.pytest.ini_options]
 .PHONY: test
-test: clean
+test:
 	@echo "running tests"
 	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
 
 .PHONY: check
-check: clean format-check test typing
+check: format-check test typing
 	@echo "run format checks, tests, and typing checks"
 
 
@@ -4153,6 +3878,7 @@ check: clean format-check test typing
 # coverage & docs
 # ==================================================
 
+
 # generates a whole tree of documentation in html format.
 # see `$(MAKE_DOCS_SCRIPT_PATH)` and the templates in `$(DOCS_RESOURCES_DIR)/templates/html/` for more info
 .PHONY: docs-html
@@ -4162,60 +3888,73 @@ docs-html:
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `$(DOCS_RESOURCES_DIR)/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
-# docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
 	$(PYTHON) $(MAKE_DOCS_SCRIPT_PATH) --combined
 
-# after running docs-md, this will convert the combined markdown file to other formats:
-# gfm (github-flavored markdown), plain text, and html
-# requires pandoc in path, pointed to by $(PANDOC)
-# pdf output would be nice but requires other deps
-.PHONY: docs-combined
-docs-combined: docs-md
-	@echo "generate combined (single-file) docs in markdown and convert to other formats"
-	@echo "requires pandoc in path"
-	$(PANDOC) -f markdown -t gfm $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME)_gfm.md
-	$(PANDOC) -f markdown -t plain $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).txt
-	$(PANDOC) -f markdown -t html $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).html
-
-# generates coverage reports as html and text with `pytest-cov`, and a badge with `coverage-badge`
-# if `.coverage` is not found, will run tests first
-# also removes the `.gitignore` file that `coverage html` creates, since we count that as part of the docs
+# generate coverage reports from test results
+# WARNING: if .coverage file not found, will automatically run `make test` first
+# - generates text report: $(COVERAGE_REPORTS_DIR)/coverage.txt
+# - generates SVG badge: $(COVERAGE_REPORTS_DIR)/coverage.svg
+# - generates HTML report: $(COVERAGE_REPORTS_DIR)/html/
+# - removes .gitignore from html dir (we publish coverage with docs)
 .PHONY: cov
 cov:
 	@echo "generate coverage reports"
 	@if [ ! -f .coverage ]; then \
 		echo ".coverage not found, running tests first..."; \
-		$(MAKE) test; \
+		$(MAKE) test PYTEST_OPTIONS="$(PYTEST_OPTIONS) --cov=." ; \
 	fi
 	mkdir $(COVERAGE_REPORTS_DIR) -p
 	$(PYTHON) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
-	$(PYTHON) -m coverage_badge -f -o $(COVERAGE_REPORTS_DIR)/coverage.svg
+	$(PYTHON) $(SCRIPTS_DIR)/generate_badge.py --coverage $(COVERAGE_REPORTS_DIR)/coverage.txt > $(COVERAGE_REPORTS_DIR)/coverage.svg
 	$(PYTHON) -m coverage html --directory=$(COVERAGE_REPORTS_DIR)/html/
 	rm -rf $(COVERAGE_REPORTS_DIR)/html/.gitignore
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo lmcat
+docs: cov docs-html docs-md todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
-# and leaves things defined in `pyproject.toml:tool.makefile.docs.no_clean`
-# (templates, svg, css, make_docs.py script)
-# distinct from `make clean`
+# remove generated documentation files, but preserve resources
+# - removes all docs except those in DOCS_RESOURCES_DIR
+# - preserves files/patterns specified in pyproject.toml config
+# - distinct from `make clean` (which removes temp build files, not docs)
+# configure via pyproject.toml:[tool.makefile.docs]:
+#   [tool.makefile.docs]
+#   output_dir = "docs"  # must match DOCS_DIR in makefile
+#   no_clean = [  # files/patterns to preserve when cleaning
+#     "resources/**",
+#     "*.svg",
+#     "*.css"
+#   ]
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs except resources"
-	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
+	$(PYTHON) $(SCRIPTS_DIR)/docs_clean.py $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
 
+# get all TODO's from the code
+# configure via pyproject.toml:[tool.makefile.inline-todo]:
+#   [tool.makefile.inline-todo]
+#   search_dir = "."  # directory to search for TODOs
+#   out_file_base = "docs/other/todo-inline"  # output file path (without extension)
+#   context_lines = 2  # lines of context around each TODO
+#   extensions = ["py", "md"]  # file extensions to search
+#   tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG", "DOC"]  # tags to look for
+#   exclude = ["docs/**", ".venv/**", "scripts/get_todos.py"]  # patterns to exclude
+#   branch = "main"  # git branch for URLs
+#   # repo_url = "..."  # repository URL (defaults to [project.urls.{repository,github}])
+#   # template_md = "..."  # custom jinja2 template for markdown output
+#   # template_issue = "..."  # custom format string for issues
+#   # template_html_source = "..."  # custom html template path
+#   tag_label_map = { "BUG" = "bug", "TODO" = "enhancement", "DOC" = "documentation" } # mapping of tags to GitHub issue labels
 .PHONY: todo
 todo:
 	@echo "get all TODO's from the code"
-	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
+	$(PYTHON) $(SCRIPTS_DIR)/get_todos.py
 
 .PHONY: lmcat-tree
 lmcat-tree:
@@ -4239,10 +3978,14 @@ lmcat:
 # build and publish
 # ==================================================
 
-# verifies that the current branch is $(PUBLISH_BRANCH) and that git is clean
-# used before publishing
+
+# verify git is ready for publishing
+# REQUIRES:
+# - current branch must be $(PUBLISH_BRANCH)
+# - no uncommitted changes (git status --porcelain must be empty)
+# EXITS with error if either condition fails
 .PHONY: verify-git
-verify-git: 
+verify-git:
 	@echo "checking git status"
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "!!! ERROR !!!"; \
@@ -4259,63 +4002,74 @@ verify-git:
 	fi; \
 
 
+# build package distribution files
+# creates wheel (.whl) and source distribution (.tar.gz) in dist/
 .PHONY: build
-build: 
+build:
 	@echo "build the package"
 	uv build
 
-# gets the commit log, checks everything, builds, and then publishes with twine
-# will ask the user to confirm the new version number (and this allows for editing the tag info)
-# will also print the contents of $(PYPI_TOKEN_FILE) to the console for the user to copy and paste in when prompted by twine
+# publish package to PyPI and create git tag
+# PREREQUISITES:
+# - must be on $(PUBLISH_BRANCH) branch with clean git status (verified by verify-git)
+# - must have $(PYPI_TOKEN_FILE) with your PyPI token
+# - version in pyproject.toml must be different from $(LAST_VERSION_FILE)
+# PROCESS:
+# 1. runs checks, validates version, builds package, verifies git clean
+# 2. prompts for version confirmation (you can edit $(COMMIT_LOG_FILE) at this point)
+# 3. creates git commit updating $(LAST_VERSION_FILE)
+# 4. creates annotated git tag with commit log as description
+# 5. pushes tag to origin
+# 6. uploads to PyPI via twine
 .PHONY: publish
-publish: gen-commit-log check build verify-git version gen-version-info
-	@echo "run all checks, build, and then publish"
+publish: check version build verify-git
+	@echo "Ready to publish $(PROJ_VERSION) to PyPI"
+	@echo "Now would be the time to edit $(COMMIT_LOG_FILE) for the tag description"
 
-	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
-	@echo "Now would also be the time to edit $(COMMIT_LOG_FILE), as that will be used as the tag description"
-	@read -p "Confirm: " NEW_VERSION; \
-	if [ "$$NEW_VERSION" = $(PROJ_VERSION) ]; then \
-		echo "!!! ERROR !!!"; \
-		echo "Version confirmed. Proceeding with publish."; \
-	else \
-		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(PROJ_VERSION)"; \
+	@read -p "Enter version to confirm: " NEW_VERSION && \
+	if [ "$$NEW_VERSION" != "$(PROJ_VERSION)" ]; then \
+		echo "Version mismatch: got $$NEW_VERSION, expected $(PROJ_VERSION)"; \
 		exit 1; \
-	fi;
+	fi && \
+	echo "Version confirmed."
 
-	@echo "pypi username: __token__"
-	@echo "pypi token from '$(PYPI_TOKEN_FILE)' :"
-	echo $$(cat $(PYPI_TOKEN_FILE))
+	@test -f "$(PYPI_TOKEN_FILE)" || { echo "ERROR: Token file not found at $(PYPI_TOKEN_FILE)"; exit 1; }
 
-	echo "Uploading!"; \
-	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE); \
-	git add $(LAST_VERSION_FILE); \
-	git commit -m "Auto update to $(PROJ_VERSION)"; \
-	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE); \
-	git push origin $(PROJ_VERSION); \
-	twine upload dist/* --verbose
+	@echo "Committing and tagging..."
+	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE) && \
+	git add $(LAST_VERSION_FILE) && \
+	git commit -m "Auto update to $(PROJ_VERSION)" && \
+	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE) && \
+	git push origin $(PROJ_VERSION)
+
+	@echo "Uploading to PyPI..."
+	TWINE_USERNAME=__token__ TWINE_PASSWORD="$$(cat $(PYPI_TOKEN_FILE))" $(PYTHON) -m twine upload dist/* --verbose
+
+	@echo "Published $(PROJ_VERSION) successfully!"
 
 # ==================================================
 # cleanup of temp files
 # ==================================================
 
-# cleans up temp files from formatter, type checking, tests, coverage
-# removes all built files
-# removes $(TESTS_TEMP_DIR) to remove temporary test files
-# recursively removes all `__pycache__` directories and `*.pyc` or `*.pyo` files
-# distinct from `make docs-clean`, which only removes generated documentation files
+
+# cleans up temporary files:
+# - caches: .mypy_cache, .ruff_cache, .pytest_cache, .coverage
+# - build artifacts: dist/, build/, *.egg-info
+# - test temp files: $(TESTS_TEMP_DIR)
+# - __pycache__ directories and *.pyc/*.pyo files in $(PACKAGE_NAME), $(TESTS_DIR), $(DOCS_DIR)
+# uses `-` prefix on find commands to continue even if directories don't exist
+# distinct from `make docs-clean`, which removes generated documentation
 .PHONY: clean
 clean:
 	@echo "clean up temporary files"
-	rm -rf .mypy_cache
-	rm -rf .ruff_cache
-	rm -rf .pytest_cache
-	rm -rf .coverage
-	rm -rf dist
-	rm -rf build
-	rm -rf $(PACKAGE_NAME).egg-info
-	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
+	rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage dist build $(PACKAGE_NAME).egg-info $(TESTS_TEMP_DIR) $(TYPE_ERRORS_DIR)
+	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type d -name '__pycache__' -exec rm -rf {} +
+	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type f -name '*.py[co]' -delete
 
+# remove all generated/build files including .venv
+# runs: clean + docs-clean + dep-clean
+# removes .venv, uv.lock, requirements.txt files, generated docs, build artifacts
+# run `make dep` after this to reinstall dependencies
 .PHONY: clean-all
 clean-all: clean docs-clean dep-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
@@ -4332,6 +4086,7 @@ clean-all: clean docs-clean dep-clean
 # ==================================================
 # smart help command
 # ==================================================
+
 
 # listing targets is from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
@@ -4369,11 +4124,10 @@ info-long: info
 	@echo "    LAST_VERSION_FILE = $(LAST_VERSION_FILE)"
 	@echo "    PYTHON_BASE = $(PYTHON_BASE)"
 	@echo "    COMMIT_LOG_FILE = $(COMMIT_LOG_FILE)"
-	@echo "    PANDOC = $(PANDOC)"
-	@echo "    COV = $(COV)"
-	@echo "    VERBOSE = $(VERBOSE)"
 	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
 	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
+	@echo "    TYPECHECK_PATH = $(TYPECHECK_PATH)"
+	@echo "    TYPE_CHECKERS = $(TYPE_CHECKERS)"
 
 # Smart help command: shows general help, or detailed info about specific targets
 # Usage:
@@ -4389,12 +4143,13 @@ help:
 	@$(eval HELP_ARG := $(or $(HELP),$(help),$(H),$(h)))
 	@$(eval HELP_EXPANDED := $(if $(filter *,$(HELP_ARG)),--all,$(HELP_ARG)))
 	@if [ -n "$(HELP_EXPANDED)" ]; then \
-		$(PYTHON) -c "$$SCRIPT_RECIPE_INFO" -f makefile $(HELP_EXPANDED); \
+		$(PYTHON_BASE) $(SCRIPTS_DIR)/recipe_info.py -f makefile $(HELP_EXPANDED); \
 	else \
 		$(MAKE) --no-print-directory help-targets info; \
 		echo ""; \
-		echo "To get detailed info about specific make targets, use:"; \
+		echo "To get detailed info about specific make targets or variables, use:"; \
 		echo "  make help=TARGET    or    make HELP=\"TARGET1 TARGET2\""; \
+		echo "  make help=VARIABLE  - shows variable values (case-insensitive)"; \
 		echo "  make H=*            or    make h=--all"; \
 	fi
 
@@ -4420,8 +4175,12 @@ help:
 #| https://github.com/mivanit/python-project-makefile-template      |
 ##[[VERSION]]##
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
-#| modifications from the original should be denoted with `~~~~~`   |
-#| as this makes it easier to find edits when updating makefile     |
+#|==================================================================|
+#| CUSTOMIZATION:                                                   |
+#| - modify PACKAGE_NAME and other variables in config section      |
+#| - mark custom changes with `~~~~~` for easier template updates   |
+#| - run `make help` to see available targets                       |
+#| - run `make help=TARGET` for detailed info about specific target |
 #|==================================================================|
 
 
@@ -4436,6 +4195,7 @@ help:
 # ==================================================
 # configuration & variables
 # ==================================================
+
 
 # !!! MODIFY AT LEAST THIS PART TO SUIT YOUR PROJECT !!!
 # it assumes that the source is in a directory named the same as the package name
@@ -4465,6 +4225,13 @@ PYPROJECT := pyproject.toml
 # use of `.meta/` inspired by https://news.ycombinator.com/item?id=36472613
 META_DIR := .meta
 
+# scripts download configuration
+# override SCRIPTS_VERSION to download a specific version (e.g., make self-setup-scripts SCRIPTS_VERSION=v0.5.0)
+SCRIPTS_DIR := $(META_DIR)/scripts
+SCRIPTS_VERSION ?= main
+SCRIPTS_REPO := mivanit/python-project-makefile-template
+SCRIPTS_URL_BASE := https://raw.githubusercontent.com/$(SCRIPTS_REPO)/$(SCRIPTS_VERSION)/scripts/out
+
 # requirements.txt files for base package, all extras, dev, and all
 REQUIREMENTS_DIR := $(META_DIR)/requirements
 
@@ -4490,9 +4257,6 @@ PYTHON_BASE := python
 # where the commit log will be stored
 COMMIT_LOG_FILE := $(LOCAL_DIR)/.commit_log
 
-# pandoc commands (for docs)
-PANDOC ?= pandoc
-
 # where to put the coverage reports
 # note that this will be published with the docs!
 # modify the `docs` targets and `.gitignore` if you don't want that
@@ -4503,7 +4267,7 @@ COVERAGE_REPORTS_DIR := $(DOCS_DIR)/coverage
 DOCS_RESOURCES_DIR := $(DOCS_DIR)/resources
 
 # location of the make docs script
-MAKE_DOCS_SCRIPT_PATH := $(DOCS_RESOURCES_DIR)/make_docs.py
+MAKE_DOCS_SCRIPT_PATH := $(SCRIPTS_DIR)/make_docs.py
 
 # version vars - extracted automatically from `pyproject.toml`, `$(LAST_VERSION_FILE)`, and $(PYTHON)
 # --------------------------------------------------
@@ -4519,6 +4283,7 @@ PYTHON_VERSION := NULL
 # ==================================================
 # reading command line options
 # ==================================================
+
 
 # for formatting or something, we might want to run python without uv
 # RUN_GLOBAL=1 to use global `PYTHON_BASE` instead of `uv run $(PYTHON_BASE)`
@@ -4545,26 +4310,29 @@ endif
 # options we might want to pass to pytest
 # --------------------------------------------------
 
-# base options for pytest, will be appended to if `COV` or `VERBOSE` are 1.
-# user can also set this when running make to add more options
+# base options for pytest, user can set this when running make to add more options
 PYTEST_OPTIONS ?=
 
-# set to `1` to run pytest with `--cov=.` to get coverage reports in a `.coverage` file
-COV ?= 1
-# set to `1` to run pytest with `--verbose`
-VERBOSE ?= 0
+# type checker configuration
+# --------------------------------------------------
 
-ifeq ($(VERBOSE),1)
-	PYTEST_OPTIONS += --verbose
-endif
+# which type checkers to run (comma-separated)
+# available: mypy,basedpyright,ty
+TYPE_CHECKERS ?= mypy,basedpyright,ty
 
-ifeq ($(COV),1)
-	PYTEST_OPTIONS += --cov=.
-endif
+# path to type check (empty = use config from pyproject.toml)
+TYPECHECK_PATH ?=
+
+# directory to store type checker outputs
+TYPE_ERRORS_DIR := $(META_DIR)/.type-errors
+
+# typing summary output file
+TYPING_SUMMARY_FILE := $(META_DIR)/typing-summary.toml
 
 # ==================================================
 # default target (help)
 # ==================================================
+
 
 # first/default target is help
 .PHONY: default
@@ -4581,79 +4349,25 @@ default: help
  ######   ######  ##     ## #### ##           ##     ######
 
 # ==================================================
-# python scripts we want to use inside the makefile
-# when developing, these are populated by `scripts/assemble_make.py`
+# downloading scripts from github
 # ==================================================
 
-# create commands for exporting requirements as specified in `pyproject.toml:tool.uv-exports.exports`
-define SCRIPT_EXPORT_REQUIREMENTS
-##[[SCRIPT_EXPORT_REQUIREMENTS]]##
-endef
+# list of scripts to download when running `make self-setup-scripts`. these are the helper scripts that the makefile uses for various tasks (e.g., getting version info, generating docs, etc.)
+SCRIPTS_LIST := export_requirements get_version get_commit_log check_torch get_todos pdoc_markdown2_cli docs_clean typing_breakdown recipe_info make_docs generate_badge
 
-export SCRIPT_EXPORT_REQUIREMENTS
-
-
-# get the version from `pyproject.toml:project.version`
-define SCRIPT_GET_VERSION
-##[[SCRIPT_GET_VERSION]]##
-endef
-
-export SCRIPT_GET_VERSION
-
-
-# get the commit log since the last version from `$(LAST_VERSION_FILE)`
-define SCRIPT_GET_COMMIT_LOG
-##[[SCRIPT_GET_COMMIT_LOG]]##
-endef
-
-export SCRIPT_GET_COMMIT_LOG
-
-
-# get cuda information and whether torch sees it
-define SCRIPT_CHECK_TORCH
-##[[SCRIPT_CHECK_TORCH]]##
-endef
-
-export SCRIPT_CHECK_TORCH
-
-
-# get todo's from the code
-define SCRIPT_GET_TODOS
-##[[SCRIPT_GET_TODOS]]##
-endef
-
-export SCRIPT_GET_TODOS
-
-
-# markdown to html using pdoc
-define SCRIPT_PDOC_MARKDOWN2_CLI
-##[[SCRIPT_PDOC_MARKDOWN2_CLI]]##
-endef
-
-export SCRIPT_PDOC_MARKDOWN2_CLI
-
-# clean up the docs (configurable in pyproject.toml)
-define SCRIPT_DOCS_CLEAN
-##[[SCRIPT_DOCS_CLEAN]]##
-endef
-
-export SCRIPT_DOCS_CLEAN
-
-# generate a report of the mypy output
-define SCRIPT_MYPY_REPORT
-##[[SCRIPT_MYPY_REPORT]]##
-endef
-
-export SCRIPT_MYPY_REPORT
-
-
-# get information about makefile recipes/targets
-define SCRIPT_RECIPE_INFO
-##[[SCRIPT_RECIPE_INFO]]##
-endef
-
-export SCRIPT_RECIPE_INFO
-
+# download makefile helper scripts from GitHub
+# uses curl to fetch scripts from the template repository
+# override version: make self-setup-scripts SCRIPTS_VERSION=v0.5.0
+.PHONY: self-setup-scripts
+self-setup-scripts:
+	@echo "downloading makefile scripts (version: $(SCRIPTS_VERSION))"
+	@mkdir -p $(SCRIPTS_DIR)
+	@for script in $(SCRIPTS_LIST); do \
+		echo "  $$script.py"; \
+		curl -fsSL "$(SCRIPTS_URL_BASE)/$$script.py" -o "$(SCRIPTS_DIR)/$$script.py"; \
+	done
+	@echo "$(SCRIPTS_VERSION)" > $(SCRIPTS_DIR)/VERSION
+	@echo "done"
 
 ##     ## ######## ########   ######  ####  #######  ##    ##
 ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
@@ -4668,15 +4382,16 @@ export SCRIPT_RECIPE_INFO
 # we do this in a separate target because it takes a bit of time
 # ==================================================
 
+
 # this recipe is weird. we need it because:
 # - a one liner for getting the version with toml is unwieldy, and using regex is fragile
 # - using $$SCRIPT_GET_VERSION within $(shell ...) doesn't work because of escaping issues
 # - trying to write to the file inside the `gen-version-info` recipe doesn't work, 
-# 	shell eval happens before our `python -c ...` gets run and `cat` doesn't see the new file
+#   shell eval happens before our `python ...` gets run and `cat` doesn't see the new file
 .PHONY: write-proj-version
 write-proj-version:
 	@mkdir -p $(VERSIONS_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_VERSION" "$(PYPROJECT)" > $(VERSION_FILE)
+	@$(PYTHON) $(SCRIPTS_DIR)/get_version.py "$(PYPROJECT)" > $(VERSION_FILE)
 
 # gets version info from $(PYPROJECT), last version from $(LAST_VERSION_FILE), and python version
 # uses just `python` for everything except getting the python version. no echo here, because this is "private"
@@ -4699,7 +4414,7 @@ gen-commit-log: gen-version-info
 		exit 1; \
 	fi
 	@mkdir -p $(LOCAL_DIR)
-	@$(PYTHON) -c "$$SCRIPT_GET_COMMIT_LOG" "$(LAST_VERSION)" "$(COMMIT_LOG_FILE)"
+	@$(PYTHON) $(SCRIPTS_DIR)/get_commit_log.py "$(LAST_VERSION)" "$(COMMIT_LOG_FILE)"
 
 
 # force the version info to be read, printing it out
@@ -4730,32 +4445,50 @@ version: gen-commit-log
 # dependencies and setup
 # ==================================================
 
+
 .PHONY: setup
-setup: dep-check
-	@echo "install and update via uv"
-	@echo "To activate the virtual environment, run one of:"
+setup: self-setup-scripts dep-check
+	@echo "download scripts and sync dependencies"
+	@echo ""
+	@echo "setup complete! To activate the virtual environment, run one of:"
 	@echo "  source .venv/bin/activate"
 	@echo "  source .venv/Scripts/activate"
 
 .PHONY: dep-check-torch
 dep-check-torch:
 	@echo "see if torch is installed, and which CUDA version and devices it sees"
-	$(PYTHON) -c "$$SCRIPT_CHECK_TORCH"
+	$(PYTHON) $(SCRIPTS_DIR)/check_torch.py
 
+# sync dependencies and export to requirements.txt files
+# - syncs all extras and groups with uv (including dev dependencies)
+# - compiles bytecode for faster imports
+# - exports to requirements.txt files per tool.uv-exports.exports config
+# configure via pyproject.toml:[tool.uv-exports]:
+#   [tool.uv-exports]
+#   exports = [
+#     { name = "base", extras = [], groups = [] },  # base package deps only
+#     { name = "dev", extras = [], groups = ["dev"] },  # dev dependencies
+#     { name = "all", extras = ["all"], groups = ["dev"] }  # everything
+#   ]
 .PHONY: dep
 dep:
 	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
 	uv sync --all-extras --all-groups --compile-bytecode
 	mkdir -p $(REQUIREMENTS_DIR)
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
-	
+	$(PYTHON) $(SCRIPTS_DIR)/export_requirements.py $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
 
+
+# verify that requirements.txt files match current dependencies
+# - exports deps to temp directory
+# - diffs temp against existing requirements files
+# - FAILS if any differences found (means you need to run `make dep`)
+# useful in CI to catch when pyproject.toml changed but requirements weren't regenerated
 .PHONY: dep-check
 dep-check:
 	@echo "Checking that exported requirements are up to date"
 	uv sync --all-extras --all-groups
 	mkdir -p $(REQUIREMENTS_DIR)-TEMP
-	$(PYTHON) -c "$$SCRIPT_EXPORT_REQUIREMENTS" $(PYPROJECT) $(REQUIREMENTS_DIR)-TEMP | sh -x
+	$(PYTHON) $(SCRIPTS_DIR)/export_requirements.py $(PYPROJECT) $(REQUIREMENTS_DIR)-TEMP | sh -x
 	diff -r $(REQUIREMENTS_DIR)-TEMP $(REQUIREMENTS_DIR)
 	rm -rf $(REQUIREMENTS_DIR)-TEMP
 
@@ -4780,7 +4513,10 @@ dep-clean:
 # checks (formatting/linting, typing, tests)
 # ==================================================
 
-# runs ruff to format the code
+
+# format code AND auto-fix linting issues
+# performs TWO operations: reformats code, then auto-fixes safe linting issues
+# configure in pyproject.toml:[tool.ruff]
 .PHONY: format
 format:
 	@echo "format the source code"
@@ -4793,25 +4529,49 @@ format-check:
 	@echo "check if the source code is formatted correctly"
 	$(PYTHON) -m ruff check --config $(PYPROJECT) .
 
-# runs type checks with mypy
+# runs type checks with configured checkers
+# set TYPE_CHECKERS to customize which checkers run (e.g., TYPE_CHECKERS=mypy,basedpyright)
+# set TYPING_OUTPUT_DIR to save outputs to files (used by typing-summary)
+# returns exit code 1 if any checker fails
 .PHONY: typing
-typing: clean
+typing:
 	@echo "running type checks"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) .
+	@div="--------------------------------------------------"; \
+	failed=0; \
+	for c in $$(echo "$(TYPE_CHECKERS)" | tr ',' ' '); do \
+		case "$$c" in ty) subcmd="check";; *) subcmd="";; esac; \
+		printf "\033[36m$$div\n[$$c]\n$$div\033[0m\n"; \
+		$(PYTHON) -m $$c $$subcmd $(TYPECHECK_ARGS) $(TYPECHECK_PATH) $(if $(TYPING_OUTPUT_DIR),> $(TYPING_OUTPUT_DIR)/$$c.txt 2>&1) || failed=1; \
+	done; \
+	if [ $$failed -eq 1 ]; then \
+		printf "\033[31m$$div\nnot all type checks passed\n$$div\033[0m\n"; \
+		exit 1; \
+	else \
+		printf "\033[32m$$div\nall type checks passed\n$$div\033[0m\n"; \
+	fi
 
-# generates a report of the mypy output
-.PHONY: typing-report
-typing-report:
-	@echo "generate a report of the type check output -- errors per file"
-	$(PYTHON) -m mypy --config-file $(PYPROJECT) $(TYPECHECK_ARGS) . | $(PYTHON) -c "$$SCRIPT_MYPY_REPORT" --mode toml
+# save type check outputs and generate detailed breakdown
+# outputs are saved to $(TYPE_ERRORS_DIR)/*.txt
+# summary is generated to $(TYPING_SUMMARY_FILE)
+.PHONY: typing-summary
+typing-summary:
+	@echo "running type checks and saving to $(TYPE_ERRORS_DIR)/"
+	@mkdir -p $(TYPE_ERRORS_DIR)
+	-@$(MAKE) --no-print-directory typing TYPING_OUTPUT_DIR=$(TYPE_ERRORS_DIR)
+	@echo "generating typing summary..."
+	$(PYTHON) $(SCRIPTS_DIR)/typing_breakdown.py --error-dir $(TYPE_ERRORS_DIR) --output $(TYPING_SUMMARY_FILE) --checkers $(TYPE_CHECKERS)
 
+# run tests with pytest
+# you can pass custom args. for example:
+# make test PYTEST_OPTIONS="--maxfail=1 -x"
+# pytest config in pyproject.toml:[tool.pytest.ini_options]
 .PHONY: test
-test: clean
+test:
 	@echo "running tests"
 	$(PYTHON) -m pytest $(PYTEST_OPTIONS) $(TESTS_DIR)
 
 .PHONY: check
-check: clean format-check test typing
+check: format-check test typing
 	@echo "run format checks, tests, and typing checks"
 
 
@@ -4827,6 +4587,7 @@ check: clean format-check test typing
 # coverage & docs
 # ==================================================
 
+
 # generates a whole tree of documentation in html format.
 # see `$(MAKE_DOCS_SCRIPT_PATH)` and the templates in `$(DOCS_RESOURCES_DIR)/templates/html/` for more info
 .PHONY: docs-html
@@ -4836,60 +4597,73 @@ docs-html:
 
 # instead of a whole website, generates a single markdown file with all docs using the templates in `$(DOCS_RESOURCES_DIR)/templates/markdown/`.
 # this is useful if you want to have a copy that you can grep/search, but those docs are much messier.
-# docs-combined will use pandoc to convert them to other formats.
 .PHONY: docs-md
 docs-md:
 	@echo "generate combined (single-file) docs in markdown"
 	mkdir $(DOCS_DIR)/combined -p
 	$(PYTHON) $(MAKE_DOCS_SCRIPT_PATH) --combined
 
-# after running docs-md, this will convert the combined markdown file to other formats:
-# gfm (github-flavored markdown), plain text, and html
-# requires pandoc in path, pointed to by $(PANDOC)
-# pdf output would be nice but requires other deps
-.PHONY: docs-combined
-docs-combined: docs-md
-	@echo "generate combined (single-file) docs in markdown and convert to other formats"
-	@echo "requires pandoc in path"
-	$(PANDOC) -f markdown -t gfm $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME)_gfm.md
-	$(PANDOC) -f markdown -t plain $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).txt
-	$(PANDOC) -f markdown -t html $(DOCS_DIR)/combined/$(PACKAGE_NAME).md -o $(DOCS_DIR)/combined/$(PACKAGE_NAME).html
-
-# generates coverage reports as html and text with `pytest-cov`, and a badge with `coverage-badge`
-# if `.coverage` is not found, will run tests first
-# also removes the `.gitignore` file that `coverage html` creates, since we count that as part of the docs
+# generate coverage reports from test results
+# WARNING: if .coverage file not found, will automatically run `make test` first
+# - generates text report: $(COVERAGE_REPORTS_DIR)/coverage.txt
+# - generates SVG badge: $(COVERAGE_REPORTS_DIR)/coverage.svg
+# - generates HTML report: $(COVERAGE_REPORTS_DIR)/html/
+# - removes .gitignore from html dir (we publish coverage with docs)
 .PHONY: cov
 cov:
 	@echo "generate coverage reports"
 	@if [ ! -f .coverage ]; then \
 		echo ".coverage not found, running tests first..."; \
-		$(MAKE) test; \
+		$(MAKE) test PYTEST_OPTIONS="$(PYTEST_OPTIONS) --cov=." ; \
 	fi
 	mkdir $(COVERAGE_REPORTS_DIR) -p
 	$(PYTHON) -m coverage report -m > $(COVERAGE_REPORTS_DIR)/coverage.txt
-	$(PYTHON) -m coverage_badge -f -o $(COVERAGE_REPORTS_DIR)/coverage.svg
+	$(PYTHON) $(SCRIPTS_DIR)/generate_badge.py --coverage $(COVERAGE_REPORTS_DIR)/coverage.txt > $(COVERAGE_REPORTS_DIR)/coverage.svg
 	$(PYTHON) -m coverage html --directory=$(COVERAGE_REPORTS_DIR)/html/
 	rm -rf $(COVERAGE_REPORTS_DIR)/html/.gitignore
 
 # runs the coverage report, then the docs, then the combined docs
 .PHONY: docs
-docs: cov docs-html docs-combined todo lmcat
+docs: cov docs-html docs-md todo lmcat
 	@echo "generate all documentation and coverage reports"
 
-# removed all generated documentation files, but leaves everything in `$DOCS_RESOURCES_DIR`
-# and leaves things defined in `pyproject.toml:tool.makefile.docs.no_clean`
-# (templates, svg, css, make_docs.py script)
-# distinct from `make clean`
+# remove generated documentation files, but preserve resources
+# - removes all docs except those in DOCS_RESOURCES_DIR
+# - preserves files/patterns specified in pyproject.toml config
+# - distinct from `make clean` (which removes temp build files, not docs)
+# configure via pyproject.toml:[tool.makefile.docs]:
+#   [tool.makefile.docs]
+#   output_dir = "docs"  # must match DOCS_DIR in makefile
+#   no_clean = [  # files/patterns to preserve when cleaning
+#     "resources/**",
+#     "*.svg",
+#     "*.css"
+#   ]
 .PHONY: docs-clean
 docs-clean:
 	@echo "remove generated docs except resources"
-	$(PYTHON) -c "$$SCRIPT_DOCS_CLEAN" $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
+	$(PYTHON) $(SCRIPTS_DIR)/docs_clean.py $(PYPROJECT) $(DOCS_DIR) $(DOCS_RESOURCES_DIR)
 
 
+# get all TODO's from the code
+# configure via pyproject.toml:[tool.makefile.inline-todo]:
+#   [tool.makefile.inline-todo]
+#   search_dir = "."  # directory to search for TODOs
+#   out_file_base = "docs/other/todo-inline"  # output file path (without extension)
+#   context_lines = 2  # lines of context around each TODO
+#   extensions = ["py", "md"]  # file extensions to search
+#   tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG", "DOC"]  # tags to look for
+#   exclude = ["docs/**", ".venv/**", "scripts/get_todos.py"]  # patterns to exclude
+#   branch = "main"  # git branch for URLs
+#   # repo_url = "..."  # repository URL (defaults to [project.urls.{repository,github}])
+#   # template_md = "..."  # custom jinja2 template for markdown output
+#   # template_issue = "..."  # custom format string for issues
+#   # template_html_source = "..."  # custom html template path
+#   tag_label_map = { "BUG" = "bug", "TODO" = "enhancement", "DOC" = "documentation" } # mapping of tags to GitHub issue labels
 .PHONY: todo
 todo:
 	@echo "get all TODO's from the code"
-	$(PYTHON) -c "$$SCRIPT_GET_TODOS"
+	$(PYTHON) $(SCRIPTS_DIR)/get_todos.py
 
 .PHONY: lmcat-tree
 lmcat-tree:
@@ -4913,10 +4687,14 @@ lmcat:
 # build and publish
 # ==================================================
 
-# verifies that the current branch is $(PUBLISH_BRANCH) and that git is clean
-# used before publishing
+
+# verify git is ready for publishing
+# REQUIRES:
+# - current branch must be $(PUBLISH_BRANCH)
+# - no uncommitted changes (git status --porcelain must be empty)
+# EXITS with error if either condition fails
 .PHONY: verify-git
-verify-git: 
+verify-git:
 	@echo "checking git status"
 	if [ "$(shell git branch --show-current)" != $(PUBLISH_BRANCH) ]; then \
 		echo "!!! ERROR !!!"; \
@@ -4933,63 +4711,74 @@ verify-git:
 	fi; \
 
 
+# build package distribution files
+# creates wheel (.whl) and source distribution (.tar.gz) in dist/
 .PHONY: build
-build: 
+build:
 	@echo "build the package"
 	uv build
 
-# gets the commit log, checks everything, builds, and then publishes with twine
-# will ask the user to confirm the new version number (and this allows for editing the tag info)
-# will also print the contents of $(PYPI_TOKEN_FILE) to the console for the user to copy and paste in when prompted by twine
+# publish package to PyPI and create git tag
+# PREREQUISITES:
+# - must be on $(PUBLISH_BRANCH) branch with clean git status (verified by verify-git)
+# - must have $(PYPI_TOKEN_FILE) with your PyPI token
+# - version in pyproject.toml must be different from $(LAST_VERSION_FILE)
+# PROCESS:
+# 1. runs checks, validates version, builds package, verifies git clean
+# 2. prompts for version confirmation (you can edit $(COMMIT_LOG_FILE) at this point)
+# 3. creates git commit updating $(LAST_VERSION_FILE)
+# 4. creates annotated git tag with commit log as description
+# 5. pushes tag to origin
+# 6. uploads to PyPI via twine
 .PHONY: publish
-publish: gen-commit-log check build verify-git version gen-version-info
-	@echo "run all checks, build, and then publish"
+publish: check version build verify-git
+	@echo "Ready to publish $(PROJ_VERSION) to PyPI"
+	@echo "Now would be the time to edit $(COMMIT_LOG_FILE) for the tag description"
 
-	@echo "Enter the new version number if you want to upload to pypi and create a new tag"
-	@echo "Now would also be the time to edit $(COMMIT_LOG_FILE), as that will be used as the tag description"
-	@read -p "Confirm: " NEW_VERSION; \
-	if [ "$$NEW_VERSION" = $(PROJ_VERSION) ]; then \
-		echo "!!! ERROR !!!"; \
-		echo "Version confirmed. Proceeding with publish."; \
-	else \
-		echo "Version mismatch, exiting: you gave $$NEW_VERSION but expected $(PROJ_VERSION)"; \
+	@read -p "Enter version to confirm: " NEW_VERSION && \
+	if [ "$$NEW_VERSION" != "$(PROJ_VERSION)" ]; then \
+		echo "Version mismatch: got $$NEW_VERSION, expected $(PROJ_VERSION)"; \
 		exit 1; \
-	fi;
+	fi && \
+	echo "Version confirmed."
 
-	@echo "pypi username: __token__"
-	@echo "pypi token from '$(PYPI_TOKEN_FILE)' :"
-	echo $$(cat $(PYPI_TOKEN_FILE))
+	@test -f "$(PYPI_TOKEN_FILE)" || { echo "ERROR: Token file not found at $(PYPI_TOKEN_FILE)"; exit 1; }
 
-	echo "Uploading!"; \
-	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE); \
-	git add $(LAST_VERSION_FILE); \
-	git commit -m "Auto update to $(PROJ_VERSION)"; \
-	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE); \
-	git push origin $(PROJ_VERSION); \
-	twine upload dist/* --verbose
+	@echo "Committing and tagging..."
+	echo $(PROJ_VERSION) > $(LAST_VERSION_FILE) && \
+	git add $(LAST_VERSION_FILE) && \
+	git commit -m "Auto update to $(PROJ_VERSION)" && \
+	git tag -a $(PROJ_VERSION) -F $(COMMIT_LOG_FILE) && \
+	git push origin $(PROJ_VERSION)
+
+	@echo "Uploading to PyPI..."
+	TWINE_USERNAME=__token__ TWINE_PASSWORD="$$(cat $(PYPI_TOKEN_FILE))" $(PYTHON) -m twine upload dist/* --verbose
+
+	@echo "Published $(PROJ_VERSION) successfully!"
 
 # ==================================================
 # cleanup of temp files
 # ==================================================
 
-# cleans up temp files from formatter, type checking, tests, coverage
-# removes all built files
-# removes $(TESTS_TEMP_DIR) to remove temporary test files
-# recursively removes all `__pycache__` directories and `*.pyc` or `*.pyo` files
-# distinct from `make docs-clean`, which only removes generated documentation files
+
+# cleans up temporary files:
+# - caches: .mypy_cache, .ruff_cache, .pytest_cache, .coverage
+# - build artifacts: dist/, build/, *.egg-info
+# - test temp files: $(TESTS_TEMP_DIR)
+# - __pycache__ directories and *.pyc/*.pyo files in $(PACKAGE_NAME), $(TESTS_DIR), $(DOCS_DIR)
+# uses `-` prefix on find commands to continue even if directories don't exist
+# distinct from `make docs-clean`, which removes generated documentation
 .PHONY: clean
 clean:
 	@echo "clean up temporary files"
-	rm -rf .mypy_cache
-	rm -rf .ruff_cache
-	rm -rf .pytest_cache
-	rm -rf .coverage
-	rm -rf dist
-	rm -rf build
-	rm -rf $(PACKAGE_NAME).egg-info
-	rm -rf $(TESTS_TEMP_DIR)
-	$(PYTHON) -Bc "import pathlib; [p.unlink() for path in ['$(PACKAGE_NAME)', '$(TESTS_DIR)', '$(DOCS_DIR)'] for pattern in ['*.py[co]', '__pycache__/*'] for p in pathlib.Path(path).rglob(pattern)]"
+	rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage dist build $(PACKAGE_NAME).egg-info $(TESTS_TEMP_DIR) $(TYPE_ERRORS_DIR)
+	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type d -name '__pycache__' -exec rm -rf {} +
+	-find $(PACKAGE_NAME) $(TESTS_DIR) $(DOCS_DIR) -type f -name '*.py[co]' -delete
 
+# remove all generated/build files including .venv
+# runs: clean + docs-clean + dep-clean
+# removes .venv, uv.lock, requirements.txt files, generated docs, build artifacts
+# run `make dep` after this to reinstall dependencies
 .PHONY: clean-all
 clean-all: clean docs-clean dep-clean
 	@echo "clean up all temporary files, dep files, venv, and generated docs"
@@ -5006,6 +4795,7 @@ clean-all: clean docs-clean dep-clean
 # ==================================================
 # smart help command
 # ==================================================
+
 
 # listing targets is from stackoverflow
 # https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
@@ -5043,11 +4833,10 @@ info-long: info
 	@echo "    LAST_VERSION_FILE = $(LAST_VERSION_FILE)"
 	@echo "    PYTHON_BASE = $(PYTHON_BASE)"
 	@echo "    COMMIT_LOG_FILE = $(COMMIT_LOG_FILE)"
-	@echo "    PANDOC = $(PANDOC)"
-	@echo "    COV = $(COV)"
-	@echo "    VERBOSE = $(VERBOSE)"
 	@echo "    RUN_GLOBAL = $(RUN_GLOBAL)"
 	@echo "    TYPECHECK_ARGS = $(TYPECHECK_ARGS)"
+	@echo "    TYPECHECK_PATH = $(TYPECHECK_PATH)"
+	@echo "    TYPE_CHECKERS = $(TYPE_CHECKERS)"
 
 # Smart help command: shows general help, or detailed info about specific targets
 # Usage:
@@ -5063,12 +4852,13 @@ help:
 	@$(eval HELP_ARG := $(or $(HELP),$(help),$(H),$(h)))
 	@$(eval HELP_EXPANDED := $(if $(filter *,$(HELP_ARG)),--all,$(HELP_ARG)))
 	@if [ -n "$(HELP_EXPANDED)" ]; then \
-		$(PYTHON) -c "$$SCRIPT_RECIPE_INFO" -f makefile $(HELP_EXPANDED); \
+		$(PYTHON_BASE) $(SCRIPTS_DIR)/recipe_info.py -f makefile $(HELP_EXPANDED); \
 	else \
 		$(MAKE) --no-print-directory help-targets info; \
 		echo ""; \
-		echo "To get detailed info about specific make targets, use:"; \
+		echo "To get detailed info about specific make targets or variables, use:"; \
 		echo "  make help=TARGET    or    make HELP=\"TARGET1 TARGET2\""; \
+		echo "  make help=VARIABLE  - shows variable values (case-insensitive)"; \
 		echo "  make H=*            or    make h=--all"; \
 	fi
 
@@ -5091,7 +4881,7 @@ help:
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.4.0"
+	version = "0.5.0"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
@@ -5123,9 +4913,10 @@ help:
 		"pytest>=8.2.2",
 		# coverage
 		"pytest-cov>=4.1.0",
-		"coverage-badge>=1.1.0",
 		# type checking
 		"mypy>=1.0.1",
+		"ty",
+		"basedpyright",
 		# docs
 		'pdoc>=14.6.0',
 		"nbconvert>=7.16.4", # for notebooks
@@ -5133,6 +4924,8 @@ help:
 		"lmcat>=0.2.0; python_version >= '3.11'",
 		# tomli since no tomlib in python < 3.11
 		"tomli>=2.1.0; python_version < '3.11'",
+		# twine
+		"twine",
 		# jinja2 vuln, see
 		# https://github.com/mivanit/python-project-makefile-template/security/dependabot/4
 		"jinja2>=3.1.6",
@@ -5172,15 +4965,25 @@ help:
 
 # mypy config
 [tool.mypy]
+	files = ["scripts/make"]
 	exclude = [
 		".*/__pycache__/.*",
 		"docs/.*",
+		"scripts/out/.*",
+		".meta/scripts/.*",
+		".venv/.*",
+		".mypy_cache/.*",
+		".ruff_cache/.*",
 	]
 
 
 # ruff config
 [tool.ruff]
-	exclude = ["__pycache__"]
+	exclude = [
+		"__pycache__",
+		".meta/scripts",
+		"scripts/out",
+	]
 
 	[tool.ruff.format]
 		indent-style = "tab"
@@ -5188,6 +4991,7 @@ help:
 
 	[tool.ruff.lint]
 		ignore = [
+			"COM812", # ????
 			"F722", # doesn't like jaxtyping
 			"W191", # we like tabs
 			"D400", # missing-trailing-period
@@ -5241,6 +5045,16 @@ help:
 		# select = ["ICN001"]
 
 		[tool.ruff.lint.per-file-ignores]
+			"scripts/make/*" = [
+				"PLR2004",  # magic values (coverage thresholds are self-documenting)
+				"RET504",   # unnecessary assignment before return
+				"TRY003",   # long exception messages
+				"TRY300",   # return in else block
+				"BLE001",   # blind exception catch (appropriate for CLI main())
+				"D103",     # missing docstring in main()
+				"PTH109",   # os.getcwd() vs Path.cwd()
+				"PTH100",   # os.path.abspath() vs Path.resolve()
+			]
 			"tests/*" = [
 				# dont need docstrings in test functions or modules
 				"D103", 
@@ -5264,17 +5078,47 @@ help:
 			"scripts/make/get_todos.py" = ["W291"]
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# basedpyright config
+[tool.basedpyright]
+	include = ["scripts/make"]
+	exclude = [
+		".meta/scripts",
+		"scripts/out",
+		".venv",
+		"docs",
+		".mypy_cache",
+		".ruff_cache",
+	]
+	reportAny = "none"
+	reportUnusedCallResult = "none"
+	reportUnnecessaryIsInstance = "none"
+	reportExplicitAny = "none"
+
+# ty config
+[tool.ty.src]
+	include = ["scripts/make"]
+	exclude = [
+		".meta/scripts",
+		"scripts/out",
+		".venv",
+		"docs",
+		".mypy_cache",
+		".ruff_cache",
+	]
+[tool.ty.rules]
+	unused-type-ignore-comment = "ignore"
+
 # `make lmcat` depends on the lmcat and can be configured here
 [tool.lmcat]
 	output = "docs/other/lmcat.txt" # changing this might mean it wont be accessible from the docs
 	ignore_patterns = [
-		"!docs/resources/make_docs.py",
 		"docs/**",
 		".venv/**",
 		".git/**",
 		".meta/**",
 		"uv.lock",
 		"LICENSE",
+		"scripts/out/",
 	]
 
 # for configuring this tool (makefile, make_docs.py)
@@ -5343,7 +5187,7 @@ help:
 		# # all groups and extras
 		{ name = "all", filename="requirements.txt", groups = true, extras=true },
 		# # all groups and extras, a different way
-		{ name = "all", groups = true, options = ["--all-extras"] },
+		{ name = "allalt", groups = true, options = ["--all-extras"] },
 	]
 
 # configures `make todo`

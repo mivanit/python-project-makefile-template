@@ -1,4 +1,4 @@
- # Inline TODOs
+# Inline TODOs
 
 
 # BUG
@@ -41,17 +41,53 @@
 
 # HACK
 
-## [`scripts/make_docs.py`](/scripts/make_docs.py)
+## [`.meta/scripts/make_docs.py`](/.meta/scripts/make_docs.py)
 
-- this is kid of fragile  
-  local link: [`/scripts/make_docs.py:149`](/scripts/make_docs.py#L149) 
-  | view on GitHub: [scripts/make_docs.py#L149](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/make_docs.py#L149)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kid%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fmake_docs.py%23L149%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake_docs.py%23L149%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kid%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
+- this is kind of fragile  
+  local link: [`/.meta/scripts/make_docs.py:152`](/.meta/scripts/make_docs.py#L152) 
+  | view on GitHub: [.meta/scripts/make_docs.py#L152](https://github.com/mivanit/python-project-makefile-template/blob/main/.meta/scripts/make_docs.py#L152)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60.meta%2Fscripts%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2F.meta%2Fscripts%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
 
   ```python
   """name of the module, which is the package name with '-' replaced by '_'
 
-  HACK: this is kid of fragile
+  HACK: this is kind of fragile
+  """
+  return self.package_name.replace("-", "_")
+  ```
+
+
+
+
+## [`scripts/make/make_docs.py`](/scripts/make/make_docs.py)
+
+- this is kind of fragile  
+  local link: [`/scripts/make/make_docs.py:152`](/scripts/make/make_docs.py#L152) 
+  | view on GitHub: [scripts/make/make_docs.py#L152](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/make/make_docs.py#L152)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fmake%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
+
+  ```python
+  """name of the module, which is the package name with '-' replaced by '_'
+
+  HACK: this is kind of fragile
+  """
+  return self.package_name.replace("-", "_")
+  ```
+
+
+
+
+## [`scripts/out/make_docs.py`](/scripts/out/make_docs.py)
+
+- this is kind of fragile  
+  local link: [`/scripts/out/make_docs.py:152`](/scripts/out/make_docs.py#L152) 
+  | view on GitHub: [scripts/out/make_docs.py#L152](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/out/make_docs.py#L152)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fout%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fout%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
+
+  ```python
+  """name of the module, which is the package name with '-' replaced by '_'
+
+  HACK: this is kind of fragile
   """
   return self.package_name.replace("-", "_")
   ```
@@ -61,6 +97,24 @@
 
 
 # TODO
+
+## [`.meta/scripts/docs_clean.py`](/.meta/scripts/docs_clean.py)
+
+- this is not recursive  
+  local link: [`/.meta/scripts/docs_clean.py:71`](/.meta/scripts/docs_clean.py#L71) 
+  | view on GitHub: [.meta/scripts/docs_clean.py#L71](https://github.com/mivanit/python-project-makefile-template/blob/main/.meta/scripts/docs_clean.py#L71)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20not%20recursive&body=%23%20source%0A%0A%5B%60.meta%2Fscripts%2Fdocs_clean.py%23L71%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2F.meta%2Fscripts%2Fdocs_clean.py%23L71%29%0A%0A%23%20context%0A%60%60%60python%0A%09%22%22%22delete%20files%20not%20in%20preserved%20set%0A%0A%09TODO%3A%20this%20is%20not%20recursive%0A%09%22%22%22%0A%09for%20path%20in%20docs_dir.iterdir%28%29%3A%0A%60%60%60&labels=enhancement)
+
+  ```python
+  """delete files not in preserved set
+
+  TODO: this is not recursive
+  """
+  for path in docs_dir.iterdir():
+  ```
+
+
+
 
 ## [`myproject/helloworld.py`](/myproject/helloworld.py)
 
@@ -100,9 +154,9 @@
 ## [`scripts/make/docs_clean.py`](/scripts/make/docs_clean.py)
 
 - this is not recursive  
-  local link: [`/scripts/make/docs_clean.py:55`](/scripts/make/docs_clean.py#L55) 
-  | view on GitHub: [scripts/make/docs_clean.py#L55](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/make/docs_clean.py#L55)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20not%20recursive&body=%23%20source%0A%0A%5B%60scripts%2Fmake%2Fdocs_clean.py%23L55%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake%2Fdocs_clean.py%23L55%29%0A%0A%23%20context%0A%60%60%60python%0A%09%22%22%22delete%20files%20not%20in%20preserved%20set%0A%0A%09TODO%3A%20this%20is%20not%20recursive%0A%09%22%22%22%0A%09for%20path%20in%20docs_dir.iterdir%28%29%3A%0A%60%60%60&labels=enhancement)
+  local link: [`/scripts/make/docs_clean.py:71`](/scripts/make/docs_clean.py#L71) 
+  | view on GitHub: [scripts/make/docs_clean.py#L71](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/make/docs_clean.py#L71)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20not%20recursive&body=%23%20source%0A%0A%5B%60scripts%2Fmake%2Fdocs_clean.py%23L71%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake%2Fdocs_clean.py%23L71%29%0A%0A%23%20context%0A%60%60%60python%0A%09%22%22%22delete%20files%20not%20in%20preserved%20set%0A%0A%09TODO%3A%20this%20is%20not%20recursive%0A%09%22%22%22%0A%09for%20path%20in%20docs_dir.iterdir%28%29%3A%0A%60%60%60&labels=enhancement)
 
   ```python
   """delete files not in preserved set
@@ -115,17 +169,19 @@
 
 
 
-## [`scripts/make/get_todos.py`](/scripts/make/get_todos.py)
+## [`scripts/out/docs_clean.py`](/scripts/out/docs_clean.py)
 
-- type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"  
-  local link: [`/scripts/make/get_todos.py:1`](/scripts/make/get_todos.py#L1) 
-  | view on GitHub: [scripts/make/get_todos.py#L1](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/make/get_todos.py#L1)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=type%20comments%20and%20write%20them%20to%20markdown%2C%20jsonl%2C%20html.%20configurable%20in%20pyproject.toml%22&body=%23%20source%0A%0A%5B%60scripts%2Fmake%2Fget_todos.py%23L1%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake%2Fget_todos.py%23L1%29%0A%0A%23%20context%0A%60%60%60python%0A%22read%20all%20TODO%20type%20comments%20and%20write%20them%20to%20markdown%2C%20jsonl%2C%20html.%20configurable%20in%20pyproject.toml%22%0A%0Afrom%20__future__%20import%20annotations%0A%60%60%60&labels=enhancement)
+- this is not recursive  
+  local link: [`/scripts/out/docs_clean.py:71`](/scripts/out/docs_clean.py#L71) 
+  | view on GitHub: [scripts/out/docs_clean.py#L71](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/out/docs_clean.py#L71)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20not%20recursive&body=%23%20source%0A%0A%5B%60scripts%2Fout%2Fdocs_clean.py%23L71%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fout%2Fdocs_clean.py%23L71%29%0A%0A%23%20context%0A%60%60%60python%0A%09%22%22%22delete%20files%20not%20in%20preserved%20set%0A%0A%09TODO%3A%20this%20is%20not%20recursive%0A%09%22%22%22%0A%09for%20path%20in%20docs_dir.iterdir%28%29%3A%0A%60%60%60&labels=enhancement)
 
   ```python
-  "read all TODO type comments and write them to markdown, jsonl, html. configurable in pyproject.toml"
+  """delete files not in preserved set
 
-  from __future__ import annotations
+  TODO: this is not recursive
+  """
+  for path in docs_dir.iterdir():
   ```
 
 

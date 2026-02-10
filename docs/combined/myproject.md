@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.4.0
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.0
 
 
 ## Contents
@@ -30,10 +30,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - the `pyproject.toml` of this repo has dev dependencies that you might need, you may want to copy those
   - it's also got some configuration that is worth looking at
 - copy `makefile` from this repo into the root of your repo
+- run `make setup` to download helper scripts and sync dependencies
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
 - if you want automatic documentation generation, copy `docs/resources/`. it contains:
-  - `docs/resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
   - `docs/resources/templates/`: jinja2 templates for the docs, template for the todolist
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for the docs
 
@@ -73,6 +73,7 @@ $ make help
     make lmcat                write the lmcat full output to pyproject.toml:[tool.lmcat.output]
     make lmcat-tree           show in console the lmcat tree view
     make publish              run all checks, build, and then publish
+    make self-setup-scripts  downloading makefile scripts from GitHub
     make setup                install and update via uv
     make test                 running tests
     make todo                 get all TODO's from the code
@@ -145,13 +146,11 @@ Pattern matching supports shell-style wildcards:
 
 # Development
 
-`makefile.template` is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.
+`makefile.template` is the template file for the makefile. Helper scripts are in `scripts/make/` and are downloaded from GitHub via `make self-setup-scripts`.
 
-the scripts used to generate the makefile are located in `scripts/`, with the exception of `scripts/assemble_make.py` which is the script used to populate the makefile.
-
-If developing, modify the `makefile.template` file or scripts in `scripts/`, and then run
+If developing, modify `makefile.template` or scripts in `scripts/make/`, then run:
 ```sh
-python scripts/assemble_make.py
+python scripts/assemble.py
 ```
 
 
@@ -163,7 +162,7 @@ python scripts/assemble_make.py
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject.py)
 
 # `myproject` { #myproject }
 
@@ -195,10 +194,10 @@ The whole idea behind this is rather than having a bunch of stuff in your readme
   - the `pyproject.toml` of this repo has dev dependencies that you might need, you may want to copy those
   - it's also got some configuration that is worth looking at
 - copy `makefile` from this repo into the root of your repo
+- run `make setup` to download helper scripts and sync dependencies
 - modify `PACKAGE_NAME := myproject` at the top of the makefile to match your package name
   - there are also a variety of other variables you can modify -- most are at the top of the makefile
 - if you want automatic documentation generation, copy `docs/resources/`. it contains:
-  - `docs/resources/make_docs.py` script to generate the docs using pdoc. reads everything it needs from your `pyproject.toml`
   - `docs/resources/templates/`: jinja2 templates for the docs, template for the todolist
   - `docs/resources/css/`, `docs/resources/svg/`: some css and icons for the docs
 
@@ -238,6 +237,7 @@ $ make help
     make lmcat                write the lmcat full output to pyproject.toml:[tool.lmcat.output]
     make lmcat-tree           show in console the lmcat tree view
     make publish              run all checks, build, and then publish
+    make self-setup-scripts  downloading makefile scripts from GitHub
     make setup                install and update via uv
     make test                 running tests
     make todo                 get all TODO's from the code
@@ -310,23 +310,21 @@ Pattern matching supports shell-style wildcards:
 
 ### Development
 
-`makefile.template` is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.
+`makefile.template` is the template file for the makefile. Helper scripts are in `scripts/make/` and are downloaded from GitHub via `make self-setup-scripts`.
 
-the scripts used to generate the makefile are located in `scripts/`, with the exception of `scripts/assemble_make.py` which is the script used to populate the makefile.
-
-If developing, modify the `makefile.template` file or scripts in `scripts/`, and then run
+If developing, modify `makefile.template` or scripts in `scripts/make/`, then run:
 ```sh
-python scripts/assemble_make.py
+python scripts/assemble.py
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py#L0-L0)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject.py#L0-L0)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.4.0
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.0
 
 
 ## Contents
@@ -341,13 +339,13 @@ dummy module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 dummy module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L0-L15)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/helloworld.py#L0-L15)
 
 
 
@@ -357,7 +355,7 @@ dummy module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L8-L10)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/helloworld.py#L8-L10)
 
 
 dummy docstring
@@ -369,7 +367,7 @@ dummy docstring
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/helloworld.py#L14-L16)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/helloworld.py#L14-L16)
 
 
 dummy docstring
@@ -377,7 +375,7 @@ dummy docstring
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.4.0
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.0
 
 
 ## Contents
@@ -391,13 +389,13 @@ a module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/other.py)
 
 # `myproject.other` { #myproject.other }
 
 a module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py#L0-L6)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/other.py#L0-L6)
 
 
 
@@ -407,7 +405,7 @@ a module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject/other.py#L5-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject/other.py#L5-L7)
 
 
 dummy docstring

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 15.0.1"/>
+    <meta name="generator" content="pdoc 16.0.0"/>
     <title>myproject API documentation</title>
 <link rel="stylesheet" href="resources/css/bootstrap-reboot.min.css"><link rel="stylesheet" href="resources/css/syntax-highlighting.css"><link rel="stylesheet" href="resources/css/theme.css"><link rel="stylesheet" href="resources/css/layout.css"><link rel="stylesheet" href="resources/css/content.css"><link rel="stylesheet" href="resources/css/custom.css"><script>
     window.MathJax = {
@@ -46,7 +46,7 @@
 </script></head>
 <body>
 <div class="package-version">
-    docs for <a href="https://github.com/mivanit/python-project-makefile-template">myproject</a> v0.4.0<br>
+    docs for <a href="https://github.com/mivanit/python-project-makefile-template">myproject</a> v0.5.0<br>
 </div>
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button">
@@ -102,7 +102,7 @@
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py">View Source on GitHub</a>
+                        <a class="pdoc-button git-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject.py">View Source on GitHub</a>
                     <h1 class="modulename">
 myproject    </h1>
 
@@ -145,13 +145,13 @@ myproject    </h1>
 <li>it's also got some configuration that is worth looking at</li>
 </ul></li>
 <li>copy <code>makefile</code> from this repo into the root of your repo</li>
+<li>run <code>make setup</code> to download helper scripts and sync dependencies</li>
 <li>modify <code>PACKAGE_NAME := myproject</code> at the top of the makefile to match your package name
 <ul>
 <li>there are also a variety of other variables you can modify -- most are at the top of the makefile</li>
 </ul></li>
 <li>if you want automatic documentation generation, copy <code>docs/resources/</code>. it contains:
 <ul>
-<li><code>docs/resources/make_docs.py</code> script to generate the docs using pdoc. reads everything it needs from your <code>pyproject.toml</code></li>
 <li><code>docs/resources/templates/</code>: jinja2 templates for the docs, template for the todolist</li>
 <li><code>docs/resources/css/</code>, <code>docs/resources/svg/</code>: some css and icons for the docs</li>
 </ul></li>
@@ -192,6 +192,7 @@ myproject    </h1>
 <span class="w">    </span>make<span class="w"> </span>lmcat<span class="w">                </span>write<span class="w"> </span>the<span class="w"> </span>lmcat<span class="w"> </span>full<span class="w"> </span>output<span class="w"> </span>to<span class="w"> </span>pyproject.toml:<span class="o">[</span>tool.lmcat.output<span class="o">]</span>
 <span class="w">    </span>make<span class="w"> </span>lmcat-tree<span class="w">           </span>show<span class="w"> </span><span class="k">in</span><span class="w"> </span>console<span class="w"> </span>the<span class="w"> </span>lmcat<span class="w"> </span>tree<span class="w"> </span>view
 <span class="w">    </span>make<span class="w"> </span>publish<span class="w">              </span>run<span class="w"> </span>all<span class="w"> </span>checks,<span class="w"> </span>build,<span class="w"> </span>and<span class="w"> </span><span class="k">then</span><span class="w"> </span>publish
+<span class="w">    </span>make<span class="w"> </span>self-setup-scripts<span class="w">  </span>downloading<span class="w"> </span>makefile<span class="w"> </span>scripts<span class="w"> </span>from<span class="w"> </span>GitHub
 <span class="w">    </span>make<span class="w"> </span>setup<span class="w">                </span>install<span class="w"> </span>and<span class="w"> </span>update<span class="w"> </span>via<span class="w"> </span>uv
 <span class="w">    </span>make<span class="w"> </span><span class="nb">test</span><span class="w">                 </span>running<span class="w"> </span>tests
 <span class="w">    </span>make<span class="w"> </span>todo<span class="w">                 </span>get<span class="w"> </span>all<span class="w"> </span>TODO<span class="err">&#39;</span>s<span class="w"> </span>from<span class="w"> </span>the<span class="w"> </span>code
@@ -271,14 +272,12 @@ dep-clean:
 
 <h1 id="development">Development</h1>
 
-<p><code>makefile.template</code> is the template file for the makefile, which contains everything except python scripts which will be inserted into the makefile.</p>
+<p><code>makefile.template</code> is the template file for the makefile. Helper scripts are in <code>scripts/make/</code> and are downloaded from GitHub via <code>make self-setup-scripts</code>.</p>
 
-<p>the scripts used to generate the makefile are located in <code>scripts/</code>, with the exception of <code>scripts/assemble_make.py</code> which is the script used to populate the makefile.</p>
-
-<p>If developing, modify the <code>makefile.template</code> file or scripts in <code>scripts/</code>, and then run</p>
+<p>If developing, modify <code>makefile.template</code> or scripts in <code>scripts/make/</code>, then run:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>python<span class="w"> </span>scripts/assemble_make.py
+<pre><span></span><code>python<span class="w"> </span>scripts/assemble.py
 </code></pre>
 </div>
 </div>
@@ -288,7 +287,7 @@ dep-clean:
                         <div class="source-button-container">
             <label class="pdoc-button view-source-button" for="mod-myproject-view-source"><span>View Source</span></label>
             <div class="github-button-wrapper">
-                <a class="pdoc-button github-link-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.4.0myproject.py#L0-L0" target="_blank">
+                <a class="pdoc-button github-link-button" href="https://github.com/mivanit/python-project-makefile-template/blob/0.5.0myproject.py#L0-L0" target="_blank">
                     <span>View on GitHub</span>
                 </a>
             </div>
