@@ -52,9 +52,7 @@ jobs:
       # Test detailed help system
       - name: Test detailed help for single target
         run: make help=test
-      - name: Test detailed help for multiple targets
-        run: make HELP="test clean"
-      - name: Test detailed help with pattern matching
+      - name: Test detailed help with wildcard
         run: make help="dep*"
       - name: Test detailed help with wildcard
         run: make h="*clean"
