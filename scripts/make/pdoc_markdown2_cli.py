@@ -32,7 +32,7 @@ def convert_file(
 	# Convert to HTML using markdown2
 	markdown: Any = Markdown(  # pyright: ignore[reportUnknownVariableType]
 		extras=["fenced-code-blocks", "header-ids", "markdown-in-html", "tables"],
-		safe_mode=safe_mode,  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type, unused-ignore-comment]
+		safe_mode=safe_mode,  # pyright: ignore[reportArgumentType] # ty: ignore[invalid-argument-type]
 	)
 	html: str = str(markdown.convert(text))  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
 

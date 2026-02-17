@@ -228,6 +228,7 @@
 	]
 [tool.ty.rules]
 	unused-type-ignore-comment = "ignore"
+	unused-ignore-comment = "ignore"
 
 # `make lmcat` depends on the lmcat and can be configured here
 [tool.lmcat]

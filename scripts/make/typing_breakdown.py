@@ -304,19 +304,19 @@ def main(error_dir: str, output_file: str, checkers: list[str]) -> None:
 
 	output_lines: list[str] = []
 
-	# First, extract summary lines from each type checker
-	checkers_info: list[tuple[str, str, Callable[[str], TypeCheckResult]]] = [
-		("mypy", "mypy.txt", parse_mypy),
-		("basedpyright", "basedpyright.txt", parse_basedpyright),
-		("ty", "ty.txt", parse_ty),
-	]
+	# Checker info lookup (filename, parser function)
+	checkers_info: dict[str, tuple[str, Callable[[str], TypeCheckResult]]] = {
+		"mypy": ("mypy.txt", parse_mypy),
+		"basedpyright": ("basedpyright.txt", parse_basedpyright),
+		"ty": ("ty.txt", parse_ty),
+	}
 
-	# Add summary comments
+	# Add summary comments (in order specified by checkers argument)
 	name: str
-	filename: str
-	for name, filename, _ in checkers_info:
-		if name not in checkers:
+	for name in checkers:
+		if name not in checkers_info:
 			continue
+		filename, _ = checkers_info[name]
 		file_path: Path = error_path / filename
 		if not file_path.exists():
 			output_lines.append(f"# {name}: (not run or file not found)")
@@ -326,11 +326,11 @@ def main(error_dir: str, output_file: str, checkers: list[str]) -> None:
 
 	output_lines.append("")
 
-	# Parse each type checker
-	parser_fn: Callable[[str], TypeCheckResult]
-	for name, filename, parser_fn in checkers_info:
-		if name not in checkers:
+	# Parse each type checker (in order specified by checkers argument)
+	for name in checkers:
+		if name not in checkers_info:
 			continue
+		filename, parser_fn = checkers_info[name]
 		file_path_: Path = error_path / filename
 		if not file_path_.exists():
 			continue
