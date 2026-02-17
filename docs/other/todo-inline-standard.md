@@ -27,7 +27,7 @@
 - an example that `make todo` should find  
   local link: [`/myproject/helloworld.py:13`](/myproject/helloworld.py#L13) 
   | view on GitHub: [myproject/helloworld.py#L13](https://github.com/mivanit/python-project-makefile-template/blob/main/myproject/helloworld.py#L13)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=an%20example%20that%20%60make%20todo%60%20should%20find&body=%23%20source%0A%0A%5B%60myproject%2Fhelloworld.py%23L13%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fmyproject%2Fhelloworld.py%23L13%29%0A%0A%23%20context%0A%60%60%60python%0A%23%20FIXME%3A%20an%20example%20that%20%60make%20todo%60%20should%20find%0Adef%20critical_function%28%29%20-%3E%20None%3A%0A%09%22dummy%20docstring%22%0A%60%60%60&labels=FIXME)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=an%20example%20that%20%60make%20todo%60%20should%20find&body=%23%20source%0A%0A%5B%60myproject%2Fhelloworld.py%23L13%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fmyproject%2Fhelloworld.py%23L13%29%0A%0A%23%20context%0A%60%60%60python%0A%23%20FIXME%3A%20an%20example%20that%20%60make%20todo%60%20should%20find%0Adef%20critical_function%28%29%20-%3E%20None%3A%0A%09%22dummy%20docstring%22%0A%60%60%60&labels=bug)
 
   ```python
   # FIXME: an example that `make todo` should find
@@ -46,7 +46,7 @@
 - this is kind of fragile  
   local link: [`/.meta/scripts/make_docs.py:152`](/.meta/scripts/make_docs.py#L152) 
   | view on GitHub: [.meta/scripts/make_docs.py#L152](https://github.com/mivanit/python-project-makefile-template/blob/main/.meta/scripts/make_docs.py#L152)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60.meta%2Fscripts%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2F.meta%2Fscripts%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60.meta%2Fscripts%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2F.meta%2Fscripts%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=enhancement)
 
   ```python
   """name of the module, which is the package name with '-' replaced by '_'
@@ -64,7 +64,7 @@
 - this is kind of fragile  
   local link: [`/scripts/make/make_docs.py:152`](/scripts/make/make_docs.py#L152) 
   | view on GitHub: [scripts/make/make_docs.py#L152](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/make/make_docs.py#L152)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fmake%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fmake%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fmake%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=enhancement)
 
   ```python
   """name of the module, which is the package name with '-' replaced by '_'
@@ -82,7 +82,7 @@
 - this is kind of fragile  
   local link: [`/scripts/out/make_docs.py:152`](/scripts/out/make_docs.py#L152) 
   | view on GitHub: [scripts/out/make_docs.py#L152](https://github.com/mivanit/python-project-makefile-template/blob/main/scripts/out/make_docs.py#L152)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fout%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fout%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=HACK)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=this%20is%20kind%20of%20fragile&body=%23%20source%0A%0A%5B%60scripts%2Fout%2Fmake_docs.py%23L152%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2Fscripts%2Fout%2Fmake_docs.py%23L152%29%0A%0A%23%20context%0A%60%60%60python%0A%09%09%22%22%22name%20of%20the%20module%2C%20which%20is%20the%20package%20name%20with%20%27-%27%20replaced%20by%20%27_%27%0A%0A%09%09HACK%3A%20this%20is%20kind%20of%20fragile%0A%09%09%22%22%22%0A%09%09return%20self.package_name.replace%28%22-%22%2C%20%22_%22%29%0A%60%60%60&labels=enhancement)
 
   ```python
   """name of the module, which is the package name with '-' replaced by '_'
@@ -135,17 +135,17 @@
 
 ## [`README.md`](/README.md)
 
-- switch to [`ty`](https://github.com/astral-sh/ty) once it's more mature  
-  local link: [`/README.md:11`](/README.md#L11) 
-  | view on GitHub: [README.md#L11](https://github.com/mivanit/python-project-makefile-template/blob/main/README.md#L11)
-  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=switch%20to%20%5B%60ty%60%5D%28https%3A%2F%2Fgithub.com%2Fastral-sh%2Fty%29%20once%20it%27s%20more%20mature&body=%23%20source%0A%0A%5B%60README.md%23L11%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2FREADME.md%23L11%29%0A%0A%23%20context%0A%60%60%60markdown%0A-%20%5B%60pytest%60%5D%28https%3A%2F%2Fdocs.pytest.org%29%20for%20testing%0A-%20%5B%60mypy%60%5D%28https%3A%2F%2Fgithub.com%2Fpython%2Fmypy%29%20for%20static%20type%20checking%0A%20%20-%20TODO%3A%20switch%20to%20%5B%60ty%60%5D%28https%3A%2F%2Fgithub.com%2Fastral-sh%2Fty%29%20once%20it%27s%20more%20mature%0A-%20%5B%60ruff%60%5D%28https%3A%2F%2Fdocs.astral.sh%2Fruff%2F%29%20for%20formatting%0A-%20%5B%60pdoc%60%5D%28https%3A%2F%2Fpdoc.dev%29%20for%20documentation%20generation%0A%60%60%60&labels=enhancement)
+- Extraction  
+  local link: [`/README.md:257`](/README.md#L257) 
+  | view on GitHub: [README.md#L257](https://github.com/mivanit/python-project-makefile-template/blob/main/README.md#L257)
+  | [Make Issue](https://github.com/mivanit/python-project-makefile-template/issues/new?title=Extraction&body=%23%20source%0A%0A%5B%60README.md%23L257%60%5D%28https%3A%2F%2Fgithub.com%2Fmivanit%2Fpython-project-makefile-template%2Fblob%2Fmain%2FREADME.md%23L257%29%0A%0A%23%20context%0A%60%60%60markdown%0A%60%60%60%0A%0A%23%23%20%60%5Btool.makefile.inline-todo%5D%60%20-%20TODO%20Extraction%0A%0ASettings%20for%20%60make%20todo%60%20which%20finds%20TODO%2FFIXME%2FBUG%20comments%20and%20generates%20reports%3A%0A%60%60%60&labels=enhancement)
 
   ```markdown
-  - [`pytest`](https://docs.pytest.org) for testing
-  - [`mypy`](https://github.com/python/mypy) for static type checking
-    - TODO: switch to [`ty`](https://github.com/astral-sh/ty) once it's more mature
-  - [`ruff`](https://docs.astral.sh/ruff/) for formatting
-  - [`pdoc`](https://pdoc.dev) for documentation generation
+  ```
+
+  ## `[tool.makefile.inline-todo]` - TODO Extraction
+
+  Settings for `make todo` which finds TODO/FIXME/BUG comments and generates reports:
   ```
 
 

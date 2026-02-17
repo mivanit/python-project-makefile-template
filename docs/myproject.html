@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 16.0.0"/>
+    <meta name="generator" content="pdoc 15.0.4"/>
     <title>myproject API documentation</title>
 <link rel="stylesheet" href="resources/css/bootstrap-reboot.min.css"><link rel="stylesheet" href="resources/css/syntax-highlighting.css"><link rel="stylesheet" href="resources/css/theme.css"><link rel="stylesheet" href="resources/css/layout.css"><link rel="stylesheet" href="resources/css/content.css"><link rel="stylesheet" href="resources/css/custom.css"><script>
     window.MathJax = {
@@ -60,7 +60,12 @@
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#makefile-template-for-python-projects">Makefile Template for Python Projects</a></li>
+  <li><a href="#makefile-template-for-python-projects">Makefile Template for Python Projects</a>
+  <ul>
+    <li><a href="#toolmakefiledocs-documentation-generation"><code>md5-fb59da5e56a26dd3a0677220cedbb71c</code"> - Documentation Generation</a></li>
+    <li><a href="#toolmakefileuv-exports-dependency-export"><code>md5-6dbe24fca888757ac05e255b0b81a1ba</code"> - Dependency Export</a></li>
+    <li><a href="#toolmakefileinline-todo-todo-extraction"><code>md5-9645687bfa9b53bf9ad9a05dc161adf9</code"> - TODO Extraction</a></li>
+  </ul></li>
   <li><a href="#how-to-use-this">How to use this:</a></li>
   <li><a href="#docs">docs</a></li>
   <li><a href="#makefile">Makefile</a>
@@ -68,7 +73,18 @@
     <li><a href="#general-help">General Help</a></li>
     <li><a href="#detailed-help-for-specific-targets">Detailed Help for Specific Targets</a></li>
   </ul></li>
-  <li><a href="#development">Development</a></li>
+  <li><a href="#configuration-reference">Configuration Reference</a>
+  <ul>
+    <li><a href="#toolmakefiledocs-documentation-generation"><code>[tool.makefile.docs]</code> - Documentation Generation</a></li>
+    <li><a href="#toolmakefileuv-exports-dependency-export"><code>[tool.makefile.uv-exports]</code> - Dependency Export</a></li>
+    <li><a href="#toolmakefileinline-todo-todo-extraction"><code>[tool.makefile.inline-todo]</code> - TODO Extraction</a></li>
+  </ul></li>
+  <li><a href="#development">Development</a>
+  <ul>
+    <li><a href="#project-structure">Project Structure</a></li>
+    <li><a href="#scripts-system">Scripts System</a></li>
+  </ul></li>
+  <li><a href="#version-system">Version System</a></li>
 </ul>
 
 
@@ -108,7 +124,7 @@ myproject    </h1>
 
                         <div class="docstring"><h1 id="makefile-template-for-python-projects">Makefile Template for Python Projects</h1>
 
-<p>I've ended up using the same style of makefile for multiple Python projects, so I've decided to create a repository with a template.</p>
+<p>I've ended up using the same style of makefile for multiple Python projects, so I've decided to create a repository with a template. The idea is to have a makefile that can be easily copied into any python project, and that provides a standard set of commands for common tasks like testing, formatting, type checking, documentation generation, and dependency management.</p>
 
 <p>Relevant ideological decisions:</p>
 
@@ -116,10 +132,7 @@ myproject    </h1>
 <li><strong>everything contained in github actions should be minimal, and mostly consist of calling makefile recipes</strong></li>
 <li><a href="https://docs.astral.sh/uv/"><code>uv</code></a> for dependency management and packaging</li>
 <li><a href="https://docs.pytest.org"><code>pytest</code></a> for testing</li>
-<li><a href="https://github.com/python/mypy"><code>mypy</code></a> for static type checking
-<ul>
-<li>TODO: switch to <a href="https://github.com/astral-sh/ty"><code>ty</code></a> once it's more mature</li>
-</ul></li>
+<li><a href="https://github.com/astral-sh/ty"><code>ty</code></a>, <a href="https://github.com/python/mypy"><code>mypy</code></a>, and <a href="https://github.com/DetachHead/basedpyright"><code>basedpyright</code></a> for static type checking</li>
 <li><a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> for formatting</li>
 <li><a href="https://pdoc.dev"><code>pdoc</code></a> for documentation generation</li>
 <li><a href="https://en.wikipedia.org/wiki/Make_(software)"><code>make</code></a> for automation
@@ -175,37 +188,42 @@ myproject    </h1>
 <span class="w">    </span>make<span class="w"> </span>clean<span class="w">                </span>clean<span class="w"> </span>up<span class="w"> </span>temporary<span class="w"> </span>files
 <span class="w">    </span>make<span class="w"> </span>clean-all<span class="w">            </span>clean<span class="w"> </span>up<span class="w"> </span>all<span class="w"> </span>temporary<span class="w"> </span>files,<span class="w"> </span>dep<span class="w"> </span>files,<span class="w"> </span>venv,<span class="w"> </span>and<span class="w"> </span>generated<span class="w"> </span>docs
 <span class="w">    </span>make<span class="w"> </span>cov<span class="w">                  </span>generate<span class="w"> </span>coverage<span class="w"> </span>reports
-<span class="w">    </span>make<span class="w"> </span>dep<span class="w">                  </span>Exporting<span class="w"> </span>dependencies<span class="w"> </span>as<span class="w"> </span>per<span class="w"> </span><span class="k">$(</span>PYPROJECT<span class="k">)</span><span class="w"> </span>section<span class="w"> </span><span class="s1">&#39;tool.uv-exports.exports&#39;</span>
+<span class="w">    </span>make<span class="w"> </span>dep<span class="w">                  </span>syncing<span class="w"> </span>and<span class="w"> </span>exporting<span class="w"> </span>dependencies<span class="w"> </span>as<span class="w"> </span>per<span class="w"> </span><span class="k">$(</span>PYPROJECT<span class="k">)</span><span class="w"> </span>section<span class="w"> </span><span class="s1">&#39;tool.uv-exports.exports&#39;</span>
 <span class="w">    </span>make<span class="w"> </span>dep-check<span class="w">            </span>Checking<span class="w"> </span>that<span class="w"> </span>exported<span class="w"> </span>requirements<span class="w"> </span>are<span class="w"> </span>up<span class="w"> </span>to<span class="w"> </span>date
 <span class="w">    </span>make<span class="w"> </span>dep-check-torch<span class="w">      </span>see<span class="w"> </span><span class="k">if</span><span class="w"> </span>torch<span class="w"> </span>is<span class="w"> </span>installed,<span class="w"> </span>and<span class="w"> </span>which<span class="w"> </span>CUDA<span class="w"> </span>version<span class="w"> </span>and<span class="w"> </span>devices<span class="w"> </span>it<span class="w"> </span>sees
 <span class="w">    </span>make<span class="w"> </span>dep-clean<span class="w">            </span>clean<span class="w"> </span>up<span class="w"> </span>lock<span class="w"> </span>files,<span class="w"> </span>.venv,<span class="w"> </span>and<span class="w"> </span>requirements<span class="w"> </span>files
+<span class="w">    </span>make<span class="w"> </span>dep-compile<span class="w">          </span>syncing<span class="w"> </span>dependencies<span class="w"> </span>with<span class="w"> </span>bytecode<span class="w"> </span>compilation
 <span class="w">    </span>make<span class="w"> </span>docs<span class="w">                 </span>generate<span class="w"> </span>all<span class="w"> </span>documentation<span class="w"> </span>and<span class="w"> </span>coverage<span class="w"> </span>reports
-<span class="w">    </span>make<span class="w"> </span>docs-clean<span class="w">           </span>remove<span class="w"> </span>generated<span class="w"> </span>docs
-<span class="w">    </span>make<span class="w"> </span>docs-combined<span class="w">        </span>generate<span class="w"> </span>combined<span class="w"> </span><span class="o">(</span>single-file<span class="o">)</span><span class="w"> </span>docs<span class="w"> </span><span class="k">in</span><span class="w"> </span>markdown<span class="w"> </span>and<span class="w"> </span>convert<span class="w"> </span>to<span class="w"> </span>other<span class="w"> </span>formats
+<span class="w">    </span>make<span class="w"> </span>docs-clean<span class="w">           </span>remove<span class="w"> </span>generated<span class="w"> </span>docs<span class="w"> </span>except<span class="w"> </span>resources
 <span class="w">    </span>make<span class="w"> </span>docs-html<span class="w">            </span>generate<span class="w"> </span>html<span class="w"> </span>docs
 <span class="w">    </span>make<span class="w"> </span>docs-md<span class="w">              </span>generate<span class="w"> </span>combined<span class="w"> </span><span class="o">(</span>single-file<span class="o">)</span><span class="w"> </span>docs<span class="w"> </span><span class="k">in</span><span class="w"> </span>markdown
 <span class="w">    </span>make<span class="w"> </span>format<span class="w">               </span>format<span class="w"> </span>the<span class="w"> </span><span class="nb">source</span><span class="w"> </span>code
 <span class="w">    </span>make<span class="w"> </span>format-check<span class="w">         </span>check<span class="w"> </span><span class="k">if</span><span class="w"> </span>the<span class="w"> </span><span class="nb">source</span><span class="w"> </span>code<span class="w"> </span>is<span class="w"> </span>formatted<span class="w"> </span>correctly
-<span class="w">    </span>make<span class="w"> </span><span class="nb">help</span>
 <span class="w">    </span>make<span class="w"> </span>info<span class="w">                 </span><span class="c1"># makefile variables</span>
 <span class="w">    </span>make<span class="w"> </span>info-long<span class="w">            </span><span class="c1"># other variables</span>
 <span class="w">    </span>make<span class="w"> </span>lmcat<span class="w">                </span>write<span class="w"> </span>the<span class="w"> </span>lmcat<span class="w"> </span>full<span class="w"> </span>output<span class="w"> </span>to<span class="w"> </span>pyproject.toml:<span class="o">[</span>tool.lmcat.output<span class="o">]</span>
 <span class="w">    </span>make<span class="w"> </span>lmcat-tree<span class="w">           </span>show<span class="w"> </span><span class="k">in</span><span class="w"> </span>console<span class="w"> </span>the<span class="w"> </span>lmcat<span class="w"> </span>tree<span class="w"> </span>view
-<span class="w">    </span>make<span class="w"> </span>publish<span class="w">              </span>run<span class="w"> </span>all<span class="w"> </span>checks,<span class="w"> </span>build,<span class="w"> </span>and<span class="w"> </span><span class="k">then</span><span class="w"> </span>publish
-<span class="w">    </span>make<span class="w"> </span>self-setup-scripts<span class="w">  </span>downloading<span class="w"> </span>makefile<span class="w"> </span>scripts<span class="w"> </span>from<span class="w"> </span>GitHub
-<span class="w">    </span>make<span class="w"> </span>setup<span class="w">                </span>install<span class="w"> </span>and<span class="w"> </span>update<span class="w"> </span>via<span class="w"> </span>uv
+<span class="w">    </span>make<span class="w"> </span>publish<span class="w">              </span>Ready<span class="w"> </span>to<span class="w"> </span>publish<span class="w"> </span><span class="k">$(</span>PROJ_VERSION<span class="k">)</span><span class="w"> </span>to<span class="w"> </span>PyPI
+<span class="w">    </span>make<span class="w"> </span>self-setup-scripts<span class="w">   </span>downloading<span class="w"> </span>makefile<span class="w"> </span>scripts<span class="w"> </span><span class="o">(</span>version:<span class="w"> </span><span class="k">$(</span>SCRIPTS_VERSION<span class="k">)</span><span class="o">)</span>
+<span class="w">    </span>make<span class="w"> </span>setup<span class="w">                </span>download<span class="w"> </span>scripts<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>dependencies
 <span class="w">    </span>make<span class="w"> </span><span class="nb">test</span><span class="w">                 </span>running<span class="w"> </span>tests
 <span class="w">    </span>make<span class="w"> </span>todo<span class="w">                 </span>get<span class="w"> </span>all<span class="w"> </span>TODO<span class="err">&#39;</span>s<span class="w"> </span>from<span class="w"> </span>the<span class="w"> </span>code
 <span class="w">    </span>make<span class="w"> </span>typing<span class="w">               </span>running<span class="w"> </span><span class="nb">type</span><span class="w"> </span>checks
+<span class="w">    </span>make<span class="w"> </span>typing-summary<span class="w">       </span>running<span class="w"> </span><span class="nb">type</span><span class="w"> </span>checks<span class="w"> </span>and<span class="w"> </span>saving<span class="w"> </span>to<span class="w"> </span><span class="k">$(</span>TYPE_ERRORS_DIR<span class="k">)</span>/
 <span class="w">    </span>make<span class="w"> </span>verify-git<span class="w">           </span>checking<span class="w"> </span>git<span class="w"> </span>status
 <span class="w">    </span>make<span class="w"> </span>version<span class="w">              </span>Current<span class="w"> </span>version<span class="w"> </span>is<span class="w"> </span><span class="k">$(</span>PROJ_VERSION<span class="k">)</span>,<span class="w"> </span>last<span class="w"> </span>auto-uploaded<span class="w"> </span>version<span class="w"> </span>is<span class="w"> </span><span class="k">$(</span>LAST_VERSION<span class="k">)</span>
 <span class="c1"># makefile variables</span>
 <span class="w">    </span><span class="nv">PYTHON</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>python
-<span class="w">    </span><span class="nv">PYTHON_VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>.12.0<span class="w"> </span>
+<span class="w">    </span><span class="nv">PYTHON_VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>.9.23<span class="w"> </span>
 <span class="w">    </span><span class="nv">PACKAGE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>myproject
-<span class="w">    </span><span class="nv">PROJ_VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>v0.0.6<span class="w"> </span>
-<span class="w">    </span><span class="nv">LAST_VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>v0.0.5
-<span class="w">    </span><span class="nv">PYTEST_OPTIONS</span><span class="w"> </span><span class="o">=</span><span class="w">  </span>--cov<span class="o">=</span>.
+<span class="w">    </span><span class="nv">PROJ_VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>v0.5.0<span class="w"> </span>
+<span class="w">    </span><span class="nv">LAST_VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>v0.0.1<span class="w"> </span>
+<span class="w">    </span><span class="nv">PYTEST_OPTIONS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+
+To<span class="w"> </span>get<span class="w"> </span>detailed<span class="w"> </span>info<span class="w"> </span>about<span class="w"> </span>specific<span class="w"> </span>make<span class="w"> </span>targets<span class="w"> </span>or<span class="w"> </span>variables,<span class="w"> </span>use:
+<span class="w">  </span>make<span class="w"> </span><span class="nv">help</span><span class="o">=</span>TARGET<span class="w">    </span>or<span class="w">    </span>make<span class="w"> </span><span class="nv">HELP</span><span class="o">=</span><span class="s2">&quot;TARGET1 TARGET2&quot;</span>
+<span class="w">  </span>make<span class="w"> </span><span class="nv">help</span><span class="o">=</span>VARIABLE<span class="w">  </span>-<span class="w"> </span>shows<span class="w"> </span>variable<span class="w"> </span>values<span class="w"> </span><span class="o">(</span><span class="k">case</span>-insensitive<span class="o">)</span>
+<span class="w">  </span>make<span class="w"> </span><span class="nv">H</span><span class="o">=</span>*<span class="w">            </span>or<span class="w">    </span>make<span class="w"> </span><span class="nv">h</span><span class="o">=</span>--all
 </code></pre>
 </div>
 
@@ -270,6 +288,175 @@ dep-clean:
 <li><code>[abc]</code> - matches any character in brackets</li>
 </ul>
 
+<h1 id="configuration-reference">Configuration Reference</h1>
+
+<p>The <code>pyproject.toml</code> file contains custom configuration sections for this makefile system. All options have sensible defaults.</p>
+
+<h2 id="toolmakefiledocs-documentation-generation"><code>[tool.makefile.docs]</code> - Documentation Generation</h2>
+
+<p>Settings for <code>make docs</code>, <code>make docs-html</code>, <code>make docs-md</code>, and <code>make docs-clean</code>:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="k">[tool.makefile.docs]</span>
+<span class="w">    </span><span class="c1"># Base directory for all generated documentation</span>
+<span class="w">    </span><span class="c1"># Default: &quot;docs&quot;</span>
+<span class="w">    </span><span class="n">output_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docs&quot;</span>
+
+<span class="w">    </span><span class="c1"># Files/directories preserved during `make docs-clean`</span>
+<span class="w">    </span><span class="c1"># Paths are relative to output_dir</span>
+<span class="w">    </span><span class="c1"># Default: []</span>
+<span class="w">    </span><span class="n">no_clean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;.nojekyll&quot;</span><span class="p">]</span>
+
+<span class="w">    </span><span class="c1"># Shifts heading levels in combined markdown output (make docs-md)</span>
+<span class="w">    </span><span class="c1"># With increment=2: # H1 → ### H3, ## H2 → #### H4</span>
+<span class="w">    </span><span class="c1"># Useful when embedding generated docs in a larger document</span>
+<span class="w">    </span><span class="c1"># Default: 2</span>
+<span class="w">    </span><span class="n">markdown_headings_increment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="w">    </span><span class="c1"># Regex patterns for pdoc warnings to suppress</span>
+<span class="w">    </span><span class="c1"># Matched against warning messages; use &quot;.*pattern.*&quot; for partial matches</span>
+<span class="w">    </span><span class="c1"># Default: [] (show all warnings)</span>
+<span class="w">    </span><span class="n">warnings_ignore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;.*No docstring.*&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;.*Private member.*&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">]</span>
+
+<span class="w">    </span><span class="c1"># Jupyter notebook conversion settings</span>
+<span class="w">    </span><span class="k">[tool.makefile.docs.notebooks]</span>
+<span class="w">        </span><span class="c1"># Master switch - set to true to convert .ipynb files to HTML</span>
+<span class="w">        </span><span class="c1"># Requires nbformat and nbconvert packages</span>
+<span class="w">        </span><span class="c1"># Default: false</span>
+<span class="w">        </span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="w">        </span><span class="c1"># Directory containing source .ipynb files</span>
+<span class="w">        </span><span class="c1"># Default: &quot;notebooks&quot;</span>
+<span class="w">        </span><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;notebooks&quot;</span>
+
+<span class="w">        </span><span class="c1"># Output subdirectory relative to output_dir</span>
+<span class="w">        </span><span class="c1"># Default: &quot;notebooks&quot;</span>
+<span class="w">        </span><span class="n">output_path_relative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;notebooks&quot;</span>
+
+<span class="w">        </span><span class="c1"># Custom Jinja2 template for notebooks index page</span>
+<span class="w">        </span><span class="c1"># Available variables: notebooks (list of dicts with ipynb, html, desc)</span>
+<span class="w">        </span><span class="c1"># Default: built-in template</span>
+<span class="w">        </span><span class="c1"># index_template = &quot;...&quot;</span>
+
+<span class="w">        </span><span class="c1"># Map notebook filename (without .ipynb) to description</span>
+<span class="w">        </span><span class="c1"># Shown on the notebooks index page</span>
+<span class="w">        </span><span class="c1"># Notebooks not listed here appear with no description</span>
+<span class="w">        </span><span class="k">[tool.makefile.docs.notebooks.descriptions]</span>
+<span class="w">            </span><span class="s2">&quot;example&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Example notebook showing basic usage&quot;</span>
+<span class="w">            </span><span class="s2">&quot;advanced&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Advanced usage patterns&quot;</span>
+</code></pre>
+</div>
+
+<h2 id="toolmakefileuv-exports-dependency-export"><code>[tool.makefile.uv-exports]</code> - Dependency Export</h2>
+
+<p>Settings for <code>make dep</code> which exports dependencies to <code>.meta/requirements/</code>:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="k">[tool.makefile.uv-exports]</span>
+<span class="w">    </span><span class="c1"># Global args passed to ALL uv export commands</span>
+<span class="w">    </span><span class="c1"># Default: []</span>
+<span class="w">    </span><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--no-hashes&quot;</span><span class="p">]</span>
+
+<span class="w">    </span><span class="c1"># Each entry generates a requirements file in .meta/requirements/</span>
+<span class="w">    </span><span class="c1"># Default: [{ name = &quot;all&quot; }] (just base dependencies)</span>
+<span class="w">    </span><span class="n">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="c1"># name (required): identifier for this export</span>
+<span class="w">        </span><span class="c1">#   - must be alphanumeric</span>
+<span class="w">        </span><span class="c1">#   - generates filename &quot;requirements-{name}.txt&quot; by default</span>
+<span class="w">        </span><span class="c1">#</span>
+<span class="w">        </span><span class="c1"># groups: which dependency groups to include</span>
+<span class="w">        </span><span class="c1">#   - true: include ALL groups from [dependency-groups]</span>
+<span class="w">        </span><span class="c1">#   - false: exclude ALL groups (base dependencies only)</span>
+<span class="w">        </span><span class="c1">#   - [&quot;dev&quot;, &quot;lint&quot;]: include only these specific groups</span>
+<span class="w">        </span><span class="c1">#   - omitted/null: no group filtering</span>
+<span class="w">        </span><span class="c1">#</span>
+<span class="w">        </span><span class="c1"># extras: which optional dependencies to include</span>
+<span class="w">        </span><span class="c1">#   - true: include ALL extras from [project.optional-dependencies]</span>
+<span class="w">        </span><span class="c1">#   - false or []: no extras</span>
+<span class="w">        </span><span class="c1">#   - [&quot;cli&quot;]: include only these specific extras</span>
+<span class="w">        </span><span class="c1">#</span>
+<span class="w">        </span><span class="c1"># filename: override the output filename</span>
+<span class="w">        </span><span class="c1">#</span>
+<span class="w">        </span><span class="c1"># options: raw args passed directly to uv export</span>
+
+<span class="w">        </span><span class="c1"># Base dependencies only (from [project.dependencies])</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;base&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="n">extras</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+
+<span class="w">        </span><span class="c1"># All dependency groups, no extras</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;groups&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">extras</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+
+<span class="w">        </span><span class="c1"># Only the lint group - using raw uv options</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;lint&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--only-group&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;lint&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+
+<span class="w">        </span><span class="c1"># Everything with custom filename</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;requirements.txt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">extras</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">]</span>
+</code></pre>
+</div>
+
+<h2 id="toolmakefileinline-todo-todo-extraction"><code>[tool.makefile.inline-todo]</code> - TODO Extraction</h2>
+
+<p>Settings for <code>make todo</code> which finds TODO/FIXME/BUG comments and generates reports:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="k">[tool.makefile.inline-todo]</span>
+<span class="w">    </span><span class="c1"># Root directory to search for TODOs</span>
+<span class="w">    </span><span class="c1"># Default: &quot;.&quot;</span>
+<span class="w">    </span><span class="n">search_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+
+<span class="w">    </span><span class="c1"># Base path for output files (without extension)</span>
+<span class="w">    </span><span class="c1"># Generates multiple files:</span>
+<span class="w">    </span><span class="c1">#   - {base}.jsonl: raw data, one JSON object per line</span>
+<span class="w">    </span><span class="c1">#   - {base}-standard.md: grouped by tag, then by file</span>
+<span class="w">    </span><span class="c1">#   - {base}-table.md: flat table format</span>
+<span class="w">    </span><span class="c1">#   - {base}.html: interactive HTML viewer</span>
+<span class="w">    </span><span class="c1"># Default: &quot;docs/todo-inline&quot;</span>
+<span class="w">    </span><span class="n">out_file_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docs/other/todo-inline&quot;</span>
+
+<span class="w">    </span><span class="c1"># Lines of context to include before/after each TODO</span>
+<span class="w">    </span><span class="c1"># Default: 2</span>
+<span class="w">    </span><span class="n">context_lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="w">    </span><span class="c1"># File extensions to scan (without dots)</span>
+<span class="w">    </span><span class="c1"># Default: [&quot;py&quot;, &quot;md&quot;]</span>
+<span class="w">    </span><span class="n">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;md&quot;</span><span class="p">]</span>
+
+<span class="w">    </span><span class="c1"># Comment tags to search for (case-sensitive, exact match)</span>
+<span class="w">    </span><span class="c1"># Must be surrounded by valid boundary characters (space, colon, brackets, etc.)</span>
+<span class="w">    </span><span class="c1"># Default: [&quot;CRIT&quot;, &quot;TODO&quot;, &quot;FIXME&quot;, &quot;HACK&quot;, &quot;BUG&quot;]</span>
+<span class="w">    </span><span class="n">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;CRIT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TODO&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;FIXME&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HACK&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;BUG&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;DOC&quot;</span><span class="p">]</span>
+
+<span class="w">    </span><span class="c1"># Glob patterns to exclude from search</span>
+<span class="w">    </span><span class="c1"># Default: [&quot;docs/**&quot;, &quot;.venv/**&quot;]</span>
+<span class="w">    </span><span class="n">exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;docs/**&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.venv/**&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scripts/get_todos.py&quot;</span><span class="p">]</span>
+
+<span class="w">    </span><span class="c1"># Git branch for GitHub code links</span>
+<span class="w">    </span><span class="c1"># Links point to: {repo_url}/blob/{branch}/{file}#L{line}</span>
+<span class="w">    </span><span class="c1"># Default: &quot;main&quot;</span>
+<span class="w">    </span><span class="n">branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;main&quot;</span>
+
+<span class="w">    </span><span class="c1"># Repository URL for GitHub links</span>
+<span class="w">    </span><span class="c1"># Auto-detected from [project.urls.Repository] or [project.urls.github]</span>
+<span class="w">    </span><span class="c1"># Only set this to override auto-detection</span>
+<span class="w">    </span><span class="c1"># repo_url = &quot;https://github.com/user/repo&quot;</span>
+
+<span class="w">    </span><span class="c1"># Map comment tags to GitHub issue labels</span>
+<span class="w">    </span><span class="c1"># Used when generating &quot;create issue&quot; links</span>
+<span class="w">    </span><span class="c1"># Tags not in this map use the tag name as the label</span>
+<span class="w">    </span><span class="c1"># Defaults: CRIT/FIXME/BUG → &quot;bug&quot;, TODO/HACK → &quot;enhancement&quot;</span>
+<span class="w">    </span><span class="k">[tool.makefile.inline-todo.tag_label_map]</span>
+<span class="w">        </span><span class="s2">&quot;CRIT&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bug&quot;</span>
+<span class="w">        </span><span class="s2">&quot;BUG&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bug&quot;</span>
+<span class="w">        </span><span class="s2">&quot;FIXME&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bug&quot;</span>
+<span class="w">        </span><span class="s2">&quot;TODO&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;enhancement&quot;</span>
+<span class="w">        </span><span class="s2">&quot;HACK&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;enhancement&quot;</span>
+<span class="w">        </span><span class="s2">&quot;DOC&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;documentation&quot;</span>
+</code></pre>
+</div>
+
 <h1 id="development">Development</h1>
 
 <p><code>makefile.template</code> is the template file for the makefile. Helper scripts are in <code>scripts/make/</code> and are downloaded from GitHub via <code>make self-setup-scripts</code>.</p>
@@ -280,6 +467,110 @@ dep-clean:
 <pre><span></span><code>python<span class="w"> </span>scripts/assemble.py
 </code></pre>
 </div>
+
+<h2 id="project-structure">Project Structure</h2>
+
+<pre><code>python-project-makefile-template/
+├── .github/workflows/       # CI/CD workflows (minimal, just call makefile recipes)
+├── .meta/
+│   ├── scripts/             # Runtime scripts (used by makefile)
+│   ├── requirements/        # Generated requirements.txt files
+│   ├── versions/            # Version tracking files (.version, .lastversion)
+│   └── local/               # Local files (tokens, logs) - not in git
+├── scripts/
+│   ├── assemble.py          # Assembles makefile and scripts from templates
+│   ├── make/                # Source scripts (templates with version placeholders)
+│   └── out/                 # Assembled scripts (generated, with version replaced)
+├── docs/                    # Generated documentation (via `make docs`)
+│   ├── resources/           # Templates, CSS, SVG (not auto-cleaned)
+│   └── ...                  # Generated HTML, markdown, coverage reports
+├── myproject/               # Example Python package (replace with your package)
+├── tests/                   # pytest test directory
+├── notebooks/               # Jupyter notebooks (optional, for docs generation)
+├── makefile                 # Generated makefile (from makefile.template)
+├── makefile.template        # Makefile source with version placeholders
+└── pyproject.toml           # Project configuration
+</code></pre>
+
+<h2 id="scripts-system">Scripts System</h2>
+
+<p>There are three script directories that serve different purposes:</p>
+
+<table>
+<thead>
+<tr>
+  <th>Directory</th>
+  <th>Purpose</th>
+  <th>When Modified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>scripts/make/</code></td>
+  <td><strong>Source templates</strong> - edit these when developing</td>
+  <td>Manual edits</td>
+</tr>
+<tr>
+  <td><code>scripts/out/</code></td>
+  <td><strong>Assembled output</strong> - generated from <code>scripts/make/</code> for download</td>
+  <td><code>python scripts/assemble.py</code></td>
+</tr>
+<tr>
+  <td><code>.meta/scripts/</code></td>
+  <td><strong>Runtime scripts</strong> - used by makefile at runtime</td>
+  <td><code>make self-setup-scripts</code> -- this is what projects using this template will use</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>For users of this template:</strong> You don't need to modify scripts. Just run <code>make self-setup-scripts</code> to download the latest versions.</p>
+
+<p><strong>For developers of this template:</strong></p>
+
+<ol>
+<li>Edit scripts in <code>scripts/make/</code></li>
+<li>Run <code>python scripts/assemble.py</code> to generate <code>scripts/out/</code> and <code>.meta/scripts/</code></li>
+<li>The <code>##[[VERSION]]##</code> placeholder gets replaced with the version from <code>pyproject.toml</code></li>
+</ol>
+
+<h1 id="version-system">Version System</h1>
+
+<p>The makefile tracks two versions:</p>
+
+<table>
+<thead>
+<tr>
+  <th>File</th>
+  <th>Variable</th>
+  <th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>pyproject.toml</code></td>
+  <td><code>PROJ_VERSION</code></td>
+  <td>Current version of the package</td>
+</tr>
+<tr>
+  <td><code>.meta/versions/.lastversion</code></td>
+  <td><code>LAST_VERSION</code></td>
+  <td>Last version published to PyPI</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>The <code>scripts/assemble.py</code> script:</strong></p>
+
+<ul>
+<li>Reads version from <code>pyproject.toml</code></li>
+<li>Replaces <code>##[[VERSION]]##</code> placeholders in <code>makefile.template</code> → <code>makefile</code></li>
+<li>Replaces <code>##[[VERSION]]##</code> placeholders in <code>scripts/make/*.py</code> → <code>scripts/out/*.py</code> and <code>.meta/scripts/*.py</code></li>
+</ul>
 </div>
 
                         <input id="mod-myproject-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
