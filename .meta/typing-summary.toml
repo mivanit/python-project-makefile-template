@@ -1,13 +1,13 @@
-# mypy: Success: no issues found in 11 source files
-# basedpyright: 0 errors, 0 warnings, 0 notes
 # ty: All checks passed!
+# basedpyright: 0 errors, 0 warnings, 0 notes
+# mypy: Success: no issues found in 11 source files
 
-[type_errors.mypy]
+[type_errors.ty]
 total_errors = 0
 
-[type_errors.mypy.by_type]
+[type_errors.ty.by_type]
 
-[type_errors.mypy.by_file]
+[type_errors.ty.by_file]
 
 [type_errors.basedpyright]
 total_errors = 0
@@ -16,9 +16,9 @@ total_errors = 0
 
 [type_errors.basedpyright.by_file]
 
-[type_errors.ty]
+[type_errors.mypy]
 total_errors = 0
 
-[type_errors.ty.by_type]
+[type_errors.mypy.by_type]
 
-[type_errors.ty.by_file]
+[type_errors.mypy.by_file]
