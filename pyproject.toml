@@ -293,76 +293,76 @@
         
         
 
-# Custom export configurations
-# affects `make dep` and related commands
+# Dependency export configurations for `make dep`
+# Generates requirements files in .meta/requirements/
+# See README.md "Configuration Reference" for full documentation
 [tool.makefile.uv-exports]
-	args = [
-		"--no-hashes"
-	]
+	# Global args passed to ALL uv export commands
+	args = ["--no-hashes"]
+
+	# Each entry generates a requirements file
+	# Fields:
+	#   name (required): alphanumeric identifier, generates "requirements-{name}.txt"
+	#   groups: true=all, false=none, ["dev"]=specific groups from [dependency-groups]
+	#   extras: true=all, false/[]=none, ["cli"]=specific from [project.optional-dependencies]
+	#   filename: override output filename
+	#   options: raw args passed to uv export
 	exports = [
-		# no groups, no extras, just the base dependencies
+		# Base dependencies only (from [project.dependencies])
 		{ name = "base", groups = false, extras = false },
-		# all groups
+		# All dependency groups (dev, lint), no extras
 		{ name = "groups", groups = true, extras = false },
-		# only the lint group -- custom options for this
+		# Only the lint group using raw uv options
 		{ name = "lint", options = ["--only-group", "lint"] },
-		# # all groups and extras
+		# Everything with custom filename
 		{ name = "all", filename="requirements.txt", groups = true, extras=true },
-		# # all groups and extras, a different way
+		# Alternative way to get all extras
 		{ name = "allalt", groups = true, options = ["--all-extras"] },
 	]
 
-# configures `make todo`
+# TODO extraction settings for `make todo`
+# Finds TODO/FIXME/BUG comments and generates reports
+# See README.md "Configuration Reference" for full documentation
 [tool.makefile.inline-todo]
-	# Directory to search for TODOs
+	# Root directory to search
 	search_dir = "."
-	
-	# Output file base path (relative to project root)
-    # If changed, update docs references -- they point to 'docs/other/todo-inline.html'
+
+	# Base path for output files (without extension)
+	# Generates: .jsonl, -standard.md, -table.md, .html
 	out_file_base = "docs/other/todo-inline"
 
-	# Number of context lines to include around each TODO
+	# Lines of context before/after each TODO
 	context_lines = 2
 
-	# File extensions to search
+	# File extensions to scan (without dots)
 	extensions = ["py", "md"]
 
-	# Tags to look for
+	# Comment tags to search for (case-sensitive)
+	# Must be surrounded by boundary chars (space, colon, brackets, etc.)
 	tags = ["CRIT", "TODO", "FIXME", "HACK", "BUG", "DOC"]
 
-	# Patterns to exclude from search
+	# Glob patterns to exclude
 	exclude = [
 		"docs/**",
 		".venv/**",
 		"scripts/get_todos.py",
 	]
-    
-    # configuring the output
-	# ------------------------------
-	# branch to put in the url
+
+	# Git branch for GitHub code links
 	branch = "main"
 
-	# repo url -- by default this will come from `[project.urls.{repository, github}]`
-	# but you can override it here
-	# repo_url = ...
+	# Repository URL (auto-detected from [project.urls.Repository])
+	# repo_url = "https://github.com/user/repo"
 
-    
-	
-	# template for the markdown output
-	# this uses jinja2. see `TEMPLATE_MD` in makefile under `SCRIPT_GET_TODOS`
-	# template_md = ...
-
-	# this uses standard python string formatting
-	# available variables: file, file_lang, line_num, code_url, context
-	# template_issue = ...
-
-	# this template has some custom syntax for adding the data directly to the html file. see that file for more info
-	# template_html_source = "docs/resources/templates/todo-template.html"
-
-    # Mapping of tags to GitHub issue labels
-    [tool.makefile.inline-todo.tag_label_map]
-        "BUG" = "bug"
-        "TODO" = "enhancement"
+	# Map tags to GitHub issue labels
+	# Tags not listed use the tag name as label
+	# Defaults: CRIT/FIXME/BUG → "bug", TODO/HACK → "enhancement"
+	[tool.makefile.inline-todo.tag_label_map]
+		"CRIT" = "bug"
+		"BUG" = "bug"
+		"FIXME" = "bug"
+		"TODO" = "enhancement"
+		"HACK" = "enhancement"
 		"DOC" = "documentation"
 
 # ============================================================
