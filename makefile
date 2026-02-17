@@ -98,6 +98,10 @@ DOCS_RESOURCES_DIR := $(DOCS_DIR)/resources
 # location of the make docs script
 MAKE_DOCS_SCRIPT_PATH := $(SCRIPTS_DIR)/make_docs.py
 
+# options to pass to `uv sync` when syncing dependencies. by default, syncs all extras and groups (including dev dependencies)
+# `--compile-bytecode` is added when running `make dep-compile`
+UV_SYNC_OPTIONS := --all-extras --all-groups
+
 # version vars - extracted automatically from `pyproject.toml`, `$(LAST_VERSION_FILE)`, and $(PYTHON)
 # --------------------------------------------------
 
@@ -107,6 +111,22 @@ PROJ_VERSION := NULL
 LAST_VERSION := NULL
 # get the python version, now that we have picked the python command
 PYTHON_VERSION := NULL
+
+# type checker configuration
+# --------------------------------------------------
+
+# which type checkers to run (comma-separated)
+# available: ty,basedpyright,mypy
+TYPE_CHECKERS ?= ty,basedpyright,mypy
+
+# path to type check (empty = use config from pyproject.toml)
+TYPECHECK_PATH ?=
+
+# directory to store type checker outputs
+TYPE_ERRORS_DIR := $(META_DIR)/.type-errors
+
+# typing summary output file
+TYPING_SUMMARY_FILE := $(META_DIR)/typing-summary.toml
 
 
 # ==================================================
@@ -142,21 +162,6 @@ endif
 # base options for pytest, user can set this when running make to add more options
 PYTEST_OPTIONS ?=
 
-# type checker configuration
-# --------------------------------------------------
-
-# which type checkers to run (comma-separated)
-# available: mypy,basedpyright,ty
-TYPE_CHECKERS ?= mypy,basedpyright,ty
-
-# path to type check (empty = use config from pyproject.toml)
-TYPECHECK_PATH ?=
-
-# directory to store type checker outputs
-TYPE_ERRORS_DIR := $(META_DIR)/.type-errors
-
-# typing summary output file
-TYPING_SUMMARY_FILE := $(META_DIR)/typing-summary.toml
 
 # ==================================================
 # default target (help)
@@ -301,10 +306,15 @@ dep-check-torch:
 #   ]
 .PHONY: dep
 dep:
-	@echo "Exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
-	uv sync --all-extras --all-groups --compile-bytecode
+	@echo "syncing and exporting dependencies as per $(PYPROJECT) section 'tool.uv-exports.exports'"
+	uv sync $(UV_SYNC_OPTIONS)
 	mkdir -p $(REQUIREMENTS_DIR)
 	$(PYTHON) $(SCRIPTS_DIR)/export_requirements.py $(PYPROJECT) $(REQUIREMENTS_DIR) | sh -x
+
+.PHONY: dep-compile
+dep-compile:
+	@echo "syncing dependencies with bytecode compilation"
+	$(MAKE) dep UV_SYNC_OPTIONS="$(UV_SYNC_OPTIONS) --compile-bytecode"
 
 
 # verify that requirements.txt files match current dependencies
