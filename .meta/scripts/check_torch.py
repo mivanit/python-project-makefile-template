@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.5.0
+# version: 0.5.1
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Print info about current python, torch, cuda, and devices.

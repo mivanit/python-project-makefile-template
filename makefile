@@ -2,7 +2,7 @@
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.5.0                                                  |
+#| version: v0.5.1                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #|==================================================================|
 #| CUSTOMIZATION:                                                   |
@@ -49,6 +49,9 @@ TESTS_TEMP_DIR := $(TESTS_DIR)/_temp/
 
 # where the pyproject.toml file is. no idea why you would change this but just in case
 PYPROJECT := pyproject.toml
+
+# name of this makefile -- change if you rename it to `Makefile` or similar
+MAKEFILE_NAME := makefile
 
 # dir to store various configuration files
 # use of `.meta/` inspired by https://news.ycombinator.com/item?id=36472613
@@ -644,7 +647,7 @@ clean-all: clean docs-clean dep-clean
 help-targets:
 	@echo -n "# make targets"
 	@echo ":"
-	@cat makefile | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
+	@cat $(MAKEFILE_NAME) | sed -n '/^\.PHONY: / h; /\(^\t@*echo\|^\t:\)/ {H; x; /PHONY/ s/.PHONY: \(.*\)\n.*"\(.*\)"/    make \1\t\2/p; d; x}'| sort -k2,2 |expand -t 30
 
 
 .PHONY: info
@@ -691,7 +694,7 @@ help:
 	@$(eval HELP_ARG := $(or $(HELP),$(help),$(H),$(h)))
 	@$(eval HELP_EXPANDED := $(if $(filter *,$(HELP_ARG)),--all,$(HELP_ARG)))
 	@if [ -n "$(HELP_EXPANDED)" ]; then \
-		$(PYTHON_BASE) $(SCRIPTS_DIR)/recipe_info.py -f makefile "$(HELP_EXPANDED)"; \
+		$(PYTHON_BASE) $(SCRIPTS_DIR)/recipe_info.py -f $(MAKEFILE_NAME) "$(HELP_EXPANDED)"; \
 	else \
 		$(MAKE) --no-print-directory help-targets info; \
 		echo ""; \
