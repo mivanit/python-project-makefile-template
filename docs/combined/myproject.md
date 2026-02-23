@@ -1,4 +1,4 @@
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.1
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.2
 
 
 ## Contents
@@ -395,7 +395,7 @@ The makefile tracks two versions:
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject.py)
 
 # `myproject` { #myproject }
 
@@ -784,13 +784,13 @@ The makefile tracks two versions:
 - Replaces `##[[VERSION]]##` placeholders in `scripts/make/*.py` → `scripts/out/*.py` and `.meta/scripts/*.py`
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject.py#L0-L0)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject.py#L0-L0)
 
 
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.1
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.2
 
 
 ## Contents
@@ -805,13 +805,13 @@ dummy module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/helloworld.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/helloworld.py)
 
 # `myproject.helloworld` { #myproject.helloworld }
 
 dummy module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/helloworld.py#L0-L15)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/helloworld.py#L0-L15)
 
 
 
@@ -821,7 +821,7 @@ dummy module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/helloworld.py#L8-L10)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/helloworld.py#L8-L10)
 
 
 dummy docstring
@@ -833,7 +833,7 @@ dummy docstring
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/helloworld.py#L14-L16)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/helloworld.py#L14-L16)
 
 
 dummy docstring
@@ -841,7 +841,7 @@ dummy docstring
 
 
 
-> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.1
+> docs for [`myproject`](https://github.com/mivanit/python-project-makefile-template) v0.5.2
 
 
 ## Contents
@@ -855,13 +855,13 @@ a module
 
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/other.py)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/other.py)
 
 # `myproject.other` { #myproject.other }
 
 a module
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/other.py#L0-L6)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/other.py#L0-L6)
 
 
 
@@ -871,7 +871,7 @@ a module
 ```
 
 
-[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.1myproject/other.py#L5-L7)
+[View Source on GitHub](https://github.com/mivanit/python-project-makefile-template/blob/0.5.2myproject/other.py#L5-L7)
 
 
 dummy docstring

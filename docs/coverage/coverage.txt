@@ -3,6 +3,7 @@ Name                      Stmts   Miss  Cover   Missing
 myproject/__init__.py         0      0   100%
 myproject/helloworld.py       5      5     0%   3-16
 myproject/other.py            2      2     0%   5-7
+tests/test_makefile.py      637      4    99%   484, 552, 1209-1210
 tests/test_nothing.py         2      0   100%
 -------------------------------------------------------
-TOTAL                         9      7    22%
+TOTAL                       646     11    98%
