@@ -1195,7 +1195,9 @@ class TestAssembly:
 class TestVerifyGitQuoting:
 	"""Document the unquoted $(PUBLISH_BRANCH) bug in verify-git."""
 
-	@pytest.mark.xfail(reason="PUBLISH_BRANCH is unquoted in shell comparison (line 542)")
+	@pytest.mark.xfail(
+		reason="PUBLISH_BRANCH is unquoted in shell comparison (line 542)"
+	)
 	def test_publish_branch_with_space(self, git_env: Path) -> None:
 		"""verify-git should handle a PUBLISH_BRANCH containing a space."""
 		subprocess.run(
