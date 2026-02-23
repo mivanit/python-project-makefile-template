@@ -2,7 +2,7 @@
 #| python project makefile template                                 |
 #| originally by Michael Ivanitskiy (mivanits@umich.edu)            |
 #| https://github.com/mivanit/python-project-makefile-template      |
-#| version: v0.5.1                                                  |
+#| version: v0.5.2                                                  |
 #| license: https://creativecommons.org/licenses/by-sa/4.0/         |
 #|==================================================================|
 #| CUSTOMIZATION:                                                   |

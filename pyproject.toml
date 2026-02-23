@@ -1,7 +1,7 @@
 [project]
 	# basic information, URLs down below because toml doesn't let you define the same table twice
 	name = "myproject"
-	version = "0.5.1"
+	version = "0.5.2"
 	description = "template for python projects/packages"
 	authors = [
 		{ name = "Michael Ivanitskiy", email = "mivanits@umich.edu" }
