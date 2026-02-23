@@ -321,6 +321,7 @@ pywin32==311 ; python_full_version < '3.10' and platform_python_implementation !
     # via jupyter-core
 pywin32-ctypes==0.2.3 ; platform_machine != 'ppc64le' and platform_machine != 's390x' and sys_platform == 'win32'
     # via keyring
+pyyaml==6.0.3
 pyzmq==27.1.0
     # via
     #   ipykernel
