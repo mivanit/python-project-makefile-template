@@ -13,6 +13,7 @@ Tests marked "EXPECTED TO FAIL before fix" verify bugs from the cleanup plan:
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -62,12 +63,16 @@ def run_make(
     cmd: list[str] = ["make", "-f", "makefile"]
     cmd.extend(f"{k}={v}" for k, v in make_vars.items())
     cmd.extend(args)
+    # Strip Make variables so the inner make runs as a top-level invocation
+    # (not a sub-make inheriting MAKELEVEL from `make test`).
+    clean_env = {k: v for k, v in os.environ.items() if k not in ("MAKELEVEL", "MAKEFLAGS", "MFLAGS")}
     return subprocess.run(
         cmd,
         cwd=env,
         capture_output=True,
         text=True,
         timeout=30,
+        env=clean_env,
     )
 
 
