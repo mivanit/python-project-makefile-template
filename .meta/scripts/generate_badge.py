@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.5.1
+# version: 0.5.2
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Generate GitHub-style SVG badges for coverage, tests, or arbitrary label/value pairs.
