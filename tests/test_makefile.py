@@ -15,10 +15,10 @@ from __future__ import annotations
 
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -316,7 +316,6 @@ class TestCIYaml:
 
     def test_valid_yaml_syntax(self) -> None:
         """YAML should parse without errors."""
-        yaml = pytest.importorskip("yaml")
         with open(self.YAML_PATH) as f:
             data = yaml.safe_load(f)
         assert data is not None

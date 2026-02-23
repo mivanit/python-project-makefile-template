@@ -33,6 +33,8 @@
 		"pytest>=8.2.2",
 		# coverage
 		"pytest-cov>=4.1.0",
+		# yaml validation
+		"pyyaml>=6.0",
 		# type checking
 		"mypy>=1.0.1",
 		"ty",
