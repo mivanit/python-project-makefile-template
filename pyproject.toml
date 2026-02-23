@@ -178,15 +178,19 @@
 				"PTH100",   # os.path.abspath() vs Path.resolve()
 			]
 			"tests/*" = [
-				# dont need docstrings in test functions or modules
-				"D103", 
+				# dont need docstrings in test functions, methods, or modules
+				"D103",
 				"D100",
+				"D102",
 				"INP001", # dont need __init__ either
 				# dont need type annotations in test functions
 				"ANN001",
-				"ANN201", 
+				"ANN201",
 				"ANN202",
 				"TRY003", # long exception messages in tests are fine
+				# subprocess calls in tests use trusted inputs and partial paths
+				"S603",
+				"S607",
 			]
 			"docs/*" = ["ALL"] # not our problem
 			"**/*.ipynb" = [

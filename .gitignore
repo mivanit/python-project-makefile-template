@@ -11,6 +11,9 @@ __pycache__/
 # coverage
 .coverage
 
+# test temp
+tests/.temp/
+
 # build
 build/
 dist/
