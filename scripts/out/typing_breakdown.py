@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.5.2
+# version: 0.5.3
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Parse type checker outputs and generate detailed breakdown of errors by type and file.

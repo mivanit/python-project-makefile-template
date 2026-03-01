@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.5.2
+# version: 0.5.3
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Generate a formatted commit log and write it to a file.
