@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Any, Callable
 if TYPE_CHECKING:
 	from collections.abc import Mapping
 
+	import torch  # type: ignore[import-not-found]
+
 
 def print_info_dict(
 	info: Mapping[str, str | int | Mapping[str, Any]],
@@ -26,6 +28,8 @@ def print_info_dict(
 	level: int = 1,
 ) -> None:
 	"pretty print the info"
+	if not info:
+		return
 	indent_str: str = indent * level
 	longest_key_len: int = max(map(len, info.keys()))
 	for key, value in info.items():
@@ -91,6 +95,32 @@ def get_nvcc_info() -> dict[str, str]:
 	return info
 
 
+def _run_matmul_test(
+	device: str,
+	a_cpu: torch.Tensor,
+	b_cpu: torch.Tensor,
+	expected_cpu: torch.Tensor,
+) -> str:
+	"allocate small matrices on device, multiply, and check against cpu result"
+	import torch  # noqa: PLC0415
+
+	n: int = a_cpu.shape[0]
+	try:
+		a = a_cpu.to(device)
+		b = b_cpu.to(device)
+		result = torch.mm(a, b)
+		if device == "cpu":
+			assert torch.equal(result, expected_cpu)
+			return f"ok ({n}x{n})"
+		result_cpu = result.to("cpu")
+		assert torch.allclose(result_cpu, expected_cpu, atol=1e-5), (
+			f"max diff: {(result_cpu - expected_cpu).abs().max().item()}"  # pyright: ignore[reportUnknownMemberType]
+		)
+		return f"ok ({n}x{n}, matches cpu)"
+	except Exception as e:
+		return f"FAILED: {e}"
+
+
 def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 	"get info about pytorch and cuda devices"
 	exceptions: list[Exception] = []
@@ -106,6 +136,19 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 	try:
 		info["torch.__version__"] = torch.__version__
 		info["torch.cuda.is_available()"] = torch.cuda.is_available()
+
+		# matmul smoke test: create fixed random matrices on cpu
+		torch.manual_seed(42)  # pyright: ignore[reportUnknownMemberType]
+		_test_n: int = 256
+		_a_cpu = torch.randn(_test_n, _test_n)  # pyright: ignore[reportUnknownMemberType]
+		_b_cpu = torch.randn(_test_n, _test_n)  # pyright: ignore[reportUnknownMemberType]
+		_expected_cpu = torch.mm(_a_cpu, _b_cpu)
+		info["matmul_test (cpu)"] = _run_matmul_test(
+			"cpu",
+			_a_cpu,
+			_b_cpu,
+			_expected_cpu,
+		)
 
 		if torch.cuda.is_available():
 			info["torch.version.cuda"] = torch.version.cuda  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # ty: ignore[possibly-missing-attribute]
@@ -136,6 +179,12 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 						current_device_info["is_integrated"] = dev_prop.is_integrated  # pyright: ignore[reportUnknownMemberType]
 						current_device_info["is_multi_gpu_board"] = (
 							dev_prop.is_multi_gpu_board  # pyright: ignore[reportUnknownMemberType]
+						)
+						current_device_info["matmul_test"] = _run_matmul_test(
+							f"cuda:{current_device}",
+							_a_cpu,
+							_b_cpu,
+							_expected_cpu,
 						)
 
 						info[f"device cuda:{current_device}"] = current_device_info
@@ -184,3 +233,4 @@ if __name__ == "__main__":
 		print("torch_exceptions:")
 		for e in torch_exceptions:
 			print(f"  {e}")
+		sys.exit(1)
