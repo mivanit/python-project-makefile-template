@@ -1,5 +1,6 @@
 {% extends "frame.html.jinja2" %}
-{% set edit_url = package_code_url + module.modulename.replace(".", "/") + ".py" %}
+{% set mod_parts = module.modulename.split(".") %}
+{% set edit_url = package_code_url + ("/".join(mod_parts[1:]) + ".py" if mod_parts | length > 1 else "__init__.py") %}
 {% block title %}{{ module.modulename }} API documentation{% endblock %}
 {% block nav %}
 

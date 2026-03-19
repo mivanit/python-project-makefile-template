@@ -1,6 +1,6 @@
 # python project makefile template
 # https://github.com/mivanit/python-project-makefile-template
-# version: 0.5.3
+# version: 0.5.4
 # license: https://creativecommons.org/licenses/by-sa/4.0/
 
 """Print info about current python, torch, cuda, and devices.
@@ -114,7 +114,7 @@ def _run_matmul_test(
 			return f"ok ({n}x{n})"
 		result_cpu = result.to("cpu")
 		assert torch.allclose(result_cpu, expected_cpu, atol=1e-5), (
-			f"max diff: {(result_cpu - expected_cpu).abs().max().item()}"
+			f"max diff: {(result_cpu - expected_cpu).abs().max().item()}"  # pyright: ignore[reportUnknownMemberType]
 		)
 		return f"ok ({n}x{n}, matches cpu)"
 	except Exception as e:
@@ -138,10 +138,10 @@ def get_torch_info() -> tuple[list[Exception], dict[str, Any]]:
 		info["torch.cuda.is_available()"] = torch.cuda.is_available()
 
 		# matmul smoke test: create fixed random matrices on cpu
-		torch.manual_seed(42)
+		torch.manual_seed(42)  # pyright: ignore[reportUnknownMemberType]
 		_test_n: int = 256
-		_a_cpu = torch.randn(_test_n, _test_n)
-		_b_cpu = torch.randn(_test_n, _test_n)
+		_a_cpu = torch.randn(_test_n, _test_n)  # pyright: ignore[reportUnknownMemberType]
+		_b_cpu = torch.randn(_test_n, _test_n)  # pyright: ignore[reportUnknownMemberType]
 		_expected_cpu = torch.mm(_a_cpu, _b_cpu)
 		info["matmul_test (cpu)"] = _run_matmul_test(
 			"cpu",
